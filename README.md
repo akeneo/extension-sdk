@@ -30,7 +30,7 @@ To use the SDK for custom development, follow these steps:
 
    ```
    # Upload script example 
-   # todo add curl command 
+   curl --location 'your-pim-base-url/api/rest/v1/ui-extensions' --header 'Authorization: Bearer app_or_connection_token' --form 'name="sdk_extension"' --form 'type="sdk_script"' --form 'position="pim.product.panel"' --form 'file=@"/path/to/your/complied/file.js"' --form 'configuration[labels][en_US]="SDK test extension"' --form 'configuration[default_label]="sdk_test_extension"'
    ```
 
 5. **Configuration**: 
