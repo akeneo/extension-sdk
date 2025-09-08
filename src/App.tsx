@@ -1,35 +1,32 @@
-import {Link, Placeholder, SectionTitle, UsersIllustration} from "akeneo-design-system";
+import {Information, Link, SectionTitle, UsersIllustration} from "akeneo-design-system";
 import {useGetProduct} from "./useGetProduct.ts";
-import {useGetCategory} from "./useGetCategory.ts";
 
 function App() {
   const PIMContext = globalThis.PIM.context;
   const PIMUser = globalThis.PIM.user
-  const currentProduct = useGetProduct('product' in PIMContext ? PIMContext.product.uuid : undefined);
-  const currentCategory = useGetCategory('category' in PIMContext ? PIMContext.category.code : undefined);
+  const productList = useGetProduct();
 
   return <>
-    <Placeholder
-        size={'large'}
-        illustration={<UsersIllustration/>}
-        title="Welcome to the SDM SDK starter kit!"
+    <Information
+      illustration={<UsersIllustration />}
+      title="Welcome to the Akeneo custom component SDK!"
     >
-      Please update the src/App.tsx file to match your needs!<br/>
-      <Link href="https://dsm.akeneo.com/" target="_blank">Link to the official Akeneo DSM</Link><br/>
-    </Placeholder>
+      See the <Link href="https://github.com/akeneo/extension-sdk/blob/init/README.md" target="_blank">Readme</Link> of the SDK to explore capabilities and see implementation examples.<br/>
+      Link to the UI Extension component  <Link href="https://api.akeneo.com/extensions/overview.html" target="_blank">documentation</Link>.<br/>
+    </Information>
+
     <SectionTitle>
-      <SectionTitle.Title>PIM Context</SectionTitle.Title>
+      <SectionTitle.Title level="secondary">Available PIM Context information within the custom component context (depend of the displayed page)</SectionTitle.Title>
     </SectionTitle>
     <pre>{JSON.stringify(PIMContext)}</pre>
     <SectionTitle>
-      <SectionTitle.Title>PIM User</SectionTitle.Title>
+      <SectionTitle.Title level="secondary">Available PIM User information within the custom component context</SectionTitle.Title>
     </SectionTitle>
     <pre>{JSON.stringify(PIMUser)}</pre>
     <SectionTitle>
-      <SectionTitle.Title>Current object properties</SectionTitle.Title>
+      <SectionTitle.Title level="secondary">Example response of products list endpoint</SectionTitle.Title>
     </SectionTitle>
-    {currentProduct && <pre>{JSON.stringify(currentProduct, null, 4)}</pre>}
-    {currentCategory && <pre>{JSON.stringify(currentCategory, null, 4)}</pre>}
+    {productList && <pre>{JSON.stringify(productList, null, 4)}</pre>}
   </>
 }
 

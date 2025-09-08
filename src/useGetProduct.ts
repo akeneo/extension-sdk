@@ -1,16 +1,14 @@
 import {useEffect, useState} from "react";
 
-const useGetProduct = (productUuid: string | undefined) => {
-    const [product, setProduct] = useState<any>();
+const useGetProduct = () => {
+    const [products, setProducts] = useState<any>();
     useEffect(() => {
-        if (productUuid) {
-            globalThis.PIM.api.product_uuid.get({uuid: productUuid}).then((product: any) => {
-                setProduct(product);
-            });
-        }
+        globalThis.PIM.api.product_uuid_v1.list({limit: 10}).then((products: any) => {
+            setProducts(products);
+        });
     }, []);
 
-    return product;
+    return products;
 }
 
 export {useGetProduct};
