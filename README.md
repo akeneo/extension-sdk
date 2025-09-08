@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Akeneo PIM JavaScript SDK provides a simple and intuitive way to interact with the Akeneo PIM API. This SDK wraps all the complexity of API calls, authentication, and data transformation into easy-to-use methods, allowing you to focus on building your integration rather than managing API details.
+The Akeneo PIM JavaScript SDK is meant to help you build an app compatible with the UI extension Custom Component feature. Easy-to-use methods provide a simple and intuitive way to interact with the Akeneo PIM API, this SDK abstract all the complexity of API calls, authentication, and data transformation. It allowis you to focus on building your integration rather than managing API details.
 
 The SDK offers a comprehensive set of functions to manage various Akeneo PIM entities such as products, attributes, assets, categories, and more. It's designed to provide a consistent developer experience with strong typing support through TypeScript declarations.
 
@@ -10,7 +10,7 @@ The SDK offers a comprehensive set of functions to manage various Akeneo PIM ent
 
 ### Integration Architecture
 
-The Akeneo PIM JavaScript SDK is designed to run within the Akeneo PIM application itself, executing in a secure sandbox environment. This architecture provides several benefits:
+Apps you will build are designed to run within the Akeneo PIM application itself,  executing in a secure sandbox environment. This architecture provides several benefits:
 
 1. **Direct Access**: Your code runs within the PIM context, allowing direct access to the current user session and context.
 2. **Security**: The SDK code operates in a secure sandbox environment using the [SES (Secure ECMAScript)](https://github.com/endojs/endo) library, which restricts access to potentially harmful JavaScript capabilities.
@@ -30,7 +30,7 @@ To use the SDK for custom development, follow these steps:
 
    ```
    # Upload script example 
-   # todo add curl command 
+   curl --location 'your-pim-base-url/api/rest/v1/ui-extensions' --header 'Authorization: Bearer app_or_connection_token' --form 'name="sdk_extension"' --form 'type="sdk_script"' --form 'position="pim.product.panel"' --form 'file=@"/path/to/your/complied/file.js"' --form 'configuration[labels][en_US]="SDK test extension"' --form 'configuration[default_label]="sdk_test_extension"'
    ```
 
 5. **Configuration**: 
@@ -124,6 +124,7 @@ The SDK provides access to the following API resources:
 ### Reference Entities
 - **Reference Entity API** (`PIM.api.reference_entity_v1`): Manage reference entities
 - **Reference Entity Attribute API** (`PIM.api.reference_entity_attribute_v1`): Work with reference entity attributes
+- - **Reference Entity Attributes Option API** (`PIM.api.reference_entity_attribute_option_v1`): Manage reference entity attributes option
 - **Reference Entity Record API** (`PIM.api.reference_entity_record_v1`): Manage reference entity records
 
 ### System & Configuration
