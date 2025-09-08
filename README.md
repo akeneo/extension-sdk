@@ -2,11 +2,11 @@
 
 ## Overview
 
-The Akeneo PIM JavaScript SDK is meant to help you build an app compatible with the UI extension Custom Component feature. Easy-to-use methods provide a simple and intuitive way to interact with the Akeneo PIM API, this SDK abstract all the complexity of API calls, authentication, and data transformation. It allowis you to focus on building your integration rather than managing API details.
+The Akeneo PIM JavaScript SDK is designed to help you build applications that are compatible with the UI extension Custom Component feature. With its intuitive methods, Custom Components simplify interactions with the Akeneo PIM API by abstracting the complexities of API calls, authentication, and data transformation. This enables you to focus on developing your integration without being hindered by API intricacies. If you're unfamiliar with this feature, you can find more information in the [Akeneo documentation](httpshttps://api.akeneo.com/extensions/overview.html).
 
-The SDK offers a comprehensive set of functions to manage various Akeneo PIM entities such as products, attributes, assets, categories, and more. It's designed to provide a consistent developer experience with strong typing support through TypeScript declarations.
+The SDK offers a comprehensive set of functions for managing various Akeneo PIM entities, including products, attributes, assets, categories, and more. It is crafted to ensure a consistent developer experience, complete with strong typing support through TypeScript declarations.
 
-## How the SDK Works in Akeneo
+## How the SDK works with the Akeneo PIM
 
 ### Integration Architecture
 
