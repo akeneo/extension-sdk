@@ -2,39 +2,22 @@
 
 ## Overview
 
-The Akeneo PIM JavaScript SDK is designed to help you build applications that are compatible with the UI extension Custom Component feature. With its intuitive methods, Custom Components simplify interactions with the Akeneo PIM API by abstracting the complexities of API calls, authentication, and data transformation. This enables you to focus on developing your integration without being hindered by API intricacies. If you're unfamiliar with this feature, you can find more information in the [Akeneo documentation](httpshttps://api.akeneo.com/extensions/overview.html).
+The Akeneo PIM JavaScript SDK is designed to help you build applications that are compatible with the UI extension Custom Component feature. 
 
-The SDK offers a comprehensive set of functions for managing various Akeneo PIM entities, including products, attributes, assets, categories, and more. It is crafted to ensure a consistent developer experience, complete with strong typing support through TypeScript declarations.
+### How the UI extension Custom Component feature works?
 
-## How the SDK works with the Akeneo PIM
+The Custom Component feature is a type of UI Extension allowing `PIM` users to upload Javascript applications directly into the `PIM`.
+With its intuitive methods, it simplifrd interactions with the Akeneo PIM API by abstracting the complexities of API calls, authentication, and data transformation. It is crafted to ensure a consistent developer experience, complete with strong typing support through TypeScript declarations. This enables you to focus on developing your integration without being hindered by API intricacies. 
+
+If you're unfamiliar with the UI Extension feature, you can find more information in the [Akeneo documentation](httpshttps://api.akeneo.com/extensions/overview.html).
 
 ### Integration Architecture
 
-Apps you will build are designed to run within the Akeneo PIM application itself,  executing in a secure sandbox environment. This architecture provides several benefits:
+Applications you will build are designed to run within the Akeneo PIM application itself, executing in a secure sandbox environment. This architecture provides several benefits:
 
 1. **Direct Access**: Your code runs within the PIM context, allowing direct access to the current user session and context.
 2. **Security**: The SDK code operates in a secure sandbox environment using the [SES (Secure ECMAScript)](https://github.com/endojs/endo) library, which restricts access to potentially harmful JavaScript capabilities.
 3. **Controlled API Access**: All API calls are automatically authenticated using the current user's session.
-
-### Development Workflow
-
-To use the SDK for custom development, follow these steps:
-
-1. **Import the SDK Type Definitions**: Use the TypeScript declaration file (`index.d.ts`) for development. This file contains all the type definitions for the SDK methods.
-
-2. **Write Your Code**: Develop your custom functionality using the SDK methods defined in the declaration file. All API methods are accessible through the global `PIM` object.
-
-3. **Compile Your Code**: Bundle all your JavaScript into a single file. This file should contain all your custom logic using the SDK methods.
-
-4. **Upload to Akeneo**: Use an API call to upload your script to the Akeneo PIM. This makes your code available to run within the PIM.
-
-   ```
-   # Upload script example 
-   curl --location 'your-pim-base-url/api/rest/v1/ui-extensions' --header 'Authorization: Bearer app_or_connection_token' --form 'name="sdk_extension"' --form 'type="sdk_script"' --form 'position="pim.product.panel"' --form 'file=@"/path/to/your/complied/file.js"' --form 'configuration[labels][en_US]="SDK test extension"' --form 'configuration[default_label]="sdk_test_extension"'
-   ```
-
-5. **Configuration**: 
-   todo position / credentials / label
 
 ### Important Constraints
 
@@ -46,7 +29,28 @@ When developing with the SDK, keep these constraints in mind:
 - **Global State**: The sandbox isolates your code from affecting the global state of the PIM application.
 - **Resources**: Your script should be efficient as it runs within the PIM application context.
 
-## Quick Start Example
+## Development Workflow
+
+To use the SDK for custom development, follow these steps:
+
+1. **Import the SDK Type Definitions**: Use the TypeScript declaration file (`index.d.ts`) for development. This file contains all the type definitions for the SDK methods.
+
+2. **Write Your Code**: Develop your custom functionality using the SDK methods defined in the declaration file. All API methods are accessible through the global `PIM` object.
+
+3. **Compile Your Code**: Bundle all your JavaScript into a single file using `vite` or any other mean you like. This file should contain all your custom logic using the SDK methods.
+
+4. **Upload to Akeneo**: Use an API call to upload your script to the Akeneo PIM. This makes your code available to run within the PIM.
+
+   ```
+   # Upload script example 
+   curl --location 'your-pim-base-url/api/rest/v1/ui-extensions' --header 'Authorization: Bearer app_or_connection_token' --form 'name="sdk_extension"' --form 'type="sdk_script"' --form 'position="pim.product.panel"' --form 'file=@"/path/to/your/complied/file.js"' --form 'configuration[labels][en_US]="SDK test extension"' --form 'configuration[default_label]="sdk_test_extension"'
+   ```
+
+5. **Configuration**: 
+   todo position / credentials / label
+   todo should we add all the information about configuration inside api doc?
+
+### Quick Start Example
 
 Here's a simple example showing how to use the SDK to list assets from a specific family:
 
