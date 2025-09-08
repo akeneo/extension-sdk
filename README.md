@@ -10,7 +10,7 @@ The SDK offers a comprehensive set of functions to manage various Akeneo PIM ent
 
 ### Integration Architecture
 
-The Akeneo PIM JavaScript SDK is designed to run within the Akeneo PIM application itself, executing in a secure sandbox environment. This architecture provides several benefits:
+Apps you will build are designed to run within the Akeneo PIM application itself,  executing in a secure sandbox environment. This architecture provides several benefits:
 
 1. **Direct Access**: Your code runs within the PIM context, allowing direct access to the current user session and context.
 2. **Security**: The SDK code operates in a secure sandbox environment using the [SES (Secure ECMAScript)](https://github.com/endojs/endo) library, which restricts access to potentially harmful JavaScript capabilities.
