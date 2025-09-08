@@ -41,7 +41,7 @@ To use the SDK for custom development, follow these steps:
 When developing with the SDK, keep these constraints in mind:
 
 - **Restricted Environment**: Your code runs in a secure sandbox that limits JavaScript capabilities.
-- **External Access**: Direct network requests (fetch, XMLHttpRequest) to external services are not allowed. All API interactions must go through the SDK methods.
+- **External Access**: Direct network requests (fetch, XMLHttpRequest) to external services are not allowed. All API interactions must go through the SDK methods. There is a specific method available to allow acces to exeternal ressources.
 - **DOM Access**: Limited access to the DOM is provided, with restrictions on what elements can be modified.
 - **Global State**: The sandbox isolates your code from affecting the global state of the PIM application.
 - **Resources**: Your script should be efficient as it runs within the PIM application context.
