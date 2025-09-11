@@ -1,4 +1,4 @@
-.PHONY: install dev build upload
+.PHONY: install dev build upload update
 
 # Load environment variables from .env file if it exists
 -include .env
@@ -27,3 +27,17 @@ upload: build
 		--form 'configuration[labels][en_US]="SDK script test extension"' \
 		--form 'configuration[default_label]="SDK script test extension"'
 	@echo "Upload complete!"
+
+# Update an existing extension using its UUID
+update: build
+	@echo "Updating extension with UUID: $(EXTENSION_UUID) on $(PIM_HOST)..."
+	@curl -X PATCH '$(PIM_HOST)/api/rest/v1/ui-extensions/$(EXTENSION_UUID)' \
+		-H "Content-Type: multipart/form-data" \
+		--header 'Authorization: Bearer $(API_TOKEN)' \
+		--form 'name="sdk_script_extension"' \
+		--form 'type="sdk_script"' \
+		--form 'position="pim.activity.navigation.tab"' \
+		--form 'file=@"$(PROJECT_PATH)/dist/demo.js"' \
+		--form 'configuration[labels][en_US]="SDK script test extension"' \
+		--form 'configuration[default_label]="SDK script test extension"'
+	@echo "Update complete!"
