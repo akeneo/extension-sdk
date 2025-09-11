@@ -3,22 +3,40 @@
 ## Installation
 
 ```
-npm install
+make install
 ```
 
 ## Development
 
 ```
-npm run dev
+make dev
 ```
 
 ## Build
 
 ```
-npm run build
+make build
 ```
 
-The file in `dist/demo.js` is your built UI Extension, just upload it to your PIM!
+The file in `dist/demo.js` is your built UI Extension.
+
+## Upload to PIM
+
+Before uploading, configure your environment variables:
+
+1. Copy the `.env.exemple` into a `.env` file and edit the `.env`  in the root directory:
+```
+PIM_HOST=https://your-pim-instance.com
+API_TOKEN=your_api_token_here
+PROJECT_PATH=$(pwd)
+```
+
+2. Then run:
+```
+make upload
+```
+
+This will build your extension and upload it to your Akeneo PIM instance.
 
 ## Customize
 

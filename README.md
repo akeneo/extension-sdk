@@ -39,14 +39,25 @@ To use the SDK for custom development, follow these steps:
 
 3. **Compile Your Code**: Bundle all your JavaScript into a single file using `vite` or any other mean you like. This file should contain all your custom logic using the SDK methods.
 
-4. **Upload to Akeneo**: Use an API call to upload your script to the Akeneo PIM. This makes your code available to run within the PIM.
-
+4. **Configure Environment**: Copy the `.env.example` file to `.env` and fill in your PIM host, API token, and other configuration values:
    ```
-   # Upload script example 
-   curl --location 'your-pim-base-url/api/rest/v1/ui-extensions' --header 'Authorization: Bearer app_or_connection_token' --form 'name="sdk_extension"' --form 'type="sdk_script"' --form 'position="pim.product.panel"' --form 'file=@"/path/to/your/complied/file.js"' --form 'configuration[labels][en_US]="SDK test extension"' --form 'configuration[default_label]="sdk_test_extension"'
+   PIM_HOST=https://your-pim-instance.com
+   API_TOKEN=your_api_token_here
+   PROJECT_PATH=$(pwd)
    ```
 
-5. **Configuration**: 
+5. **Build and Upload**: Use the provided Makefile commands to build and upload your extension:
+   ```
+   # Build the extension
+   make build
+
+   # Upload the extension to your PIM instance
+   make upload
+   ```
+
+   This will automatically upload your compiled extension to the configured PIM instance using the API.
+
+6. **Configuration**: 
    todo position / credentials / label
    todo should we add all the information about configuration inside api doc?
 
