@@ -29,6 +29,19 @@ When developing with the SDK, keep these constraints in mind:
 - **Global State**: The sandbox isolates your code from affecting the global state of the PIM application.
 - **Resources**: Your script should be efficient as it runs within the PIM application context.
 
+### Permissions and Access Control
+
+The SDK operates under the permissions of the currently logged-in user. This means:
+
+- **Inherited Permissions**: All API calls made through the SDK inherit the Web API permissions of the user who is currently logged into the PIM.
+- **Role-Based Access**: What your extension can do depends entirely on the role and permissions assigned to the user running it.
+- **Permission Variations**: The same extension may have different capabilities depending on who is using it.
+- **Error Handling**: Your code should gracefully handle permission-denied scenarios, as different users may have different access levels.
+
+For example, if a user doesn't have permission to edit products, any SDK calls attempting to update products will fail, even if your code is technically correct. Always design your extensions with these permission constraints in mind.
+
+You can refer to the [Akeneo Web API permissions documentation](https://api.akeneo.com/documentation/permissions.html) for more details on the permission system.
+
 ## Development Workflow
 
 To use the SDK for custom development, follow these steps:
@@ -229,6 +242,80 @@ if ('product' in context) {
   console.log(`Current product UUID: ${context.product.uuid}`);
 }
 ```
+
+## Navigation within the PIM
+
+The SDK provides a navigation method that allows you to open new tabs, but only within the Akeneo PIM application. This is useful for directing users to different sections of the PIM from your extension:
+
+```typescript
+// Navigate to a product edit page
+PIM.navigate.internal('#/enrich/product/6b7546f8-929c-4ba3-b7ed-d55b61753313');
+
+// Navigate to a category page
+PIM.navigate.internal('#/enrich/product-category-tree/');
+
+// Navigate to an asset page
+PIM.navigate.internal('#/asset/video/asset/absorb_video/enrich');
+```
+
+Important limitations to keep in mind:
+- This navigation method can **only** open tabs within the PIM application
+- It cannot be used to navigate to external websites or applications
+- The paths must be valid PIM routes that the user has permission to access
+- Navigation will open in a new tab, preserving the current extension context
+
+Use this feature to create helpful shortcuts or workflows that connect your extension's functionality with standard PIM screens.
+
+## External API Calls
+
+The SDK provides a secure gateway for making calls to external APIs and services. Since direct network requests (fetch, XMLHttpRequest) are not allowed within the sandbox environment, the SDK offers a dedicated method for external communication:
+
+```typescript
+// Make a GET request to an external API
+const response = await PIM.api.external.call({
+  method: 'GET',
+  url: 'https://api.example.com/data',
+  headers: {
+    'my_super_header': 'your super header value',
+    'Content-Type': 'application/json'
+  }
+});
+
+// Make a POST request with a body
+const createResponse = await PIM.api.external.call({
+  method: 'POST',
+  url: 'https://api.example.com/items',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    name: 'New Item',
+    description: 'Item description'
+  })
+});
+
+// Make a request using stored credentials
+const secureResponse = await PIM.api.external.call({
+  method: 'GET',
+  url: 'https://api.secure-service.com/data',
+  credentials_code: 'my_registered_credentials' // Reference credentials stored in PIM
+});
+```
+
+// TODO EXPLAIN STORED CREDENTIALS
+
+
+Important considerations for external calls:
+- This is the **only method** allowed for accessing external resources from your extension
+- All external domains must be allowlisted in your extension configuration
+- For security reasons, requests are proxied through the PIM server
+- **Never hardcode credentials** in your extension code as it runs in the browser and can expose sensitive information
+- Always use the `credentials_code` parameter to reference credentials that are securely stored in the PIM configuration
+- The credential management is handled through the extension configuration in the PIM admin interface
+- The method supports standard HTTP methods (GET, POST, PUT, DELETE, etc.)
+- Responses are returned as promises that can be handled with async/await
+
+The external gateway provides a secure way to integrate your extension with external systems while maintaining the security of the PIM environment.
 
 ## Error Handling
 

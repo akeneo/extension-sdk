@@ -1178,6 +1178,7 @@ declare interface externalGatewayRequest {
     headers?: Record<string, string>;
     body?: string;
     url?: string;
+    credentials_code?: string;
 }
 
 /**
@@ -1626,12 +1627,17 @@ export declare type PIM_SDK = {
         reference_entity_attribute_option_v1: SdkApiReferenceEntityAttributeOption;
         attribute_v1: SdkApiAttribute;
     };
+    navigate: pimNavigate;
 };
 
 export declare type PIM_USER = {
     username: string;
     first_name: string;
     last_name: string;
+};
+
+declare type pimNavigate = {
+    internal: (path: string) => void;
 };
 
 /**
