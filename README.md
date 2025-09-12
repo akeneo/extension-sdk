@@ -7,7 +7,7 @@ The Akeneo PIM JavaScript SDK is designed to help you build applications that ar
 ### How the UI extension Custom Component feature works?
 
 The Custom Component feature is a type of UI Extension allowing `PIM` users to upload Javascript applications directly into the `PIM`.
-With its intuitive methods, it simplifrd interactions with the Akeneo PIM API by abstracting the complexities of API calls, authentication, and data transformation. It is crafted to ensure a consistent developer experience, complete with strong typing support through TypeScript declarations. This enables you to focus on developing your integration without being hindered by API intricacies. 
+With its intuitive methods, it simplify interactions with the Akeneo PIM API by abstracting the complexities of API calls, authentication, and data transformation. It is crafted to ensure a consistent developer experience, complete with strong typing support through TypeScript declarations. This enables you to focus on developing your integration without being hindered by API intricacies. 
 
 If you're unfamiliar with the UI Extension feature, you can find more information in the [Akeneo documentation](httpshttps://api.akeneo.com/extensions/overview.html).
 
@@ -15,7 +15,7 @@ If you're unfamiliar with the UI Extension feature, you can find more informatio
 
 Applications you will build are designed to run within the Akeneo PIM application itself, executing in a secure sandbox environment. This architecture provides several benefits:
 
-1. **Direct Access**: Your code runs within the PIM context, allowing direct access to the current user session and context.
+1. **Direct Access**: Your code runs within the PIM context, allowing direct access to the current context.
 2. **Security**: The SDK code operates in a secure sandbox environment using the [SES (Secure ECMAScript)](https://github.com/endojs/endo) library, which restricts access to potentially harmful JavaScript capabilities.
 3. **Controlled API Access**: All API calls are automatically authenticated using the current user's session.
 
@@ -24,7 +24,7 @@ Applications you will build are designed to run within the Akeneo PIM applicatio
 When developing with the SDK, keep these constraints in mind:
 
 - **Restricted Environment**: Your code runs in a secure sandbox that limits JavaScript capabilities.
-- **External Access**: Direct network requests (fetch, XMLHttpRequest) to external services are not allowed. All API interactions must go through the SDK methods. There is a specific method available to allow acces to exeternal ressources.
+- **External Access**: Direct network requests (fetch, XMLHttpRequest) to external services are not allowed. All API interactions must go through the SDK methods. There is a specific method available to allow access to external resources.
 - **DOM Access**: Limited access to the DOM is provided, with restrictions on what elements can be modified.
 - **Global State**: The sandbox isolates your code from affecting the global state of the PIM application.
 - **Resources**: Your script should be efficient as it runs within the PIM application context.
@@ -46,11 +46,11 @@ You can refer to the [Akeneo Web API permissions documentation](https://api.aken
 
 To use the SDK for custom development, follow these steps:
 
-1. **Import the SDK Type Definitions**: Use the TypeScript declaration file (`index.d.ts`) for development. This file contains all the type definitions for the SDK methods.
+1. **Import the SDK Type Definitions**: Use the TypeScript declaration file (`global.d.ts`) for development. This file contains all the type definitions for the SDK methods.
 
 2. **Write Your Code**: Develop your custom functionality using the SDK methods defined in the declaration file. All API methods are accessible through the global `PIM` object.
 
-3. **Compile Your Code**: Bundle all your JavaScript into a single file using `vite` or any other mean you like. This file should contain all your custom logic using the SDK methods.
+3. **Compile Your Code**: Bundle all your JavaScript into a single file (This example is using `vite` but use any other mean you like). This file should contain all your custom logic using the SDK methods.
 
 4. **Configure Environment**: Copy the `.env.example` file to `.env` and fill in your PIM host, API token, and other configuration values:
    ```
@@ -85,8 +85,6 @@ const assetApi = PIM.api.asset_v1;
 // List assets with filters
 const listParams = {
   assetFamilyCode: 'packshots',
-  channel: 'ecommerce',        // Get values for specific channel
-  locales: 'en_US,fr_FR',      // Get values for specific locales
 };
 
 // Call the API and handle the response
@@ -100,27 +98,13 @@ try {
 
 ## TypeScript Support
 
-The SDK comes with comprehensive TypeScript declarations (`index.d.ts`), providing rich intellisense and autocompletion in compatible editors. This makes development faster and helps prevent errors by ensuring you're using the API correctly.
+The SDK comes with comprehensive TypeScript declarations (`global.d.ts`), providing rich intellisense and autocompletion in compatible editors. This makes development faster and helps prevent errors by ensuring you're using the API correctly.
 
 Benefits of the TypeScript declarations:
 - **Autocomplete**: Get suggestions for available methods and properties
 - **Type Checking**: Catch type errors before runtime
 - **Documentation**: View parameter descriptions and requirements directly in your editor
 - **Improved Developer Experience**: Navigate the SDK easily with proper typing
-
-Example of how the declarations help in development:
-
-```typescript
-// The SDK will show you available parameters and their types
-const params: AssetListParams = {
-  assetFamilyCode: 'packshots',
-  // Your editor will suggest other available params with descriptions
-};
-
-// Method autocomplete and parameter validation
-const result = await PIM.api.asset_v1.list(params);
-// TypeScript knows the return type (PaginatedList<Asset>)
-```
 
 ## Available Features
 
@@ -213,20 +197,6 @@ const createParams = {
 const response = await PIM.api.resource_v1.create(createParams);
 ```
 
-## Example Files
-
-TODO should we add example file for each entity ?
-
-This folder contains numerous example files demonstrating how to use each part of the SDK:
-
-- `asset-usage.ts`: Working with assets
-- `asset-family-usage.ts`: Managing asset families
-- `asset-attribute-usage.ts`: Working with asset attributes
-- `product-uuid-usage.ts`: Managing products using UUIDs
-- ... and many more
-
-Each example file includes detailed code samples that you can use as a starting point for your own integrations.
-
 ## User Context
 
 The SDK provides access to the current user context through:
@@ -301,8 +271,6 @@ const secureResponse = await PIM.api.external.call({
   credentials_code: 'my_registered_credentials' // Reference credentials stored in PIM
 });
 ```
-
-// TODO EXPLAIN STORED CREDENTIALS
 
 
 Important considerations for external calls:
