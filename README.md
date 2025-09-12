@@ -215,8 +215,6 @@ const response = await PIM.api.resource_v1.create(createParams);
 
 ## Example Files
 
-TODO should we add example file for each entity ?
-
 This folder contains numerous example files demonstrating how to use each part of the SDK:
 
 - `asset-usage.ts`: Working with assets
@@ -293,7 +291,14 @@ const createResponse = await PIM.api.external.call({
     description: 'Item description'
   })
 });
+```
 
+#### Authenticated calls and credentials:
+You have the ability to make authenticated calls using the `external.call` method. To do so you have to specify as a paramter the code of the credential you want to use.
+
+For details on the types of credentials supported by this feature, please refer to the [credentials documenation](https://api.akeneo.com/extensions/credentials.html). To learn how to add credentials to your extension, consult the [API doc](https://api.akeneo.com/extensions/api.html).
+
+```typescript
 // Make a request using stored credentials
 const secureResponse = await PIM.api.external.call({
   method: 'GET',
@@ -301,9 +306,6 @@ const secureResponse = await PIM.api.external.call({
   credentials_code: 'my_registered_credentials' // Reference credentials stored in PIM
 });
 ```
-
-// TODO EXPLAIN STORED CREDENTIALS
-
 
 Important considerations for external calls:
 - This is the **only method** allowed for accessing external resources from your extension
