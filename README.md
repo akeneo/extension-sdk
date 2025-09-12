@@ -294,9 +294,7 @@ const createResponse = await PIM.api.external.call({
 ```
 
 #### Authenticated calls and credentials:
-You have the ability to make authenticated calls using the `external.call` method. To do so you have to specify as a paramter the code of the credential you want to use.
-
-For details on the types of credentials supported by this feature, please refer to the [credentials documenation](https://api.akeneo.com/extensions/credentials.html). To learn how to add credentials to your extension, consult the [API doc](https://api.akeneo.com/extensions/api.html).
+You have the ability to make authenticated calls using the `external.call` method. To do so you have to specify as a paramter the code of the credential you want to use. The specified credential will be used as headers in the generated requests.
 
 ```typescript
 // Make a request using stored credentials
@@ -305,6 +303,46 @@ const secureResponse = await PIM.api.external.call({
   url: 'https://api.secure-service.com/data',
   credentials_code: 'my_registered_credentials' // Reference credentials stored in PIM
 });
+```
+
+#### Available Credential Methods
+
+| Methode              | Header                                             |
+|----------------------|----------------------------------------------------|
+| Basic Authentication | `Authorization : base64_encode(username:password)` |    
+| Bearer Token         | `Authorization : Bearer token_value`               |
+| Custom Credentials   | `custom_header_key : custom_header_value`          |
+
+Basic Authentication and Bearer Token credentials are encrypted before being stored, ensuring the security of your sensitive data. Additionally, the API calls are made server-side, meaning that the credentials are not accessible from the front end of the application, further enhancing security.
+
+#### How to add credential to your extension
+
+When uploading or updating your extension you have the possibility to add one or more credentials. The expected format is an array of credentials with three fields, code, type and values.
+
+```JSON
+// Example of each supported credential type
+{
+"credentials": [
+        {
+            "code": "code_to_identify_the_credential",
+            "type": "Bearer Token",
+            "values": "your_auth_token"
+        },
+        {
+            "code": "code_to_identify_the_credential",
+            "type": "Basic Auth",
+            "values": {
+             "username": "your_username",
+             "passwrd": "your_password"   
+            }
+        },
+        {
+            "code": "code_to_identify_the_credential",
+            "type": "Custom Header",
+            "values": "your_custom_key"
+        }
+    ]
+}
 ```
 
 Important considerations for external calls:
