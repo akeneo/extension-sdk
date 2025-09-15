@@ -7,10 +7,6 @@
 install:
 	npm install
 
-# Run development server
-dev:
-	npm run dev
-
 # Build the project
 build:
 	npm run build
