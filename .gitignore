@@ -1,9 +1,10 @@
 node_modules
 dist
 *.local
+*.env
 
-tsconfig.app.tsbuildinfo
-tsconfig.node.tsbuildinfo
+*tsconfig.app.tsbuildinfo
+*tsconfig.node.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
