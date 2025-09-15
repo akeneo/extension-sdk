@@ -19,6 +19,19 @@ Applications you will build are designed to run within the Akeneo PIM applicatio
 2. **Security**: The SDK code operates in a secure sandbox environment using the [SES (Secure ECMAScript)](https://github.com/endojs/endo) library, which restricts access to potentially harmful JavaScript capabilities.
 3. **Controlled API Access**: All API calls are automatically authenticated using the current user's session.
 
+### Available SDK Positions
+
+When configuring your UI extension, you must specify where it will appear in the PIM interface. The SDK supports the following positions:
+
+- `pim.product.tab`: Adds a new tab in the product edit form
+- `pim.category.tab`: Adds a new tab in the category edit form
+- `pim.product.panel`: Displays in a side panel in the product edit form
+- `pim.sub-product-model.panel`: Displays a side panel in the sub-product model edit form
+- `pim.product-model.panel`: Displays a side panel in the product model edit form
+- `pim.activity.navigation.tab`: Adds a new tab in the activity navigation
+
+The position you choose will determine where and how your extension is presented to users in the PIM interface.
+
 ### Important Constraints
 
 When developing with the SDK, keep these constraints in mind:
@@ -50,7 +63,7 @@ To use the SDK for custom development, follow these steps:
 
 2. **Write Your Code**: Develop your custom functionality using the SDK methods defined in the declaration file. All API methods are accessible through the global `PIM` object.
 
-3. **Compile Your Code**: Bundle all your JavaScript into a single file (This example is using `vite` but use any other mean you like). This file should contain all your custom logic using the SDK methods.
+3. **Compile Your Code**: Bundle all your JavaScript into a single file (Our example are using `vite` but use any other mean you like). This file should contain all your custom logic using the SDK methods.
 
 4. **Configure Environment**: Copy the `.env.example` file to `.env` and fill in your PIM host, API token, and other configuration values:
    ```
@@ -69,6 +82,46 @@ To use the SDK for custom development, follow these steps:
    ```
 
    This will automatically upload your compiled extension to the configured PIM instance using the API.
+
+## API Commands for SDK Deployment
+
+### Uploading an SDK Extension
+
+If you don't use our provided makefile to upload your extension to the Akeneo PIM, you can use the following curl command:
+
+```bash
+curl --location '{YOUR_PIM_HOST}/api/rest/v1/ui-extensions' \
+  --header 'Authorization: Bearer {YOUR_API_TOKEN}' \
+  --form 'name="sdk_script_extension"' \
+  --form 'type="sdk_script"' \
+  --form 'position="pim.activity.navigation.tab"' \
+  --form 'file=@"{YOUR_PROJECT_PATH}/dist/demo.js"' \
+  --form 'configuration[labels][en_US]="SDK script test extension"' \
+  --form 'configuration[default_label]="SDK script test extension"'
+```
+
+You can also add credentials to your extension with additional form parameters:
+```bash
+  --form 'credentials[0][code]="credential_code_example"' \
+  --form 'credentials[0][type]="Bearer Token"' \
+  --form 'credentials[0][value]="token_value"'
+```
+
+### Updating an Existing SDK Extension
+
+To update an existing extension, you need to include the extension UUID in the endpoint:
+
+```bash
+curl -X POST '{YOUR_PIM_HOST}/api/rest/v1/ui-extensions/{YOUR_EXTENSION_UUID}' \
+  -H "Content-Type: multipart/form-data" \
+  --header 'Authorization: Bearer {YOUR_API_TOKEN}' \
+  --form 'name="sdk_script_extension"' \
+  --form 'type="sdk_script"' \
+  --form 'position="pim.activity.navigation.tab"' \
+  --form 'file=@"{YOUR_PROJECT_PATH}/dist/demo.js"' \
+  --form 'configuration[labels][en_US]="SDK script test extension"' \
+  --form 'configuration[default_label]="SDK script test extension"'
+```
 
 6. **Configuration**: 
    todo position / credentials / label
