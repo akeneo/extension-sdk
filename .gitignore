@@ -3,10 +3,8 @@ dist
 *.local
 *.env
 
-examples/quickstart/tsconfig.app.tsbuildinfo
-examples/quickstart/tsconfig.node.tsbuildinfo
-examples/stock_data_on_panel/tsconfig.app.tsbuildinfo
-examples/stock_data_on_panel/tsconfig.node.tsbuildinfo
+*tsconfig.app.tsbuildinfo
+*tsconfig.node.tsbuildinfo
 
 # Editor directories and files
 .vscode/*

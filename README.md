@@ -9,7 +9,7 @@ The Akeneo PIM JavaScript SDK is designed to help you build applications that ar
 The Custom Component feature is a type of UI Extension allowing `PIM` users to upload Javascript applications directly into the `PIM`.
 With its intuitive methods, it simplify interactions with the Akeneo PIM API by abstracting the complexities of API calls, authentication, and data transformation. It is crafted to ensure a consistent developer experience, complete with strong typing support through TypeScript declarations. This enables you to focus on developing your integration without being hindered by API intricacies. 
 
-If you're unfamiliar with the UI Extension feature, you can find more information in the [Akeneo documentation](httpshttps://api.akeneo.com/extensions/overview.html).
+If you're unfamiliar with the UI Extension feature, you can find more information in the [Akeneo documentation](https://api.akeneo.com/extensions/overview.html).
 
 ### Integration Architecture
 
