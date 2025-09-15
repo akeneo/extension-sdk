@@ -6,12 +6,6 @@
 make install
 ```
 
-## Development
-
-```
-make dev
-```
-
 ## Build
 
 ```
