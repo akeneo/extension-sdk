@@ -6,8 +6,8 @@ The Akeneo PIM JavaScript SDK is designed to help you build applications that ar
 
 ### How the UI extension Custom Component feature works?
 
-The Custom Component feature is a type of UI Extension allowing `PIM` users to upload Javascript applications directly into the `PIM`.
-With its intuitive methods, it simplify interactions with the Akeneo PIM API by abstracting the complexities of API calls, authentication, and data transformation. It is crafted to ensure a consistent developer experience, complete with strong typing support through TypeScript declarations. This enables you to focus on developing your integration without being hindered by API intricacies. 
+The Custom Component feature is a type of UI Extension allowing `PIM` users to upload JavaScript applications directly into the `PIM`.
+With its intuitive methods, it simplifies interactions with the Akeneo PIM API by abstracting the complexities of API calls, authentication, and data transformation. It is designed to provide a uniform experience for developers, featuring robust typing support through TypeScript declarations. This enables you to focus on developing your integration without being hindered by API intricacies.
 
 If you're unfamiliar with the UI Extension feature, you can find more information in the [Akeneo documentation](https://api.akeneo.com/extensions/overview.html).
 
@@ -18,19 +18,6 @@ Applications you will build are designed to run within the Akeneo PIM applicatio
 1. **Direct Access**: Your code runs within the PIM context, allowing direct access to the current context.
 2. **Security**: The SDK code operates in a secure sandbox environment using the [SES (Secure ECMAScript)](https://github.com/endojs/endo) library, which restricts access to potentially harmful JavaScript capabilities.
 3. **Controlled API Access**: All API calls are automatically authenticated using the current user's session.
-
-### Available SDK Positions
-
-When configuring your UI extension, you must specify where it will appear in the PIM interface. The SDK supports the following positions:
-
-- `pim.product.tab`: Adds a new tab in the product edit form
-- `pim.category.tab`: Adds a new tab in the category edit form
-- `pim.product.panel`: Displays in a side panel in the product edit form
-- `pim.sub-product-model.panel`: Displays a side panel in the sub-product model edit form
-- `pim.product-model.panel`: Displays a side panel in the product model edit form
-- `pim.activity.navigation.tab`: Adds a new tab in the activity navigation
-
-The position you choose will determine where and how your extension is presented to users in the PIM interface.
 
 ### Important Constraints
 
@@ -288,6 +275,19 @@ Important limitations to keep in mind:
 - Navigation will open in a new tab, preserving the current extension context
 
 Use this feature to create helpful shortcuts or workflows that connect your extension's functionality with standard PIM screens.
+
+## Available SDK Positions
+
+When configuring your UI extension, you must specify where it will appear in the PIM interface. The SDK supports the following positions:
+
+- `pim.product.tab`: Adds a new tab in the product edit form
+- `pim.category.tab`: Adds a new tab in the category edit form
+- `pim.product.panel`: Displays in a side panel in the product edit form
+- `pim.sub-product-model.panel`: Displays a side panel in the sub-product model edit form
+- `pim.product-model.panel`: Displays a side panel in the product model edit form
+- `pim.activity.navigation.tab`: Adds a new tab in the activity navigation
+
+The position you choose will determine where and how your extension is presented to users in the PIM interface.
 
 ## External API Calls
 

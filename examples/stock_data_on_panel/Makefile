@@ -11,8 +11,8 @@ install:
 build:
 	npm run build
 
-# Upload the built extension to Akeneo PIM
-upload: build
+# Upload the built file to Akeneo PIM by creating a new extension
+create: build
 	@echo "Uploading extension to $(PIM_HOST)..."
 	@echo "Opening $(PROJECT_PATH)/dist/demo.js"
 	@curl --location '$(PIM_HOST)/api/rest/v1/ui-extensions' \
