@@ -9,6 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DIRECTORY_TO_WATCH = path.resolve(__dirname, 'src');
 const UPDATE_COMMAND = 'make update-dev';
+const GET_TOKEN_COMMAND = 'make get-token';
 
 let timeout = null;
 let isRunning = false;
@@ -18,13 +19,23 @@ function update() {
 
     isRunning = true;
     console.log('Changes has been detected...');
+    exec(GET_TOKEN_COMMAND, (tokenError, tokenStdout, tokenStderr) => {
+        if (tokenError) {
+            console.error(`Token error: ${tokenError.message}`);
+            isRunning = false;
+            return;
+        }
 
-    exec(UPDATE_COMMAND, (error, stdout, stderr) => {
-        if (error) console.error(`error: ${error.message}`);
-        if (stderr) console.error(`stderr: ${stderr}`);
-        if (stdout) console.log(`stdout: ${stdout}`);
-        isRunning = false;
-        console.log('Update process completed successfully');
+        if (tokenStderr) console.error(`Token stderr: ${tokenStderr}`);
+        if (tokenStdout) console.log(`Token stdout: ${tokenStdout}`);
+
+        exec(UPDATE_COMMAND, (error, stdout, stderr) => {
+            if (error) console.error(`error: ${error.message}`);
+            if (stderr) console.error(`stderr: ${stderr}`);
+            if (stdout) console.log(`stdout: ${stdout}`);
+            isRunning = false;
+            console.log('Update process completed successfully');
+        });
     });
 }
 

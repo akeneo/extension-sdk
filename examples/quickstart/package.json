@@ -21,6 +21,7 @@
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "@vitejs/plugin-react": "^4.3.1",
+    "dotenv": "^17.2.2",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "unplugin-swc": "^1.5.7",
