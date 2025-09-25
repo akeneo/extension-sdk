@@ -44,14 +44,14 @@ export const updateEnvVar = (key, value) => {
   }
 };
 
-export const createExtensionPayload = (projectPath, withCredentials) => {
+export const createExtensionPayload = (projectPath, withCredentials, configuration) => {
   const payload = new FormData();
   payload.append('name', 'sdk_script_extension');
   payload.append('type', 'sdk_script');
-  payload.append('position', 'pim.product.panel');
+  payload.append('position', configuration.position);
   payload.append('file', fs.createReadStream(path.join(projectPath, 'dist/demo.js')));
-  payload.append('configuration[labels][en_US]', 'SDK script test extension');
-  payload.append('configuration[default_label]', 'SDK script test extension');
+  payload.append('configuration[labels][en_US]', configuration.label_en_US);
+  payload.append('configuration[default_label]', configuration.default_label);
 
   if (withCredentials) {
     payload.append('credentials[0][code]', 'credential_code_example');

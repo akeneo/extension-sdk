@@ -16,6 +16,8 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { createExtensionPayload } from './utils.mjs';
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config({override: true});
 
@@ -38,7 +40,10 @@ if (!EXTENSION_UUID) {
 
 const withCredentials = process.argv.includes('--with-credentials');
 
-const payload = createExtensionPayload(PROJECT_PATH, withCredentials);
+const configPath = path.join(PROJECT_PATH, 'extension_configuration.json');
+const configuration = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+const payload = createExtensionPayload(PROJECT_PATH, withCredentials, configuration);
 
 (async () => {
   try {

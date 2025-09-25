@@ -16,6 +16,8 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import {updateEnvVar, createExtensionPayload} from './utils.mjs';
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config({override: true});
 
@@ -32,7 +34,10 @@ if (!PIM_HOST || !API_TOKEN) {
 
 const withCredentials = process.argv.includes('--with-credentials');
 
-const payload = createExtensionPayload(PROJECT_PATH, withCredentials);
+const configPath = path.join(PROJECT_PATH, 'extension_configuration.json');
+const configuration = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+const payload = createExtensionPayload(PROJECT_PATH, withCredentials, configuration);
 
 (async () => {
   try {
