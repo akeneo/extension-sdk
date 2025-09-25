@@ -1,3 +1,18 @@
+/**
+ * This script updates an existing UI extension in the Akeneo PIM.
+ *
+ * It performs the following steps:
+ * 1. Loads environment variables, including the `EXTENSION_UUID` of the extension to be updated.
+ * 2. Builds a multipart/form-data payload containing the updated compiled JavaScript file (`dist/demo.js`).
+ * 3. Sends a POST request (using a `_method=PATCH` override) to the Akeneo PIM API to update the extension.
+ * 4. Confirms that the extension has been updated successfully.
+ *
+ * This script is intended to be used after the initial creation of the extension to push changes.
+ *
+ * Usage:
+ * `node update-extension.mjs`
+ */
+
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { createExtensionPayload } from './utils.mjs';
@@ -44,4 +59,3 @@ const payload = createExtensionPayload(PROJECT_PATH, withCredentials);
     process.exit(1);
   }
 })();
-

@@ -1,3 +1,14 @@
+/**
+ * This file provides utility functions used by other scripts in this directory.
+ *
+ * It includes functions for:
+ * - `updateEnvVar`: Safely updates or adds a key-value pair to the project's .env file.
+ *   It preserves existing content and formatting.
+ * - `createExtensionPayload`: Constructs the multipart/form-data payload required for creating
+ *   or updating a UI extension via the Akeneo PIM API. It reads the project's `package.json`
+ *   for metadata and attaches the compiled `dist/demo.js` file.
+ */
+
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';

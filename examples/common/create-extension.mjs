@@ -1,3 +1,18 @@
+/**
+ * This script creates a new UI extension in the Akeneo PIM.
+ *
+ * It performs the following steps:
+ * 1. Loads environment variables (PIM_HOST, API_TOKEN) from the .env file.
+ * 2. Reads the project's `package.json` to get the extension name.
+ * 3. Builds a multipart/form-data payload containing the extension's metadata and the compiled JavaScript file (`dist/demo.js`).
+ * 4. Sends a POST request to the Akeneo PIM API to create the extension.
+ * 5. Upon successful creation, it retrieves the new extension's UUID and saves it to the .env file as `EXTENSION_UUID`.
+ *
+ * Usage:
+ * `node create-extension.mjs`
+ * `node create-extension.mjs --with-credentials` (to include dummy credentials)
+ */
+
 import axios from 'axios';
 import dotenv from 'dotenv';
 import {updateEnvVar, createExtensionPayload} from './utils.mjs';

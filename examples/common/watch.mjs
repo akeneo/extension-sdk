@@ -1,3 +1,16 @@
+/**
+ * This script provides a "watch" functionality for hot-reloading during development.
+ *
+ * It uses `chokidar` to monitor the `src/` directory for any file changes.
+ * When a change is detected, it automatically triggers the `make update-dev` command.
+ * This command rebuilds the project with development settings and pushes the update
+ * to the Akeneo PIM, allowing developers to see their changes in near real-time
+ * without manual intervention.
+ *
+ * Usage:
+ * `node watch.mjs` (typically run via `make watch`)
+ */
+
 import chokidar from 'chokidar';
 import { exec } from 'child_process';
 import path from 'path';
@@ -46,4 +59,3 @@ watcher.on('all', (event, path) => {
         if (!isRunning) update();
     }, DEBOUNCE_TIME);
 });
-
