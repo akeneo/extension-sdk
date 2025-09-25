@@ -1,6 +1,6 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-import {createExtensionPayload} from './utils.js';
+import { createExtensionPayload } from './utils.mjs';
 
 dotenv.config({override: true});
 
@@ -44,3 +44,4 @@ const payload = createExtensionPayload(PROJECT_PATH, withCredentials);
     process.exit(1);
   }
 })();
+

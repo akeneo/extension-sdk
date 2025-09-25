@@ -1,6 +1,6 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-import {updateEnvVar, createExtensionPayload} from './utils.js';
+import {updateEnvVar, createExtensionPayload} from './utils.mjs';
 
 dotenv.config({override: true});
 

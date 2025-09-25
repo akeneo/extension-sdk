@@ -8,7 +8,7 @@ import FormData from 'form-data';
 export const updateEnvVar = (key, value) => {
   try {
     const __dirname = dirname(fileURLToPath(import.meta.url));
-    const envPath = path.resolve(__dirname, '.env');
+    const envPath = path.resolve(process.cwd(), '.env');
 
     let envData = {};
     if (fs.existsSync(envPath)) {
@@ -34,19 +34,19 @@ export const updateEnvVar = (key, value) => {
 };
 
 export const createExtensionPayload = (projectPath, withCredentials) => {
-  const form = new FormData();
-  form.append('name', 'sdk_script_extension');
-  form.append('type', 'sdk_script');
-  form.append('position', 'pim.product.panel');
-  form.append('file', fs.createReadStream(path.join(projectPath, 'dist/demo.js')));
-  form.append('configuration[labels][en_US]', 'SDK script test extension');
-  form.append('configuration[default_label]', 'SDK script test extension');
+  const payload = new FormData();
+  payload.append('name', 'sdk_script_extension');
+  payload.append('type', 'sdk_script');
+  payload.append('position', 'pim.product.panel');
+  payload.append('file', fs.createReadStream(path.join(projectPath, 'dist/demo.js')));
+  payload.append('configuration[labels][en_US]', 'SDK script test extension');
+  payload.append('configuration[default_label]', 'SDK script test extension');
 
   if (withCredentials) {
-    form.append('credentials[0][code]', 'credential_code_example');
-    form.append('credentials[0][type]', 'Bearer Token');
-    form.append('credentials[0][value]', 'token_value');
+    payload.append('credentials[0][code]', 'credential_code_example');
+    payload.append('credentials[0][type]', 'Bearer Token');
+    payload.append('credentials[0][value]', 'token_value');
   }
 
-  return form;
+  return payload;
 };
