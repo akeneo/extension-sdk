@@ -44,31 +44,29 @@ You can refer to the [Akeneo Web API permissions documentation](https://api.aken
 
 ## Development Workflow
 
-To use the SDK for custom development, follow these steps:
+To get started with an example, navigate to one of the project folders (e.g., `examples/quickstart`) and follow the instructions in its `README.md` file.
 
-1. **Import the SDK Type Definitions**: Use the TypeScript declaration file (`global.d.ts`) for development. This file contains all the type definitions for the SDK methods.
+The general workflow is:
 
-2. **Write Your Code**: Develop your custom functionality using the SDK methods defined in the declaration file. All API methods are accessible through the global `PIM` object.
+1.  **Run the setup command**:
+    ```bash
+    make start
+    ```
+    This command installs dependencies, helps you configure your environment, and creates the UI extension in your PIM for the first time.
 
-3. **Compile Your Code**: Bundle all your JavaScript into a single file (Our example are using `vite` but use any other mean you like). This file should contain all your custom logic using the SDK methods.
+2.  **Develop and Update**:
+    Modify the source code in the `src/` directory. To see your changes in the PIM, you can either:
+    - Run `make update-dev` to manually build and push an update.
+    - Run `make watch` to automatically update the extension whenever you save a file.
 
-4. **Configure Environment**: Copy the `.env.example` file to `.env` and fill in your PIM host, API token, and other configuration values:
-   ```
-   PIM_HOST=https://your-pim-instance.com
-   API_TOKEN=your_api_token_here
-   PROJECT_PATH=$(pwd)
-   ```
+This streamlined process, powered by the shared `Makefile`, handles building, API token management, and uploading for you.
 
-5. **Build and Upload**: Use the provided Makefile commands to build and upload your extension:
-   ```
-   # Build the extension
-   make build
+To help you with development, we have created several examples in the `examples/` folder.
 
-   # Upload the extension to your PIM instance
-   make upload
-   ```
-
-   This will automatically upload your compiled extension to the configured PIM instance using the API.
+| Example                  | Description                                                                          | Link                                                                    |
+|--------------------------|--------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| **Quickstart**           | A basic "Hello World" example to get you started with the fundamental project setup. | [Go to Quickstart](./examples/quickstart/README.md)                     |
+| **Stock Data on Panel**  | A more advanced example showing how to fetch and display external data in a panel.   | [Go to Stock Data on Panel](./examples/stock_data_on_panel/README.md)   |
 
 ## API Commands for SDK Deployment
 
@@ -109,10 +107,6 @@ curl -X POST '{YOUR_PIM_HOST}/api/rest/v1/ui-extensions/{YOUR_EXTENSION_UUID}' \
   --form 'configuration[labels][en_US]="SDK script test extension"' \
   --form 'configuration[default_label]="SDK script test extension"'
 ```
-
-6. **Configuration**: 
-   todo position / credentials / label
-   todo should we add all the information about configuration inside api doc?
 
 ### Quick Start Example
 
@@ -176,7 +170,7 @@ The SDK provides access to the following API resources:
 ### Reference Entities
 - **Reference Entity API** (`PIM.api.reference_entity_v1`): Manage reference entities
 - **Reference Entity Attribute API** (`PIM.api.reference_entity_attribute_v1`): Work with reference entity attributes
-- - **Reference Entity Attributes Option API** (`PIM.api.reference_entity_attribute_option_v1`): Manage reference entity attributes option
+- **Reference Entity Attributes Option API** (`PIM.api.reference_entity_attribute_option_v1`): Manage reference entity attributes option
 - **Reference Entity Record API** (`PIM.api.reference_entity_record_v1`): Manage reference entity records
 
 ### System & Configuration
@@ -344,8 +338,8 @@ Basic Authentication and Bearer Token credentials are encrypted before being sto
 
 When uploading or updating your extension you have the possibility to add one or more credentials. The expected format is an array of credentials with three fields, code, type and values.
 
+Example of each supported credential type
 ```JSON
-// Example of each supported credential type
 {
 "credentials": [
         {

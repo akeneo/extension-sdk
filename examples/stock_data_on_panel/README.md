@@ -1,53 +1,49 @@
-# SDK script example
+# SDK Script Example: Stock Data on Panel
 
-## Installation
+This is an example of a UI extension that displays stock data on a product panel in Akeneo PIM.
 
+## Get Started
+
+To begin, run the setup command:
+```bash
+make start
 ```
-make install
+...and follow the interactive instructions in your terminal. This will install dependencies, configure your environment, and create the extension in your PIM for the first time.
+
+## Development
+
+### Uploading Changes
+To upload your changes to Akeneo, use the following command. This will build the extension for development and push it to the PIM.
+```bash
+make update-dev
 ```
 
-## Build
-
+### Automatic Updates (Hot-Reload)
+To have your extension automatically update every time you save a code change, run the watch command:
+```bash
+make watch
 ```
+This is highly recommended for an efficient development workflow.
+
+## Customization
+
+### Application Logic
+All the frontend logic is located in `src/App.tsx`. Please update this file to match your needs.
+
+### Extension Configuration
+Want to change the extension's display name or its position in the UI? Modify the `extension_configuration.json` file.
+
+For more information on available positions, see the official documentation: https://api.akeneo.com/extensions/positions.html#available-positions-for-ui-extensions
+
+## Build for Production
+
+Once your project is finished, you can build it for production with the command:
+```bash
 make build
 ```
+This will create an optimized production build in `dist/demo.js`.
 
-The file in `dist/demo.js` is your built UI Extension.
-
-## Upload to PIM
-
-Before uploading, configure your environment variables:
-
-1. Copy the `.env.exemple` into a `.env` file and edit the `.env`  in the root directory:
-```
-PIM_HOST=https://your-pim-instance.com
-API_TOKEN=your_api_token_here
-PROJECT_PATH=$(pwd)
-```
-
-2. Then run:
-```
-make upload
-```
-
-This will build your extension and upload it to your Akeneo PIM instance.
-
-## Update an Existing Extension
-
-If you already have an extension uploaded and want to update it:
-
-1. Add your extension UUID to the `.env` file:
-```
-EXTENSION_UUID=your_extension_uuid_here
-```
-
-2. Then run:
-```
+To deploy this production version, use:
+```bash
 make update
 ```
-
-This will build your extension and update the existing extension with the same configuration but new code.
-
-## Customize
-
-Please update `src/App.tsx` file to match your needs.
