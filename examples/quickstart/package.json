@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "akeneo-design-system": "^4.0.0",
+    "axios": "^1.12.2",
+    "chokidar": "^4.0.3",
+    "form-data": "^4.0.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "styled-components": "^6.1.13"
@@ -20,8 +23,10 @@
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "@vitejs/plugin-react": "^4.3.1",
+    "dotenv": "^17.2.2",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
+    "unplugin-swc": "^1.5.7",
     "vite": "^7.1.5"
   }
 }

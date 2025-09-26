@@ -1,0 +1,13 @@
+{
+  "position": "pim.product.panel",
+  "name": "sdk_script_extension_stock_data",
+  "type": "sdk_script",
+  "file": "dist/stock_data.js",
+  "configuration": {
+    "default_label": "Stock data on panel",
+    "labels": {
+      "en_US": "Stock data on panel"
+    }
+  },
+  "credentials": []
+}
