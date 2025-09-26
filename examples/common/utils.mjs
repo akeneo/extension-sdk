@@ -46,17 +46,31 @@ export const updateEnvVar = (key, value) => {
 
 export const createExtensionPayload = (projectPath, withCredentials, configuration) => {
   const payload = new FormData();
-  payload.append('name', 'sdk_script_extension');
-  payload.append('type', 'sdk_script');
+  payload.append('name', configuration.name);
+  payload.append('type', configuration.type);
   payload.append('position', configuration.position);
-  payload.append('file', fs.createReadStream(path.join(projectPath, 'dist/demo.js')));
-  payload.append('configuration[labels][en_US]', configuration.label_en_US);
-  payload.append('configuration[default_label]', configuration.default_label);
+  payload.append('file', fs.createReadStream(path.join(projectPath, configuration.file)));
+  payload.append('configuration[default_label]', configuration.configuration.default_label);
 
-  if (withCredentials) {
-    payload.append('credentials[0][code]', 'credential_code_example');
-    payload.append('credentials[0][type]', 'Bearer Token');
-    payload.append('credentials[0][value]', 'token_value');
+  if (configuration.configuration.labels) {
+    for (const [locale, label] of Object.entries(configuration.configuration.labels)) {
+      payload.append(`configuration[labels][${locale}]`, label);
+    }
+  }
+
+  if (withCredentials && configuration.credentials) {
+    configuration.credentials.forEach((credential, index) => {
+      payload.append(`credentials[${index}][code]`, credential.code);
+      payload.append(`credentials[${index}][type]`, credential.type);
+
+      if (typeof credential.values === 'object' && credential.values !== null) {
+        for (const [key, value] of Object.entries(credential.values)) {
+          payload.append(`credentials[${index}][values][${key}]`, value);
+        }
+      } else {
+        payload.append(`credentials[${index}][value]`, credential.values);
+      }
+    });
   }
 
   return payload;

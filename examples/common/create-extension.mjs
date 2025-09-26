@@ -38,7 +38,6 @@ const configPath = path.join(PROJECT_PATH, 'extension_configuration.json');
 const configuration = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
 const payload = createExtensionPayload(PROJECT_PATH, withCredentials, configuration);
-
 (async () => {
   try {
     console.log(`Creating extension on ${PIM_HOST}...`);

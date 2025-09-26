@@ -44,7 +44,6 @@ const configPath = path.join(PROJECT_PATH, 'extension_configuration.json');
 const configuration = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
 const payload = createExtensionPayload(PROJECT_PATH, withCredentials, configuration);
-
 (async () => {
   try {
     console.log(`Updating extension with UUID: ${EXTENSION_UUID} on ${PIM_HOST}...`);
@@ -53,7 +52,7 @@ const payload = createExtensionPayload(PROJECT_PATH, withCredentials, configurat
         payload,
         {
             headers: {
-                ...payload.getHeaders(),
+            ...payload.getHeaders(),
                 Authorization: `Bearer ${API_TOKEN}`,
             },
         }
