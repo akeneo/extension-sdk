@@ -13,7 +13,7 @@
       {
             "code": "credential_example_1",
             "type": "Bearer Token",
-            "values": "your_auth_token"
+            "value": "your_auth_token"
         },
         {
             "code": "credential_example_2",
