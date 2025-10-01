@@ -350,15 +350,18 @@ Example of each supported credential type
         {
             "code": "code_to_identify_the_credential",
             "type": "Basic Auth",
-            "values": {
+            "value": {
              "username": "your_username",
-             "passwrd": "your_password"   
+             "password": "your_password"   
             }
         },
         {
             "code": "code_to_identify_the_credential",
             "type": "Custom Header",
-            "values": "your_custom_key"
+            "value": {
+             "header_key": "your_header_key",
+             "header_value": "your_header_value"   
+            }
         }
     ]
 }

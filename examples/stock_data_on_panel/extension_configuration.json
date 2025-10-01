@@ -9,5 +9,27 @@
       "en_US": "Stock data on panel"
     }
   },
-  "credentials": []
+  "credentials": [
+      {
+            "code": "credential_example_1",
+            "type": "Bearer Token",
+            "values": "your_auth_token"
+        },
+        {
+            "code": "credential_example_2",
+            "type": "Basic Auth",
+            "value": {
+             "username": "your_username",
+             "password": "your_password"   
+            }
+        },
+        {
+            "code": "credential_example_3",
+            "type": "Custom Header",
+            "value": {
+             "header_key": "your_header_key",
+             "header_value": "your_header_value"   
+            }
+        }
+  ]
 }
