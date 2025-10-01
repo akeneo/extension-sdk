@@ -336,7 +336,7 @@ Basic Authentication and Bearer Token credentials are encrypted before being sto
 
 #### How to add credential to your extension
 
-When uploading or updating your extension you have the possibility to add one or more credentials. The expected format is an array of credentials with three fields, code, type and values.
+When uploading or updating your extension you have the possibility to add one or more credentials. The expected format is an array of credentials with three fields, code, type and value.
 
 Example of each supported credential type
 ```JSON
@@ -345,20 +345,23 @@ Example of each supported credential type
         {
             "code": "code_to_identify_the_credential",
             "type": "Bearer Token",
-            "values": "your_auth_token"
+            "value": "your_auth_token"
         },
         {
             "code": "code_to_identify_the_credential",
             "type": "Basic Auth",
-            "values": {
+            "value": {
              "username": "your_username",
-             "passwrd": "your_password"   
+             "password": "your_password"   
             }
         },
         {
             "code": "code_to_identify_the_credential",
             "type": "Custom Header",
-            "values": "your_custom_key"
+            "value": {
+             "header_key": "your_header_key",
+             "header_value": "your_header_value"   
+            }
         }
     ]
 }
