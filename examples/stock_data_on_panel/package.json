@@ -23,6 +23,7 @@
     "chokidar": "^4.0.3"
   },
   "devDependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.27.1",
     "@types/node": "^22.7.4",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
