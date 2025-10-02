@@ -14,12 +14,7 @@ export default defineConfig(({ mode }) => ({
     // React plugin configuration with options to automatically import React
     react({
       jsxRuntime: 'automatic',
-      jsxImportSource: 'react',
-      babel: {
-        plugins: [
-          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
-        ]
-      }
+      jsxImportSource: 'react'
     }),
     // SWC configuration with enhanced React support
     // SWC (Speedy Web Compiler) is a super-fast TypeScript/JavaScript compiler written in Rust
