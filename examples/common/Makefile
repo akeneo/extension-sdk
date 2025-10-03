@@ -7,8 +7,6 @@ PROJECT_PATH := $(CURDIR)
 start:
 	@echo "Welcome to the Akeneo Extension SDK project! Let's set up your environment."
 	@echo "---------------------------------------------------------------------"
-	@echo "Installing common dependencies..."
-	@(cd ../common && npm install)
 	@echo "Installing dependencies..."
 	@$(MAKE) install
 	@echo "\nCopying environment file..."

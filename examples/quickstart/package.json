@@ -20,6 +20,8 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-react-jsx": "^7.27.1",
+    "@swc/cli": "^0.7.8",
+    "@swc/core": "^1.13.5",
     "@types/node": "^22.7.4",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
