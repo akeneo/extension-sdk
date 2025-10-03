@@ -3,6 +3,7 @@
   "name": "sdk_script_extension_quickstart",
   "type": "sdk_script",
   "file": "dist/quickstart.js",
+  "allowlisted_domains": ["https://api.example.com/"],
   "configuration": {
     "default_label": "Quickstart",
     "labels": {
@@ -21,6 +22,14 @@
       "value": {
         "header_key": "X-My-Custom-Header",
         "header_value": "my-test-value"
+      }
+    },
+    {
+      "code": "custom_api",
+      "type": "Custom Header",
+      "value": {
+        "header_key": "X-Custom-Api-Key",
+        "header_value": "your-secret-key"
       }
     }
   ]
