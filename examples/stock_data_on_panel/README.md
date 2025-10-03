@@ -53,29 +53,32 @@ Each object in the `credentials` array can have the following properties:
 | --- | --- | --- |
 | `code` | `string` | A unique code to identify the credential within your extension. |
 | `type` | `string` | The type of authentication. Supported values are `Bearer Token`, `Basic Auth`, and `Custom Header`. |
-| `values` | `string` or `object` | The value(s) for the credential. For `Bearer Token` or `Custom Header`, this is a string. For `Basic Auth`, this is an object with `username` and `password`. |
+| `value` | `string` or `object` | The value(s) for the credential. For `Bearer Token` or `Custom Header`, this is a string. For `Basic Auth`, this is an object with `username` and `password`. |
 
 **Example of `credentials`:**
 ```json
 {
   "credentials": [
     {
-      "code": "my_bearer_token",
+      "code": "code_to_identify_the_credential",
       "type": "Bearer Token",
-      "values": "your_auth_token"
+      "value": "your_auth_token"
     },
     {
-      "code": "my_basic_auth",
+      "code": "code_to_identify_the_credential",
       "type": "Basic Auth",
-      "values": {
+      "value": {
         "username": "your_username",
         "password": "your_password"
       }
     },
     {
-      "code": "my_custom_header",
-      "type": "Custom Header",
-      "values": "your_custom_key"
+        "code": "code_to_identify_the_credential",
+        "type": "Custom Header",
+        "value": {
+          "header_key": "your_header_key",
+          "header_value": "your_header_value"   
+        }
     }
   ]
 }
