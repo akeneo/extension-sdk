@@ -8,10 +8,9 @@ export async function referenceEntityExample(): Promise<void> {
     const referenceEntitiesList = await referenceEntityApi.list();
     console.log('Reference entities list:', referenceEntitiesList);
 
-    // Create a new reference entity by directly using patch with a new code
+    // Create a new reference entity using upsert
     console.log('\nCreating a new reference entity...');
     const newReferenceEntity = {
-      code: 'materials',
       labels: {
         'en_US': 'Materials',
         'fr_FR': 'Matériaux'
@@ -19,8 +18,7 @@ export async function referenceEntityExample(): Promise<void> {
       image: null
     };
 
-    // Use patch to create a new reference entity (since create method doesn't exist in the interface)
-    await referenceEntityApi.patch({
+    await referenceEntityApi.upsert({
       code: 'materials',
       data: newReferenceEntity
     });
@@ -47,7 +45,7 @@ export async function referenceEntityExample(): Promise<void> {
       }
     };
 
-    await referenceEntityApi.patch({
+    await referenceEntityApi.upsert({
       code: 'materials',
       data: updateData
     });
