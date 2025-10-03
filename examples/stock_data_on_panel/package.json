@@ -9,18 +9,12 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
-  "dependenciesComments": {
-    "akeneo-design-system": "For now, the 2.x is not tagged, we need to get it from the repository."
-  },
   "dependencies": {
-    "akeneo-design-system": "github:akeneo/akeneo-design-system",
+    "akeneo-design-system": "^4.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "styled-components": "^6.1.13",
-    "dotenv": "^17.2.2",
-    "form-data": "^4.0.4",
-    "axios": "^1.12.2",
-    "chokidar": "^4.0.3"
+    "axios": "^1.12.2"
   },
   "devDependencies": {
     "@babel/plugin-transform-react-jsx": "^7.27.1",
