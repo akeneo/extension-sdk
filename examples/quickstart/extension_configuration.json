@@ -9,5 +9,19 @@
       "en_US": "Quickstart"
     }
   },
-  "credentials": []
+  "credentials": [
+    {
+      "code": "graphql_pim",
+      "type": "Bearer Token",
+      "value": "OTc3NzVhN2MxZjZjZTNjNzAwNzFlZTM5OTFkNDVkZDE3ZTc3NGI3YTk3Y2QxYmY0ZTdkM2U1MGJiOWEwOWExMQ"
+    },
+    {
+      "code": "test_custom",
+      "type": "Custom Header",
+      "value": {
+        "header_key": "X-My-Custom-Header",
+        "header_value": "my-test-value"
+      }
+    }
+  ]
 }

@@ -1,10 +1,14 @@
 import {Information, Link, SectionTitle, UsersIllustration} from "akeneo-design-system";
 import {useGetProduct} from "./useGetProduct.ts";
+import {useGetCategories} from "./useGetCategories.ts";
+import {useGetCustomHeaders} from "./useGetCustomHeaders.ts";
 
 function App() {
   const PIMContext = globalThis.PIM.context;
   const PIMUser = globalThis.PIM.user
   const productList = useGetProduct();
+  const graphPIMCategories = useGetCategories();
+  const customHeaders = useGetCustomHeaders();
 
   return <>
     <Information
@@ -24,9 +28,17 @@ function App() {
     </SectionTitle>
     <pre>{JSON.stringify(PIMUser)}</pre>
     <SectionTitle>
+      <SectionTitle.Title level="secondary">Example response of external call with custom headers</SectionTitle.Title>
+    </SectionTitle>
+    {customHeaders && <pre>{JSON.stringify(customHeaders, null, 4)}</pre>}
+    <SectionTitle>
       <SectionTitle.Title level="secondary">Example response of products list endpoint</SectionTitle.Title>
     </SectionTitle>
     {productList && <pre>{JSON.stringify(productList, null, 4)}</pre>}
+    <SectionTitle>
+      <SectionTitle.Title level="secondary">Example response of external call with credentials</SectionTitle.Title>
+    </SectionTitle>
+    {graphPIMCategories && <pre>{JSON.stringify(graphPIMCategories, null, 4)}</pre>}
   </>
 }
 

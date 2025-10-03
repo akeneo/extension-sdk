@@ -66,6 +66,9 @@ update: build get-token
 update-dev: build-dev get-token
 	@node ../common/update-extension.mjs
 
+update-dev-with-credentials: build-dev get-token
+	@node ../common/update-extension.mjs --with-credentials
+
 update-with-credentials: build get-token
 	@node ../common/update-extension.mjs --with-credentials
 

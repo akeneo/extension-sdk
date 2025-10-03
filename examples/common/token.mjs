@@ -29,6 +29,12 @@ import { updateEnvVar } from './utils.mjs';
   const tokenCreatedAt = process.env.TOKEN_CREATED_AT;
   const appToken = process.env.APP_TOKEN;
 
+  if (appToken) {
+    console.error('APP_TOKEN in the .env file. Using it.');
+    updateEnvVar('API_TOKEN', appToken);
+    return;
+  }
+
   if (!clientId || !clientSecret || !username || !password || !pimHost) {
     console.error('Error: Please define CLIENT_ID, CLIENT_SECRET, USERNAME, PASSWORD and PIM_HOST in the .env file');
     process.exit(1);
