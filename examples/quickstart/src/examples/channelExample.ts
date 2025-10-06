@@ -12,20 +12,26 @@ export async function channelExample(): Promise<void> {
       });
       console.log(`Found ${channelList.count} channels`);
 
-      // Create a new channel
+      // Create a new channel (check if it exists first)
       console.log('Creating a new channel...');
-      await channelApi.create({
-        data: {
-          code: 'my_new_channel',
-          category_tree: 'master',
-          currencies: ['USD', 'EUR'],
-          locales: ['en_US', 'fr_FR'],
-          labels: {
-            en_US: 'My New Channel',
-            fr_FR: 'Mon Nouveau Canal',
+      try {
+        await channelApi.get({ code: 'my_new_channel' });
+        console.log('Channel already exists, skipping creation...');
+      } catch (error) {
+        // Channel doesn't exist, create it
+        await channelApi.create({
+          data: {
+            code: 'my_new_channel',
+            category_tree: 'master',
+            currencies: ['USD', 'EUR'],
+            locales: ['en_US', 'fr_FR'],
+            labels: {
+              en_US: 'My New Channel',
+              fr_FR: 'Mon Nouveau Canal',
+            },
           },
-        },
-      });
+        });
+      }
 
       // Get the created channel
       console.log('Getting the created channel...');

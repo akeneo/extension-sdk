@@ -14,31 +14,37 @@ export async function familyVariantExample(): Promise<void> {
       console.log(`Found ${familyVariantList.count} family variants in the clothing family`);
       console.log('First page items:', familyVariantList.items.map(item => item.code));
 
-      // Create a new family variant
+      // Create a new family variant (check if it exists first)
       console.log('\nCreating a new family variant...');
-      await familyVariantApi.create({
-        familyCode: 'clothing',
-        data: {
-          code: 'clothing_by_color_and_size',
-          labels: {
-            en_US: 'Clothing by color and size',
-            fr_FR: 'Vêtements par couleur et taille',
+      try {
+        await familyVariantApi.get({ familyCode: 'clothing', code: 'clothing_by_color_and_size' });
+        console.log('Family variant already exists, skipping creation...');
+      } catch (error) {
+        // Family variant doesn't exist, create it
+        await familyVariantApi.create({
+          familyCode: 'clothing',
+          data: {
+            code: 'clothing_by_color_and_size',
+            labels: {
+              en_US: 'Clothing by color and size',
+              fr_FR: 'Vêtements par couleur et taille',
+            },
+            variant_attribute_sets: [
+              {
+                level: 1,
+                axes: ['color'],
+                attributes: ['color', 'material', 'brand'],
+              },
+              {
+                level: 2,
+                axes: ['size'],
+                attributes: ['size', 'ean', 'weight'],
+              },
+            ],
           },
-          variant_attribute_sets: [
-            {
-              level: 1,
-              axes: ['color'],
-              attributes: ['color', 'material', 'brand'],
-            },
-            {
-              level: 2,
-              axes: ['size'],
-              attributes: ['size', 'ean', 'weight'],
-            },
-          ],
-        },
-      });
-      console.log('Family variant created successfully');
+        });
+        console.log('Family variant created successfully');
+      }
 
       // Get the created family variant
       console.log('\nGetting the created family variant...');

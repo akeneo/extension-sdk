@@ -16,24 +16,30 @@ export async function attributeGroupExample(): Promise<void> {
         sortOrder: item.sortOrder,
       })));
 
-      // Create a new attribute group
+      // Create a new attribute group (check if it exists first)
       console.log('\nCreating a new attribute group for technical specifications...');
-      await attributeGroupApi.create({
-        data: {
-          code: 'technical_specs',
-          sort_order: 10,
-          attributes: [
-            'brand',
-            'erp_name',
-            'name',
-          ],
-          labels: {
-            en_US: 'Technical Specifications',
-            fr_FR: 'Spécifications techniques',
+      try {
+        await attributeGroupApi.get({ code: 'technical_specs' });
+        console.log('Attribute group already exists, skipping creation...');
+      } catch (error) {
+        // Attribute group doesn't exist, create it
+        await attributeGroupApi.create({
+          data: {
+            code: 'technical_specs',
+            sort_order: 10,
+            attributes: [
+              'brand',
+              'erp_name',
+              'name',
+            ],
+            labels: {
+              en_US: 'Technical Specifications',
+              fr_FR: 'Spécifications techniques',
+            },
           },
-        },
-      });
-      console.log('Attribute group created successfully');
+        });
+        console.log('Attribute group created successfully');
+      }
 
       // Get the created attribute group
       console.log('\nGetting the created attribute group...');

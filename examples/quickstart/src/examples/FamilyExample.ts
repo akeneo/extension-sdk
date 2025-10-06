@@ -34,21 +34,27 @@ export async function familyExample(): Promise<void> {
       console.log(`\nCreating a new family for testing: ${testFamilyCode}`);
 
       try {
-        // Create the test family
-        await familyApi.create({
-          data: {
-            code: testFamilyCode,
-            labels: {
-              en_US: 'Test Family',
-              fr_FR: 'Famille de Test'
-            },
-            attribute_as_label: 'sku',
-            attributes: referenceFamily.attributes ?
-              referenceFamily.attributes.slice(0, 5) : // Take first 5 attributes from reference family
-              ['sku'] // Fallback to just sku
-          }
-        });
-        console.log('Test family created successfully!');
+        // Create the test family (check if it exists first)
+        try {
+          await familyApi.get({ code: testFamilyCode });
+          console.log('Test family already exists, skipping creation...');
+        } catch (error) {
+          // Family doesn't exist, create it
+          await familyApi.create({
+            data: {
+              code: testFamilyCode,
+              labels: {
+                en_US: 'Test Family',
+                fr_FR: 'Famille de Test'
+              },
+              attribute_as_label: 'sku',
+              attributes: referenceFamily.attributes ?
+                referenceFamily.attributes.slice(0, 5) : // Take first 5 attributes from reference family
+                ['sku'] // Fallback to just sku
+            }
+          });
+          console.log('Test family created successfully!');
+        }
 
         // Get the newly created family
         console.log(`\nRetrieving the test family: ${testFamilyCode}`);

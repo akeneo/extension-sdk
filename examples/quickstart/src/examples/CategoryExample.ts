@@ -34,18 +34,24 @@ export async function categoryExample(): Promise<void> {
       console.log(`\nCreating a new category for testing: ${testCategoryCode}`);
 
       try {
-        // Create the test category
-        await categoryApi.create({
-          data: {
-            code: testCategoryCode,
-            parent: referenceCategory.code,
-            labels: {
-              en_US: 'Test Category',
-              fr_FR: 'Catégorie de Test'
+        // Create the test category (check if it exists first)
+        try {
+          await categoryApi.get({ code: testCategoryCode });
+          console.log('Test category already exists, skipping creation...');
+        } catch (error) {
+          // Category doesn't exist, create it
+          await categoryApi.create({
+            data: {
+              code: testCategoryCode,
+              parent: referenceCategory.code,
+              labels: {
+                en_US: 'Test Category',
+                fr_FR: 'Catégorie de Test'
+              }
             }
-          }
-        });
-        console.log('Test category created successfully!');
+          });
+          console.log('Test category created successfully!');
+        }
 
         // Get the newly created category
         console.log(`\nRetrieving the test category: ${testCategoryCode}`);
@@ -84,17 +90,23 @@ export async function categoryExample(): Promise<void> {
 
         const subCategoryCode = `${testCategoryCode}_SUB`;
         console.log(`\nCreating a subcategory: ${subCategoryCode}`);
-        await categoryApi.create({
-          data: {
-            code: subCategoryCode,
-            parent: testCategoryCode,
-            labels: {
-              en_US: 'Test Subcategory',
-              fr_FR: 'Sous-catégorie de Test'
+        try {
+          await categoryApi.get({ code: subCategoryCode });
+          console.log('Subcategory already exists, skipping creation...');
+        } catch (error) {
+          // Subcategory doesn't exist, create it
+          await categoryApi.create({
+            data: {
+              code: subCategoryCode,
+              parent: testCategoryCode,
+              labels: {
+                en_US: 'Test Subcategory',
+                fr_FR: 'Sous-catégorie de Test'
+              }
             }
-          }
-        });
-        console.log('Subcategory created successfully');
+          });
+          console.log('Subcategory created successfully');
+        }
 
         // Get the created subcategory to verify parent-child relationship
         const subCategory = await categoryApi.get({

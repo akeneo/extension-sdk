@@ -102,10 +102,17 @@ export async function productUuidExample(): Promise<void> {
 
         console.log('Create data:', createData);
 
-        await productUuidApi.create({
-          data: createData
-        });
-        console.log('Product created successfully');
+        // Check if product exists before creating
+        try {
+          await productUuidApi.get({ uuid: newProductUuid });
+          console.log('Product already exists, skipping creation...');
+        } catch (error) {
+          // Product doesn't exist, create it
+          await productUuidApi.create({
+            data: createData
+          });
+          console.log('Product created successfully');
+        }
 
         // Verify the creation by getting the new product
         console.log('\nVerifying product creation...');

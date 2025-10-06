@@ -55,25 +55,31 @@ export async function attributeExample(): Promise<void> {
       const attributeGroup = referenceAttribute.group || 'other';
 
       try {
-        // Create the test attribute (using a text type which is simpler)
-        await attributeApi.create({
-          data: {
-            code: testAttributeCode,
-            type: 'pim_catalog_text', // Simple text attribute
-            group: attributeGroup,
-            labels: {
-              en_US: 'Test Attribute',
-              fr_FR: 'Attribut de Test'
-            },
-            localizable: true,
-            scopable: true,
-            sort_order: 10,
-            max_characters: 255,
-            unique: false,
-            usable_in_grid: true
-          }
-        });
-        console.log('Test attribute created successfully!');
+        // Create the test attribute (check if it exists first)
+        try {
+          await attributeApi.get({ code: testAttributeCode });
+          console.log('Test attribute already exists, skipping creation...');
+        } catch (error) {
+          // Attribute doesn't exist, create it
+          await attributeApi.create({
+            data: {
+              code: testAttributeCode,
+              type: 'pim_catalog_text', // Simple text attribute
+              group: attributeGroup,
+              labels: {
+                en_US: 'Test Attribute',
+                fr_FR: 'Attribut de Test'
+              },
+              localizable: true,
+              scopable: true,
+              sort_order: 10,
+              max_characters: 255,
+              unique: false,
+              usable_in_grid: true
+            }
+          });
+          console.log('Test attribute created successfully!');
+        }
 
         // Get the newly created attribute
         console.log(`\nRetrieving the test attribute: ${testAttributeCode}`);

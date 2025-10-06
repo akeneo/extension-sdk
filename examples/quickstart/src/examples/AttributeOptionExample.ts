@@ -18,20 +18,26 @@ export async function attributeOptionExample(): Promise<void> {
         labels: item.labels,
       })));
 
-      // Create a new attribute option
+      // Create a new attribute option (check if it exists first)
       console.log('\nCreating a new size option...');
-      await attributeOptionApi.create({
-        attributeCode: 'size',
-        data: {
-          code: 'ZXXL',
-          sort_order: 50, // Position after XL
-          labels: {
-            en_US: 'zuper Extra Extra Large',
-            fr_FR: 'zuper Très Très Grand',
+      try {
+        await attributeOptionApi.get({ attribute_code: 'size', code: 'ZXXL' });
+        console.log('Attribute option already exists, skipping creation...');
+      } catch (error) {
+        // Attribute option doesn't exist, create it
+        await attributeOptionApi.create({
+          attributeCode: 'size',
+          data: {
+            code: 'ZXXL',
+            sort_order: 50, // Position after XL
+            labels: {
+              en_US: 'zuper Extra Extra Large',
+              fr_FR: 'zuper Très Très Grand',
+            },
           },
-        },
-      });
-      console.log('Attribute option created successfully');
+        });
+        console.log('Attribute option created successfully');
+      }
 
       // Get the created attribute option
       console.log('\nGetting the created attribute option...');

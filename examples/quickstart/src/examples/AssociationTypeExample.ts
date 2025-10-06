@@ -13,19 +13,25 @@ export async function associationTypeExample(): Promise<void> {
       console.log(`Found ${associationTypeList.count} association types`);
       console.log('First page items:', associationTypeList.items.map(item => item.code));
 
-      // Create a new association type
+      // Create a new association type (check if it exists first)
       console.log('\nCreating a new bidirectional association type...');
-      await associationTypeApi.create({
-        data: {
-          code: 'REPLACEMENT_PARTS',
-          labels: {
-            en_US: 'Replacement Parts',
-            fr_FR: 'Pièces de rechange',
+      try {
+        await associationTypeApi.get({ code: 'REPLACEMENT_PARTS' });
+        console.log('Association type already exists, skipping creation...');
+      } catch (error) {
+        // Association type doesn't exist, create it
+        await associationTypeApi.create({
+          data: {
+            code: 'REPLACEMENT_PARTS',
+            labels: {
+              en_US: 'Replacement Parts',
+              fr_FR: 'Pièces de rechange',
+            },
+            is_two_way: true,     // This makes it bidirectional
           },
-          is_two_way: true,     // This makes it bidirectional
-        },
-      });
-      console.log('Association type created successfully');
+        });
+        console.log('Association type created successfully');
+      }
 
       // Get the created association type
       console.log('\nGetting the created association type...');
