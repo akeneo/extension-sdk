@@ -63,12 +63,12 @@ export const createExtensionPayload = (projectPath, withCredentials, configurati
       payload.append(`credentials[${index}][code]`, credential.code);
       payload.append(`credentials[${index}][type]`, credential.type);
 
-      if (typeof credential.values === 'object' && credential.values !== null) {
-        for (const [key, value] of Object.entries(credential.values)) {
-          payload.append(`credentials[${index}][values][${key}]`, value);
+      if (typeof credential.value === 'object' && credential.value !== null) {
+        for (const [key, value] of Object.entries(credential.value)) {
+          payload.append(`credentials[${index}][value][${key}]`, value);
         }
       } else {
-        payload.append(`credentials[${index}][value]`, credential.values);
+        payload.append(`credentials[${index}][value]`, credential.value);
       }
     });
   }
