@@ -10,11 +10,13 @@ export async function productUuidExample(): Promise<void> {
     const productList = await productUuidApi.list({
       limit: 10,
       page: 1,
-      withCount: true
+      withCount: true,
+      withCompletenesses: true
     });
     console.log(`Found ${productList.count} products`);
     console.log('First page items:', productList.items.map(item => ({
       uuid: item.uuid,
+      completness: item.completenesses,
     })));
 
     if (productList.items.length > 0) {
@@ -29,7 +31,8 @@ export async function productUuidExample(): Promise<void> {
       // Get a specific product by UUID
       console.log(`\nGetting product with UUID: ${firstProduct.uuid}`);
       const product = await productUuidApi.get({
-        uuid: firstProduct.uuid
+        uuid: firstProduct.uuid,
+        withCompletenesses: true
       });
 
       console.log('Product details:', {
@@ -37,10 +40,11 @@ export async function productUuidExample(): Promise<void> {
         enabled: product.enabled,
         family: product.family,
         categories: product.categories,
-        attributeCount: product.values ? Object.keys(product.values).length : 0
+        attributeCount: product.values ? Object.keys(product.values).length : 0,
+        completness: product.completenesses
       });
 
-      // Example of attribute values (showing one or two attributes if they exist)
+       // Example of attribute values (showing one or two attributes if they exist)
       if (product.values) {
         const attributeCodes = Object.keys(product.values).slice(0, 2);
         console.log('\nSample attribute values:');
@@ -48,9 +52,9 @@ export async function productUuidExample(): Promise<void> {
           // Use type assertion to tell TypeScript that values can be indexed with a string
           console.log(`${code}:`, (product.values as Record<string, any>)[code]);
         });
-      }
+      } 
 
-      // Create a new product
+       // Create a new product
       console.log('\nDemonstrating product creation...');
       // const newProductName = `test_product_${Date.now()}`;
       const newProductUuid = v4();
@@ -190,8 +194,8 @@ export async function productUuidExample(): Promise<void> {
         if ('response' in (operationError as any)) {
           console.error('API Response:', (operationError as any).response?.data);
         }
-      }
-
+      } 
+ 
       // Also demonstrate update operation on the original product
       console.log(`\nUpdating original product: ${product.identifier || product.uuid}`);
 

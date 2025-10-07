@@ -1114,6 +1114,15 @@ declare interface ChannelUpdateParams extends ChannelGetParams {
 }
 
 /**
+ * Product completeness
+ */
+declare interface Completeness {
+    locale?: string;
+    scope?: string;
+    data?: number;
+}
+
+/**
  * Currency representation
  */
 declare interface Currency {
@@ -1601,9 +1610,18 @@ export declare type PIM_SDK = {
     user: PIM_USER;
     context: PIM_CONTEXT;
     api: {
+        product_uuid: SdkApiProductUuid;
+        attribute: SdkApiAttribute;
+        family: SdkApiFamily;
+        category: SdkApiCategory;
+        reference_entity: SdkApiReferenceEntity;
+        reference_entity_record: SdkApiReferenceEntityRecord;
+        reference_entity_attribute: SdkApiReferenceEntityAttribute;
+        locale: SdkApiLocale;
+        channel: SdkApiChannel;
         external: externalGateway;
         system_v1: SdkApiSystem;
-        channel_v1: SdkApiChannel;
+        channel_v1: SdkApiChannel_2;
         currency_v1: SdkApiCurrency;
         product_model_v1: SdkApiProductModel;
         attribute_option_v1: SdkApiAttributeOption;
@@ -1617,15 +1635,15 @@ export declare type PIM_SDK = {
         asset_attribute_v1: SdkApiAssetAttribute;
         asset_attribute_option_v1: SdkApiAssetAttributeOption;
         asset_media_file_v1: SdkApiAssetMediaFile;
-        category_v1: SdkApiCategory;
-        product_uuid_v1: SdkApiProductUuid;
-        locale_v1: SdkApiLocale;
-        family_v1: SdkApiFamily;
-        reference_entity_v1: SdkApiReferenceEntity;
-        reference_entity_attribute_v1: SdkApiReferenceEntityAttribute;
-        reference_entity_record_v1: SdkApiReferenceEntityRecord;
+        category_v1: SdkApiCategory_2;
+        product_uuid_v1: SdkApiProductUuid_2;
+        locale_v1: SdkApiLocale_2;
+        family_v1: SdkApiFamily_2;
+        reference_entity_v1: SdkApiReferenceEntity_2;
+        reference_entity_attribute_v1: SdkApiReferenceEntityAttribute_2;
+        reference_entity_record_v1: SdkApiReferenceEntityRecord_2;
         reference_entity_attribute_option_v1: SdkApiReferenceEntityAttributeOption;
-        attribute_v1: SdkApiAttribute;
+        attribute_v1: SdkApiAttribute_2;
     };
     navigate: pimNavigate;
 };
@@ -1654,6 +1672,7 @@ declare interface Product {
     values?: ProductValues;
     associations?: ProductAssociations;
     quantifiedAssociations?: ProductQuantifiedAssociations;
+    completenesses?: Completeness[];
     created?: string;
     updated?: string;
     metadata?: {
@@ -1743,6 +1762,10 @@ declare interface ProductGetParams {
      * UUID of the product
      */
     uuid: string;
+    /**
+     * Completnesses of the product
+     */
+    withCompletenesses?: boolean;
 }
 
 /**
@@ -1771,6 +1794,10 @@ declare interface ProductListParams {
      * Whether to include the total count in the response
      */
     withCount?: boolean;
+    /**
+     * Completnesses of the products
+     */
+    withCompletenesses?: boolean;
 }
 
 /**
@@ -2551,7 +2578,7 @@ declare interface SdkApiAssociationType {
 /**
  * SDK interface for attribute operations
  */
-declare interface SdkApiAttribute {
+declare interface SdkApiAttribute_2 {
     /**
      * Get a single attribute by code
      */
@@ -2617,7 +2644,7 @@ declare interface SdkApiAttributeOption {
 /**
  * SDK interface for category operations
  */
-declare interface SdkApiCategory {
+declare interface SdkApiCategory_2 {
     /**
      * Get a single category by code
      */
@@ -2639,7 +2666,7 @@ declare interface SdkApiCategory {
 /**
  * SDK interface for channel operations
  */
-declare interface SdkApiChannel {
+declare interface SdkApiChannel_2 {
     /**
      * Get a single channel by code
      */
@@ -2675,7 +2702,7 @@ declare interface SdkApiCurrency {
 /**
  * SDK interface for family operations
  */
-declare interface SdkApiFamily {
+declare interface SdkApiFamily_2 {
     /**
      * Get a single family by code
      */
@@ -2719,7 +2746,7 @@ declare interface SdkApiFamilyVariant {
 /**
  * SDK interface for locale operations
  */
-declare interface SdkApiLocale {
+declare interface SdkApiLocale_2 {
     /**
      * Get a single locale by code
      */
@@ -2795,7 +2822,7 @@ declare interface SdkApiProductModel {
 /**
  * SDK interface for product UUID operations
  */
-declare interface SdkApiProductUuid {
+declare interface SdkApiProductUuid_2 {
     /**
      * Get a single product by UUID
      */
@@ -2821,7 +2848,7 @@ declare interface SdkApiProductUuid {
 /**
  * Interface defining the available methods for the Reference Entity SDK
  */
-declare interface SdkApiReferenceEntity {
+declare interface SdkApiReferenceEntity_2 {
     /**
      * Get a reference entity by code
      */
@@ -2842,7 +2869,7 @@ declare interface SdkApiReferenceEntity {
 /**
  * Interface defining the available methods for the Reference Entity Attribute SDK
  */
-declare interface SdkApiReferenceEntityAttribute {
+declare interface SdkApiReferenceEntityAttribute_2 {
     /**
      * Get a reference entity attribute by code
      */
@@ -2870,7 +2897,7 @@ declare interface SdkApiReferenceEntityAttributeOption {
 /**
  * Interface defining the available methods for the Reference Entity Record SDK
  */
-declare interface SdkApiReferenceEntityRecord {
+declare interface SdkApiReferenceEntityRecord_2 {
     /**
      * Get a reference entity record by code
      */

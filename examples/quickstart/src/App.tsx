@@ -26,7 +26,7 @@ function App() {
   const [results, setResults] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const runExample = async (exampleFn: () => Promise<void>, exampleName: string) => {
+  const runExample = async (exampleFn: () => Promise<void>) => {
     setIsLoading(true);
     setResults([]);
 
@@ -98,7 +98,7 @@ function App() {
       {examples.map((example) => (
         <Button
           key={example.name}
-          onClick={() => runExample(example.fn, example.name)}
+          onClick={() => runExample(example.fn)}
           disabled={isLoading}
         >
           {example.name}
