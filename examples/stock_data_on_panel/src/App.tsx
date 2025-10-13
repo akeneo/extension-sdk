@@ -23,7 +23,7 @@ function App() {
         const response = await globalThis.PIM.api.external.call({
           method: 'GET',
           url: 'https://66e7dcf4927f4604bcbeb54c920d9761.api.mockbin.io/',
-          credentials_code: 'same-credential_example_1',
+          credentials_code: 'credential_example_1',
         });
 
         const data = await response.json();
