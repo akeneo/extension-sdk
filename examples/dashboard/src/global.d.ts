@@ -1114,6 +1114,15 @@ declare interface ChannelUpdateParams extends ChannelGetParams {
 }
 
 /**
+ * Product completeness
+ */
+declare interface Completeness {
+    locale?: string;
+    scope?: string;
+    data?: number;
+}
+
+/**
  * Currency representation
  */
 declare interface Currency {
@@ -1654,6 +1663,7 @@ declare interface Product {
     values?: ProductValues;
     associations?: ProductAssociations;
     quantifiedAssociations?: ProductQuantifiedAssociations;
+    completenesses?: Completeness[];
     created?: string;
     updated?: string;
     metadata?: {
@@ -1743,6 +1753,10 @@ declare interface ProductGetParams {
      * UUID of the product
      */
     uuid: string;
+    /**
+     * Completnesses of the product
+     */
+    withCompletenesses?: boolean;
 }
 
 /**
@@ -1771,6 +1785,10 @@ declare interface ProductListParams {
      * Whether to include the total count in the response
      */
     withCount?: boolean;
+    /**
+     * Completnesses of the products
+     */
+    withCompletenesses?: boolean;
 }
 
 /**

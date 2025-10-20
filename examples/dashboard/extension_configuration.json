@@ -1,0 +1,19 @@
+{
+  "position": "pim.activity.navigation.tab",
+  "name": "demo_dashboard",
+  "type": "sdk_script",
+  "file": "dist/dashboard.js",
+  "configuration": {
+    "default_label": "Dashboard",
+    "labels": {
+      "en_US": "Dashboard"
+    }
+  },
+  "credentials": [
+    {
+      "code": "credential_code_example",
+      "type": "Bearer Token",
+      "value": "your_token_value_here"
+    }
+  ]
+}
