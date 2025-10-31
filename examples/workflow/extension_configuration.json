@@ -1,0 +1,13 @@
+{
+  "position": "pim.activity.navigation.tab",
+  "name": "sdk_script_extension_quickstart",
+  "type": "sdk_script",
+  "file": "dist/quickstart.js",
+  "configuration": {
+    "default_label": "Quickstart",
+    "labels": {
+      "en_US": "Quickstart"
+    }
+  },
+  "credentials": []
+}
