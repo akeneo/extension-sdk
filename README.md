@@ -11,9 +11,9 @@ With its intuitive methods, it simplifies interactions with the Akeneo PIM API b
 
 If you're unfamiliar with the UI Extension feature, you can find more information in the [Akeneo documentation](https://api.akeneo.com/extensions/overview.html).
 
-For more information about the **available features**, **integration architecture**,  **constraints**, **permissions** and **access control** or **development workflow** you can look at the [Advanced Extension in depth documentation](https://api.akeneo.com/advanced-extensions/sdk-in-depth.html#sdk-in-depth) 
+For more information about the **available features**, **integration architecture**,  **constraints**, **permissions** and **access control** or **development workflow** you can look at the [Advanced Extension in depth documentation](https://api.akeneo.com/advanced-extensions/sdk-in-depth.html#sdk-in-depth). 
 
-For more information about the SDK deployment you can look at the Advanced Extensions [API deployment](https://api.akeneo.com/advanced-extensions/api-deployment.html#api-deployment) or [UI deployment](https://api.akeneo.com/advanced-extensions/ui-deployment.html#ui-deployment)
+For more information about the SDK deployment you can look at the Advanced Extensions [API deployment](https://api.akeneo.com/advanced-extensions/api-deployment.html#api-deployment) or [UI deployment](https://api.akeneo.com/advanced-extensions/ui-deployment.html#ui-deployment).
 
 ### Quick Start Example
 
