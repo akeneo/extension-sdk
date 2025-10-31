@@ -12,6 +12,51 @@ make start
 ```
 ...and follow the interactive instructions in your terminal. This will install dependencies, configure your environment, and create the extension in your PIM for the first time.
 
+### Manual setup commands
+If you prefer to set up your environment manually or need more control over individual steps, you can use these commands:
+
+**Copy environment configuration:**
+```bash
+make copy-env
+```
+This copies `.env.example` to `.env` so you can manually configure your environment variables.
+
+**Install dependencies:**
+```bash
+make install
+```
+This installs all npm dependencies required for the project.
+
+**Get API token:**
+```bash
+make get-token
+```
+This retrieves an API token from your Akeneo PIM instance.
+
+**Create extension (development mode):**
+```bash
+make create-dev
+```
+This creates the extension in development mode in your PIM. This is what `make start` uses internally.
+
+**Create extension with credentials (development mode):**
+```bash
+make create-dev-with-credentials
+```
+This creates the extension in development mode, including any credentials defined in your `extension_configuration.json`.
+
+**Create extension (production mode):**
+```bash
+make create
+```
+This creates the extension in production mode in your PIM.
+
+**Create extension with credentials (production mode):**
+```bash
+make create-with-credentials
+```
+This creates the extension in production mode, including any credentials defined in your `extension_configuration.json`.
+
 ## Development
 
 ### Uploading changes
@@ -19,6 +64,26 @@ To upload your changes to Akeneo, use the following command. This will build the
 ```bash
 make update-dev
 ```
+
+**Update with credentials (development mode):**
+```bash
+make update-dev-with-credentials
+```
+This builds the extension for development and updates it in the PIM, including any credentials defined in your `extension_configuration.json`.
+
+### Development server
+To run the development server locally:
+```bash
+make dev
+```
+This starts a local development server (typically on port 3000) where you can test your extension.
+
+### Development build
+To build the extension for development without uploading:
+```bash
+make build-dev
+```
+This creates a development build with source maps and debugging tools enabled.
 
 ### Automatic updates (hot-reload)
 To have your extension automatically update every time you save a code change, run the watch command:
@@ -95,3 +160,9 @@ To deploy this production version, use:
 ```bash
 make update
 ```
+
+**Update with credentials (production mode):**
+```bash
+make update-with-credentials
+```
+This builds the extension for production and updates it in the PIM, including any credentials defined in your `extension_configuration.json`.
