@@ -1641,6 +1641,7 @@ export declare type PIM_SDK = {
 
 export declare type PIM_USER = {
     username: string;
+    uuid: string;
     first_name: string;
     last_name: string;
 };
