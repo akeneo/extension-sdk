@@ -1,3 +1,8 @@
+declare interface AllottedTime {
+    value?: number;
+    unit?: string;
+}
+
 /**
  * Common link structure for API navigation
  */
@@ -13,6 +18,10 @@ declare interface ApiLinks {
     first?: ApiLink;
     previous?: ApiLink;
     next?: ApiLink;
+}
+
+declare interface ApproveTaskRequest {
+    status: 'approved';
 }
 
 /**
@@ -385,6 +394,18 @@ declare interface AssetUpsertParams extends AssetBaseParams {
      * Asset data to create or update
      */
     asset: AssetData;
+}
+
+declare interface Assignee {
+    uuid?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+}
+
+declare interface AssigneesList {
+    currentPage?: number;
+    items?: Assignee[];
 }
 
 /**
@@ -1122,6 +1143,10 @@ declare interface Completeness {
     data?: number;
 }
 
+declare interface CompleteTaskRequest {
+    status: 'completed';
+}
+
 /**
  * Currency representation
  */
@@ -1176,6 +1201,18 @@ declare interface CurrencyListParams {
      * Number of results per page
      */
     limit?: number;
+}
+
+declare interface ExecutionProduct {
+    uuid: string;
+}
+
+declare interface ExecutionProductModel {
+    code: string;
+}
+
+declare interface ExecutionWorkflow {
+    uuid: string;
 }
 
 declare type externalGateway = {
@@ -1595,6 +1632,13 @@ declare interface PaginatedList<T> {
     links?: ApiLinks;
 }
 
+declare interface PendingAttributeValue {
+    locale?: string | null;
+    scope?: string | null;
+    rejected: boolean;
+    comment?: string;
+}
+
 export declare type PIM_CONTEXT = {
     product: {
         uuid: string;
@@ -1635,6 +1679,9 @@ export declare type PIM_SDK = {
         reference_entity_record_v1: SdkApiReferenceEntityRecord;
         reference_entity_attribute_option_v1: SdkApiReferenceEntityAttributeOption;
         attribute_v1: SdkApiAttribute;
+        workflows_v1: SdkApiWorkflows;
+        workflow_tasks_v1: SdkApiWorkflowTasks;
+        workflow_executions_v1: SdkApiWorkflowExecutions;
     };
     navigate: pimNavigate;
 };
@@ -1758,6 +1805,10 @@ declare interface ProductGetParams {
      * Completnesses of the product
      */
     withCompletenesses?: boolean;
+    /**
+     * Asset share links of the product
+     */
+    withAssetShareLinks?: boolean;
 }
 
 /**
@@ -1790,6 +1841,10 @@ declare interface ProductListParams {
      * Completnesses of the products
      */
     withCompletenesses?: boolean;
+    /**
+     * Asset share links of the products
+     */
+    withAssetShareLinks?: boolean;
 }
 
 /**
@@ -1974,6 +2029,10 @@ declare interface ProductModelGetParams {
      * Code of the product model
      */
     code: string;
+    /**
+     * Asset share links of the product model
+     */
+    withAssetShareLinks?: boolean;
 }
 
 /**
@@ -2022,6 +2081,10 @@ declare interface ProductModelListParams {
      * Whether to include the total count in the response
      */
     withCount?: boolean;
+    /**
+     * Asset share links of the product models
+     */
+    withAssetShareLinks?: boolean;
 }
 
 /**
@@ -2088,6 +2151,7 @@ declare interface ProductModelValues {
         locale?: string;
         scope?: string;
         data: any;
+        linked_data?: any;
     }>;
 }
 
@@ -2167,6 +2231,7 @@ declare interface ProductValues {
         locale?: string;
         scope?: string;
         data: any;
+        linked_data?: any;
     }>;
 }
 
@@ -2454,6 +2519,20 @@ declare interface ReferenceEntityRecordValues {
  * Type for partially updating a reference entity
  */
 declare type ReferenceEntityUpdate = Partial<ReferenceEntityCreate>;
+
+declare interface RejectedAttributeValue {
+    locale: string | null;
+    scope: string | null;
+    comment: string;
+}
+
+declare interface RejectTaskRequest {
+    status: 'rejected';
+    sendBackToStepUuid: string;
+    rejectedAttributes?: {
+        [key: string]: RejectedAttributeValue[];
+    };
+}
 
 /**
  * SDK interface for asset operations
@@ -2917,6 +2996,33 @@ declare interface SdkApiSystem {
     get: () => Promise<SystemInfo>;
 }
 
+declare interface SdkApiWorkflowExecutions {
+    start: (executions: StartExecutionRequest[]) => Promise<void>;
+}
+
+declare interface SdkApiWorkflows {
+    list: (page?: number, limit?: number) => Promise<WorkflowsList>;
+    get: (uuid: string) => Promise<Workflow>;
+    getStepAssignees: (stepUuid: string, page?: number, limit?: number) => Promise<AssigneesList>;
+}
+
+declare interface SdkApiWorkflowTasks {
+    list: (search: string, withAttributes?: boolean, page?: number, limit?: number) => Promise<WorkflowTasksList>;
+    patch: (uuid: string, request: UpdateTaskRequest) => Promise<void>;
+}
+
+declare interface StartExecutionForProductModelRequest {
+    workflow: ExecutionWorkflow;
+    productModel: ExecutionProductModel;
+}
+
+declare interface StartExecutionForProductRequest {
+    workflow: ExecutionWorkflow;
+    product: ExecutionProduct;
+}
+
+declare type StartExecutionRequest = StartExecutionForProductRequest | StartExecutionForProductModelRequest;
+
 /**
  * Represents system information in the SDK
  */
@@ -2931,6 +3037,16 @@ declare interface SystemInfo {
     edition?: string;
 }
 
+declare interface TaskProduct {
+    uuid?: string;
+}
+
+declare interface TaskProductModel {
+    code?: string;
+}
+
+declare type UpdateTaskRequest = RejectTaskRequest | CompleteTaskRequest | ApproveTaskRequest;
+
 /**
  * Variant attribute set for defining attribute distribution in family variants
  */
@@ -2938,6 +3054,54 @@ declare interface VariantAttributeSet {
     level: number;
     axes: string[];
     attributes: string[];
+}
+
+declare interface Workflow {
+    uuid?: string;
+    code?: string;
+    labels?: Record<string, string>;
+    enabled?: boolean;
+    steps?: WorkflowStep[];
+}
+
+declare interface WorkflowListItem {
+    uuid?: string;
+    code?: string;
+    labels?: Record<string, string>;
+    enabled?: boolean;
+}
+
+declare interface WorkflowsList {
+    currentPage?: number;
+    items?: WorkflowListItem[];
+}
+
+declare interface WorkflowStep {
+    uuid?: string;
+    code?: string;
+    type?: string;
+    labels?: Record<string, string>;
+    descriptions?: Record<string, string>;
+    allottedTime?: AllottedTime;
+    channelsAndLocales?: Record<string, string[]>;
+}
+
+declare interface WorkflowTask {
+    uuid?: string;
+    status?: string;
+    createdAt?: string;
+    product?: TaskProduct;
+    productModel?: TaskProductModel;
+    dueDate?: string | null;
+    rejected?: boolean;
+    pendingAttributes?: {
+        [key: string]: PendingAttributeValue[];
+    };
+}
+
+declare interface WorkflowTasksList {
+    currentPage?: number;
+    items?: WorkflowTask[];
 }
 
 export { }
