@@ -1648,6 +1648,11 @@ export declare type PIM_CONTEXT = {
     category: {
         code: string;
     };
+} | {
+    productGrid: {
+        productUuids: string[];
+        productModelCodes: string[];
+    };
 };
 
 export declare type PIM_SDK = {
