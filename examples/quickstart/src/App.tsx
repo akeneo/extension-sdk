@@ -7,6 +7,23 @@ import {
 } from "akeneo-design-system";
 import { useEffect, useState } from "react";
 
+interface ShopifyProduct {
+  id: number;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  status: string;
+  variants: Array<{
+    id: number;
+    sku: string;
+    title: string;
+  }>;
+}
+
+interface ShopifyProductsResponse {
+  products: ShopifyProduct[];
+}
+
 interface ShopifyOrder {
   id: number;
   name: string;
@@ -44,6 +61,8 @@ function App() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [productSku, setProductSku] = useState<string | null>(null);
+  const [shopifyProduct, setShopifyProduct] = useState<ShopifyProduct | null>(null);
+  const [isLoadingProduct, setIsLoadingProduct] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchProductAndOrders = async () => {
@@ -89,6 +108,41 @@ function App() {
         }
 
         setProductSku(sku);
+
+        // Fetch product from Shopify to check if it exists
+        try {
+          setIsLoadingProduct(true);
+          const productsResponse = await globalThis.PIM.api.external.call({
+            method: 'GET',
+            url: `https://extensibility-store-2.myshopify.com/admin/api/2024-01/products.json?limit=250`,
+            credentials_code: 'shopify_access_token',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          const productsText = await productsResponse.text();
+          const productsApiResponse: {
+            statusCode: number;
+            body: ShopifyProductsResponse;
+            error: any;
+          } = JSON.parse(productsText);
+
+          if (!productsApiResponse.error && productsApiResponse.statusCode === 200) {
+            const products = productsApiResponse.body.products;
+            // Find product by SKU in variants
+            const foundProduct = products.find(p =>
+              p.variants.some(v => v.sku === sku)
+            );
+            if (foundProduct) {
+              setShopifyProduct(foundProduct);
+            }
+          }
+        } catch (err) {
+          console.warn('Could not fetch Shopify products:', err);
+        } finally {
+          setIsLoadingProduct(false);
+        }
 
         // Fetch orders from Shopify
         const shopifyResponse = await globalThis.PIM.api.external.call({
@@ -242,7 +296,7 @@ function App() {
             gap: '8px',
             flexWrap: 'wrap'
           }}>
-            <span>Shopify Orders</span>
+            <span>Shopify Integration</span>
             {productSku && (
               <span style={{
                 fontSize: '13px',
@@ -255,6 +309,122 @@ function App() {
           </div>
         </SectionTitle>
       </div>
+
+      {/* Product Presence Section */}
+      {!error && productSku && (
+        <div style={{ marginBottom: '20px' }}>
+          {isLoadingProduct ? (
+            <div style={{
+              border: '1px solid #E8EBEE',
+              borderRadius: '4px',
+              padding: '12px',
+              backgroundColor: '#FFFFFF',
+            }}>
+              <Helper level="info" inline={false}>
+                Checking if product exists in Shopify...
+              </Helper>
+            </div>
+          ) : shopifyProduct ? (
+            <div style={{
+              border: '2px solid #2FAF7B',
+              borderRadius: '4px',
+              padding: '16px',
+              backgroundColor: '#F0FDF4',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginBottom: '12px'
+              }}>
+                <Badge level="primary">Found in Shopify</Badge>
+                <strong style={{ fontSize: '15px', color: '#2FAF7B' }}>
+                  {shopifyProduct.title}
+                </strong>
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '12px',
+                fontSize: '13px'
+              }}>
+                <div>
+                  <div style={{ color: '#67768A', marginBottom: '4px', fontSize: '12px' }}>Status</div>
+                  <div>
+                    <Badge level={shopifyProduct.status === 'active' ? 'primary' : 'warning'}>
+                      {shopifyProduct.status}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ color: '#67768A', marginBottom: '4px', fontSize: '12px' }}>Created</div>
+                  <div style={{ fontWeight: 500 }}>
+                    {formatDate(shopifyProduct.created_at)}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ color: '#67768A', marginBottom: '4px', fontSize: '12px' }}>Last Updated</div>
+                  <div style={{ fontWeight: 500 }}>
+                    {formatDate(shopifyProduct.updated_at)}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '12px' }}>
+                <a
+                  href={`https://extensibility-store-2.myshopify.com/admin/products/${shopifyProduct.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-block',
+                    padding: '6px 12px',
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    color: '#5E4ABA',
+                    textDecoration: 'none',
+                    border: '1px solid #5E4ABA',
+                    borderRadius: '4px',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#F0EDFC';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  View in Shopify
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div style={{
+              border: '2px solid #F5A623',
+              borderRadius: '4px',
+              padding: '12px',
+              backgroundColor: '#FFF8E1',
+            }}>
+              <Helper level="warning" inline={false}>
+                Product with SKU "{productSku}" was not found in Shopify.
+              </Helper>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Orders Section Title */}
+      {!error && !isLoading && orders.length > 0 && (
+        <div style={{ marginBottom: '12px', marginTop: '20px' }}>
+          <SectionTitle>
+            <SectionTitle.Title level="secondary">Orders</SectionTitle.Title>
+          </SectionTitle>
+        </div>
+      )}
 
       {isLoading && (
         <Placeholder
