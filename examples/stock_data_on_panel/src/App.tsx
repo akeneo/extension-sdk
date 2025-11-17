@@ -4,7 +4,8 @@ import {
   ApiIllustration,
   Helper,
   Badge,
-  Button
+  Button,
+  TextInput
 } from "akeneo-design-system";
 import { useEffect, useState } from "react";
 
@@ -57,20 +58,22 @@ interface ProductOrderData {
 
 function App() {
   const [topProducts, setTopProducts] = useState<ProductOrderData[]>([]);
-  const [isLoadingShopify, setIsLoadingShopify] = useState<boolean>(true);
+  const [isLoadingShopify, setIsLoadingShopify] = useState<boolean>(false);
   const [isLoadingAkeneo, setIsLoadingAkeneo] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [shopifyUrl, setShopifyUrl] = useState<string>('');
+  const [shopifyUrlInput, setShopifyUrlInput] = useState<string>('');
+  const [isUrlSet, setIsUrlSet] = useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchOrdersAndCalculateTopProducts = async () => {
+  const fetchOrdersAndCalculateTopProducts = async (storeUrl: string) => {
       try {
         setIsLoadingShopify(true);
         setError(null);
 
-        // Fetch orders from Shopify
+        // Fetch orders from Shopify using the provided store URL
         const shopifyResponse = await globalThis.PIM.api.external.call({
           method: 'GET',
-          url: `https://extensibility-store-2.myshopify.com/admin/api/2024-01/orders.json?status=any&limit=250`,
+          url: `${storeUrl}/admin/api/2024-01/orders.json?status=any&limit=250`,
           credentials_code: 'shopify_access_token',
           headers: {
             'Content-Type': 'application/json',
@@ -243,16 +246,13 @@ function App() {
       }
     };
 
-    fetchOrdersAndCalculateTopProducts();
-  }, []);
-
   const handleProductClick = (productUuid: string) => {
     globalThis.PIM.navigate.internal(`/#/enrich/product/${productUuid}`);
   };
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {Ok
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -261,6 +261,30 @@ function App() {
 
   const formatCurrency = (amount: number, currency: string): string => {
     return `${currency} ${amount.toFixed(2)}`;
+  };
+
+  const handleUrlSubmit = () => {
+    const trimmedUrl = shopifyUrlInput.trim();
+
+    // Basic validation
+    if (!trimmedUrl) {
+      setError('Please enter a Shopify store URL');
+      return;
+    }
+
+    // Remove trailing slash if present
+    const cleanedUrl = trimmedUrl.replace(/\/$/, '');
+
+    // Validate URL format
+    if (!cleanedUrl.match(/^https:\/\/[^\/]+\.myshopify\.com$/)) {
+      setError('Please enter a valid Shopify store URL (e.g., https://your-store.myshopify.com)');
+      return;
+    }
+
+    setShopifyUrl(cleanedUrl);
+    setIsUrlSet(true);
+    setError(null);
+    fetchOrdersAndCalculateTopProducts(cleanedUrl);
   };
 
   return (
@@ -283,6 +307,66 @@ function App() {
         </SectionTitle>
       </div>
 
+      {/* Shopify URL Input */}
+      <div style={{
+        marginBottom: '20px',
+        border: '2px solid #5E4ABA',
+        borderRadius: '4px',
+        padding: '16px',
+        backgroundColor: '#F0EDFC'
+      }}>
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{
+            display: 'block',
+            fontWeight: 600,
+            fontSize: '14px',
+            marginBottom: '8px',
+            color: '#333'
+          }}>
+            Shopify Store URL
+          </label>
+          <div style={{ marginBottom: '12px' }}>
+            <Helper level="info" inline={false}>
+              Enter your Shopify store URL (e.g., https://your-store.myshopify.com)
+            </Helper>
+          </div>
+        </div>
+
+        {!isUrlSet ? (
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+            <div style={{ flex: 1 }}>
+              <TextInput
+                value={shopifyUrlInput}
+                onChange={(value: string) => setShopifyUrlInput(value)}
+                placeholder="https://your-store.myshopify.com"
+              />
+            </div>
+            <Button
+              onClick={handleUrlSubmit}
+              level="primary"
+              disabled={!shopifyUrlInput.trim()}
+            >
+              Load Dashboard
+            </Button>
+          </div>
+        ) : (
+          <div style={{
+            padding: '8px 12px',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '4px',
+            border: '1px solid #E8EBEE'
+          }}>
+            <div style={{ fontSize: '12px', color: '#67768A', marginBottom: '4px' }}>
+              Connected to:
+            </div>
+            <div style={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '14px' }}>
+              {shopifyUrl}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Loading, Error, and Data Display States */}
       {isLoadingShopify && topProducts.length === 0 && (
         <Placeholder
           illustration={<ApiIllustration />}
@@ -346,7 +430,7 @@ function App() {
                     {/* Shopify link */}
                     {product.shopifyProductId ? (
                       <a
-                        href={`https://extensibility-store-2.myshopify.com/admin/products/${product.shopifyProductId}`}
+                        href={`${shopifyUrl}/admin/products/${product.shopifyProductId}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{

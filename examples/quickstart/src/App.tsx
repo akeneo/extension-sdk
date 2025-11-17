@@ -3,7 +3,9 @@ import {
   Placeholder,
   ApiIllustration,
   Helper,
-  Badge
+  Badge,
+  Button,
+  TextInput
 } from "akeneo-design-system";
 import { useEffect, useState } from "react";
 
@@ -58,14 +60,16 @@ interface ExternalApiResponse {
 
 function App() {
   const [orders, setOrders] = useState<ShopifyOrder[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [productSku, setProductSku] = useState<string | null>(null);
   const [shopifyProduct, setShopifyProduct] = useState<ShopifyProduct | null>(null);
-  const [isLoadingProduct, setIsLoadingProduct] = useState<boolean>(true);
+  const [isLoadingProduct, setIsLoadingProduct] = useState<boolean>(false);
+  const [shopifyUrl, setShopifyUrl] = useState<string>('');
+  const [shopifyUrlInput, setShopifyUrlInput] = useState<string>('');
+  const [isUrlSet, setIsUrlSet] = useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchProductAndOrders = async () => {
+  const fetchProductAndOrders = async (storeUrl: string) => {
       try {
         setIsLoading(true);
         setError(null);
@@ -114,7 +118,7 @@ function App() {
           setIsLoadingProduct(true);
           const productsResponse = await globalThis.PIM.api.external.call({
             method: 'GET',
-            url: `https://extensibility-store-2.myshopify.com/admin/api/2024-01/products.json?limit=250`,
+            url: `${storeUrl}/admin/api/2024-01/products.json?limit=250`,
             credentials_code: 'shopify_access_token',
             headers: {
               'Content-Type': 'application/json',
@@ -147,7 +151,7 @@ function App() {
         // Fetch orders from Shopify
         const shopifyResponse = await globalThis.PIM.api.external.call({
           method: 'GET',
-          url: `https://extensibility-store-2.myshopify.com/admin/api/2024-01/orders.json?status=any&limit=250`,
+          url: `${storeUrl}/admin/api/2024-01/orders.json?status=any&limit=250`,
           credentials_code: 'shopify_access_token',
           headers: {
             'Content-Type': 'application/json',
@@ -191,8 +195,29 @@ function App() {
       }
     };
 
-    fetchProductAndOrders();
-  }, []);
+  const handleUrlSubmit = () => {
+    const trimmedUrl = shopifyUrlInput.trim();
+
+    // Basic validation
+    if (!trimmedUrl) {
+      setError('Please enter a Shopify store URL');
+      return;
+    }
+
+    // Remove trailing slash if present
+    const cleanedUrl = trimmedUrl.replace(/\/$/, '');
+
+    // Validate URL format
+    if (!cleanedUrl.match(/^https:\/\/[^\/]+\.myshopify\.com$/)) {
+      setError('Please enter a valid Shopify store URL (e.g., https://your-store.myshopify.com)');
+      return;
+    }
+
+    setShopifyUrl(cleanedUrl);
+    setIsUrlSet(true);
+    setError(null);
+    fetchProductAndOrders(cleanedUrl);
+  };
 
   const getStatusBadgeLevel = (status: string): 'primary' | 'warning' | 'danger' => {
     if (status === 'paid' || status === 'fulfilled') return 'primary';
@@ -310,8 +335,67 @@ function App() {
         </SectionTitle>
       </div>
 
+      {/* Shopify URL Input */}
+      <div style={{
+        marginBottom: '20px',
+        border: '2px solid #5E4ABA',
+        borderRadius: '4px',
+        padding: '16px',
+        backgroundColor: '#F0EDFC'
+      }}>
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{
+            display: 'block',
+            fontWeight: 600,
+            fontSize: '14px',
+            marginBottom: '8px',
+            color: '#333'
+          }}>
+            Shopify Store URL
+          </label>
+          <div style={{ marginBottom: '12px' }}>
+            <Helper level="info" inline={false}>
+              Enter your Shopify store URL (e.g., https://your-store.myshopify.com)
+            </Helper>
+          </div>
+        </div>
+
+        {!isUrlSet ? (
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+            <div style={{ flex: 1 }}>
+              <TextInput
+                value={shopifyUrlInput}
+                onChange={(value: string) => setShopifyUrlInput(value)}
+                placeholder="https://your-store.myshopify.com"
+              />
+            </div>
+            <Button
+              onClick={handleUrlSubmit}
+              level="primary"
+              disabled={!shopifyUrlInput.trim()}
+            >
+              Load Data
+            </Button>
+          </div>
+        ) : (
+          <div style={{
+            padding: '8px 12px',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '4px',
+            border: '1px solid #E8EBEE'
+          }}>
+            <div style={{ fontSize: '12px', color: '#67768A', marginBottom: '4px' }}>
+              Connected to:
+            </div>
+            <div style={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '14px' }}>
+              {shopifyUrl}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Product Presence Section */}
-      {!error && productSku && (
+      {!error && productSku && isUrlSet && (
         <div style={{ marginBottom: '20px' }}>
           {isLoadingProduct ? (
             <div style={{
@@ -375,7 +459,7 @@ function App() {
 
               <div style={{ marginTop: '12px' }}>
                 <a
-                  href={`https://extensibility-store-2.myshopify.com/admin/products/${shopifyProduct.id}`}
+                  href={`${shopifyUrl}/admin/products/${shopifyProduct.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -426,7 +510,7 @@ function App() {
         </div>
       )}
 
-      {isLoading && (
+      {isLoading && isUrlSet && (
         <Placeholder
           illustration={<ApiIllustration />}
           title="Loading Shopify orders..."
@@ -441,7 +525,7 @@ function App() {
         </Helper>
       )}
 
-      {!isLoading && !error && orders.length === 0 && (
+      {!isLoading && !error && isUrlSet && orders.length === 0 && (
         <Placeholder
           illustration={<ApiIllustration />}
           title="No orders found"
