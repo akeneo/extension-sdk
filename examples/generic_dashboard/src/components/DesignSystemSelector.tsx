@@ -24,8 +24,9 @@ export const DesignSystemSelector = () => {
             <SelectValue placeholder="Select design system" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="custom">Custom UI</SelectItem>
+            <SelectItem value="shadcn">shadcn/ui (Radix UI + Tailwind)</SelectItem>
             <SelectItem value="akeneo">Akeneo Design System</SelectItem>
+            <SelectItem value="polaris">Shopify Polaris Web Components</SelectItem>
           </SelectContent>
         </Select>
       </div>

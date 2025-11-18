@@ -2946,4 +2946,20 @@ declare global {
     namespace globalThis {
         var PIM: PIM_SDK;
     }
+
+    namespace JSX {
+        interface IntrinsicElements {
+            'ui-card': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+            'ui-text': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { variant?: string }, HTMLElement>;
+            'ui-data-table': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+            'ui-progress-bar': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { progress?: number }, HTMLElement>;
+            'ui-select': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
+                value?: string;
+                onChange?: (e: CustomEvent) => void;
+            }, HTMLElement>;
+            'ui-option': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { value?: string }, HTMLElement>;
+            'ui-block-stack': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { gap?: string }, HTMLElement>;
+            'ui-inline-stack': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { gap?: string }, HTMLElement>;
+        }
+    }
 }

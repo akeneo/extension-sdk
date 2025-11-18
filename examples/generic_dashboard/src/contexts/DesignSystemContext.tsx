@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type DesignSystem = 'custom' | 'akeneo';
+export type DesignSystem = 'shadcn' | 'akeneo' | 'polaris';
 
 interface DesignSystemContextType {
   designSystem: DesignSystem;
@@ -10,7 +10,7 @@ interface DesignSystemContextType {
 const DesignSystemContext = createContext<DesignSystemContextType | undefined>(undefined);
 
 export const DesignSystemProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [designSystem, setDesignSystem] = useState<DesignSystem>('custom');
+  const [designSystem, setDesignSystem] = useState<DesignSystem>('shadcn');
 
   return (
     <DesignSystemContext.Provider value={{ designSystem, setDesignSystem }}>
