@@ -197,7 +197,7 @@ function App() {
 
             if (productsResult.items && productsResult.items.length > 0) {
               productsResult.items.forEach((akProduct) => {
-                // Try to get SKU from values field
+                // Try to get SKU from the sku attribute
                 if (akProduct.values?.sku) {
                   const skuValues = akProduct.values.sku;
                   if (Array.isArray(skuValues) && skuValues.length > 0 && skuValues[0].data) {
@@ -205,9 +205,25 @@ function App() {
                   }
                 }
 
-                // Also map by identifier as fallback
-                if (akProduct.identifier) {
-                  skuToUuidMap.set(akProduct.identifier, akProduct.uuid);
+                // If SKU not found, search through all identifier-type attributes
+                // (identifier field is empty due to a known bug)
+                if (akProduct.values && !skuToUuidMap.has(akProduct.uuid)) {
+                  for (const [attributeCode, attributeValue] of Object.entries(akProduct.values)) {
+                    if (Array.isArray(attributeValue) && attributeValue.length > 0) {
+                      const firstValue = attributeValue[0];
+                      // Check if this is a pim_catalog_identifier type attribute with data
+                      if (firstValue && typeof firstValue === 'object' &&
+                          'attribute_type' in firstValue &&
+                          firstValue.attribute_type === 'pim_catalog_identifier' &&
+                          'data' in firstValue) {
+                        const data = firstValue.data;
+                        if (typeof data === 'string' && data.trim().length > 0) {
+                          skuToUuidMap.set(data.trim(), akProduct.uuid);
+                          break;
+                        }
+                      }
+                    }
+                  }
                 }
               });
 

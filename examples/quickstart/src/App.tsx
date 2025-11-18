@@ -93,16 +93,33 @@ function App() {
         // Get product SKU from values field
         let sku: string | null = null;
 
-        // Try to get SKU from values
+        // Try to get SKU from the sku attribute
         if (product.values?.sku) {
           if (Array.isArray(product.values.sku) && product.values.sku.length > 0) {
             sku = product.values.sku[0].data;
           }
         }
 
-        // Fallback to identifier if SKU attribute doesn't exist
-        if (!sku && product.identifier) {
-          sku = product.identifier;
+        // If SKU not found, search through all identifier-type attributes
+        // (identifier field is empty due to a known bug)
+        if (!sku && product.values) {
+          for (const [attributeCode, attributeValue] of Object.entries(product.values)) {
+            if (Array.isArray(attributeValue) && attributeValue.length > 0) {
+              const firstValue = attributeValue[0];
+              // Check if this is a pim_catalog_identifier type attribute with data
+              if (firstValue && typeof firstValue === 'object' &&
+                  'attribute_type' in firstValue &&
+                  firstValue.attribute_type === 'pim_catalog_identifier' &&
+                  'data' in firstValue) {
+                const data = firstValue.data;
+                if (typeof data === 'string' && data.trim().length > 0) {
+                  sku = data.trim();
+                  console.log(`Found SKU in identifier attribute '${attributeCode}': ${sku}`);
+                  break;
+                }
+              }
+            }
+          }
         }
 
         if (!sku) {
