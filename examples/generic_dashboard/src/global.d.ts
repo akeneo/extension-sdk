@@ -2949,17 +2949,12 @@ declare global {
 
     namespace JSX {
         interface IntrinsicElements {
-            'ui-card': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-            'ui-text': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { variant?: string }, HTMLElement>;
-            'ui-data-table': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-            'ui-progress-bar': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { progress?: number }, HTMLElement>;
-            'ui-select': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
-                value?: string;
-                onChange?: (e: CustomEvent) => void;
-            }, HTMLElement>;
-            'ui-option': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { value?: string }, HTMLElement>;
-            'ui-block-stack': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { gap?: string }, HTMLElement>;
-            'ui-inline-stack': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { gap?: string }, HTMLElement>;
+            's-section': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { title?: string }, HTMLElement>;
+            's-text': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { variant?: string }, HTMLElement>;
+            's-table': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+            's-stack': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { gap?: string; direction?: 'vertical' | 'horizontal' }, HTMLElement>;
+            's-grid': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+            's-page': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
         }
     }
 }
