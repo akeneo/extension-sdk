@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { ThemeProvider } from 'styled-components';
+import { pimTheme } from 'akeneo-design-system';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -125,15 +127,17 @@ function App() {
         )}
 
         {designSystem === 'akeneo' && (
-          <AkeneoDashboard
-            productStatusData={productStatusData}
-            pricingStatusData={pricingStatusData}
-            chartOptions={chartOptions}
-            selectedFamilyLabel={selectedFamilyLabel}
-            completenessData={completenessData}
-            completenessLoading={completenessLoading}
-            products={products}
-          />
+          <ThemeProvider theme={pimTheme}>
+            <AkeneoDashboard
+              productStatusData={productStatusData}
+              pricingStatusData={pricingStatusData}
+              chartOptions={chartOptions}
+              selectedFamilyLabel={selectedFamilyLabel}
+              completenessData={completenessData}
+              completenessLoading={completenessLoading}
+              products={products}
+            />
+          </ThemeProvider>
         )}
 
         {designSystem === 'polaris' && (
