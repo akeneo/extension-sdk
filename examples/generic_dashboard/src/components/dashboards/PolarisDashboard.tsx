@@ -58,20 +58,18 @@ export const PolarisDashboard = ({
           Complete products with or without a price.
         </p>
         <s-table>
-          <thead>
-            <tr>
-              <th>Status</th>
-              <th>Count</th>
-            </tr>
-          </thead>
-          <tbody>
+          <s-table-header-row>
+            <s-table-header>Status</s-table-header>
+            <s-table-header>Count</s-table-header>
+          </s-table-header-row>
+          <s-table-body>
             {pricingLabels.map((label: string, index: number) => (
-              <tr key={index}>
-                <td>{label}</td>
-                <td>{pricingValues[index] || 0}</td>
-              </tr>
+              <s-table-row>
+                <s-table-cell>{label}</s-table-cell>
+                <s-table-cell>{pricingValues[index] || 0}</s-table-cell>
+              </s-table-row>
             ))}
-          </tbody>
+          </s-table-body>
         </s-table>
       </s-section>
 

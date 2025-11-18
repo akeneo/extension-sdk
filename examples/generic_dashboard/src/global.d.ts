@@ -2946,15 +2946,4 @@ declare global {
     namespace globalThis {
         var PIM: PIM_SDK;
     }
-
-    namespace JSX {
-        interface IntrinsicElements {
-            's-section': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { title?: string }, HTMLElement>;
-            's-text': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { variant?: string }, HTMLElement>;
-            's-table': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-            's-stack': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & { gap?: string; direction?: 'vertical' | 'horizontal' }, HTMLElement>;
-            's-grid': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-            's-page': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-        }
-    }
 }

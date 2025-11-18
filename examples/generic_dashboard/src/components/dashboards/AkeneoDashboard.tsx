@@ -47,9 +47,11 @@ export const AkeneoDashboard = ({
   // Extract data from chart objects
   const pricingLabels = pricingStatusData.labels || [];
   const pricingValues = pricingStatusData.datasets?.[0]?.data || [];
+  const pricingTotal = pricingValues.reduce((sum: number, val: number) => sum + val, 0);
 
   const productLabels = productStatusData.labels || [];
   const productValues = productStatusData.datasets?.[0]?.data || [];
+  const productTotal = productValues.reduce((sum: number, val: number) => sum + val, 0);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -64,14 +66,20 @@ export const AkeneoDashboard = ({
           <Table.Header>
             <Table.HeaderCell>Status</Table.HeaderCell>
             <Table.HeaderCell>Count</Table.HeaderCell>
+            <Table.HeaderCell>Percentage</Table.HeaderCell>
           </Table.Header>
           <Table.Body>
-            {pricingLabels.map((label: string, index: number) => (
-              <Table.Row key={index}>
-                <Table.Cell>{label}</Table.Cell>
-                <Table.Cell>{pricingValues[index] || 0}</Table.Cell>
-              </Table.Row>
-            ))}
+            {pricingLabels.map((label: string, index: number) => {
+              const value = pricingValues[index] || 0;
+              const percentage = pricingTotal > 0 ? ((value / pricingTotal) * 100).toFixed(1) : '0.0';
+              return (
+                <Table.Row key={index}>
+                  <Table.Cell>{label}</Table.Cell>
+                  <Table.Cell>{value}</Table.Cell>
+                  <Table.Cell>{percentage}%</Table.Cell>
+                </Table.Row>
+              );
+            })}
           </Table.Body>
         </Table>
       </div>
@@ -85,14 +93,20 @@ export const AkeneoDashboard = ({
           <Table.Header>
             <Table.HeaderCell>Status</Table.HeaderCell>
             <Table.HeaderCell>Count</Table.HeaderCell>
+            <Table.HeaderCell>Percentage</Table.HeaderCell>
           </Table.Header>
           <Table.Body>
-            {productLabels.map((label: string, index: number) => (
-              <Table.Row key={index}>
-                <Table.Cell>{label}</Table.Cell>
-                <Table.Cell>{productValues[index] || 0}</Table.Cell>
-              </Table.Row>
-            ))}
+            {productLabels.map((label: string, index: number) => {
+              const value = productValues[index] || 0;
+              const percentage = productTotal > 0 ? ((value / productTotal) * 100).toFixed(1) : '0.0';
+              return (
+                <Table.Row key={index}>
+                  <Table.Cell>{label}</Table.Cell>
+                  <Table.Cell>{value}</Table.Cell>
+                  <Table.Cell>{percentage}%</Table.Cell>
+                </Table.Row>
+              );
+            })}
           </Table.Body>
         </Table>
       </div>
