@@ -1,0 +1,89 @@
+import { useEffect, useState } from "react";
+
+// Define a more specific type for Product to help with type safety
+interface Product {
+    uuid: string;
+    identifier: string;
+    updated: string;
+    family: string;
+    enabled: boolean;
+    values: {
+        [key: string]: any;
+    };
+    imageUrl?: string; // Add imageUrl to the product type
+}
+
+/**
+ * A hook to fetch a list of products from the Akeneo PIM API, including their main image.
+ */
+const useProducts = (familyCode: string | null) => {
+    const [products, setProducts] = useState<Product[]>([]);
+
+    useEffect(() => {
+        const fetchProductsAndImages = async () => {
+            console.log("useProducts hook: Mounting and preparing to fetch...");
+
+            if (globalThis.PIM?.api?.product_uuid_v1 && globalThis.PIM?.api?.asset_v1 && familyCode) {
+                try {
+                    console.log(`useProducts hook: PIM API found, calling list() for family ${familyCode}.`);
+                    const search = {
+                        "family": [{
+                            "operator": "IN",
+                            "value": [familyCode]
+                        }]
+                    };
+        
+                    const response = await globalThis.PIM.api.product_uuid_v1.list({
+                        limit: 10,
+                        search: search,
+                        withCompletenesses: true,
+                    });
+
+                    console.log("useProducts hook: API response received:", response);
+                    if (response.items) {
+                        const productsWithImages = await Promise.all(
+                            response.items.map(async (product: any) => {
+                                const imageAssetCollection = product.values?.main_image?.[0];
+                                if (imageAssetCollection && imageAssetCollection.data?.length > 0) {
+                                    const assetFamily = imageAssetCollection.reference_data_name;
+                                    const assetCode = imageAssetCollection.data[0];
+
+                                    try {
+                                        const asset = await globalThis.PIM.api.asset_v1.get(assetFamily, assetCode);
+                                        const firstAttributeValues = Object.values(asset)[0] as any[];
+                                        
+                                        if (firstAttributeValues && firstAttributeValues.length > 0) {
+                                            const imageUrl = firstAttributeValues[0]?._links?.share_link?.href;
+                                            if (imageUrl) {
+                                                return { ...product, imageUrl };
+                                            }
+                                        }
+                                    } catch (error) {
+                                        console.error(`Failed to fetch asset for product ${product.identifier}:`, error);
+                                    }
+                                }
+                                return product; // Return product without image URL if something fails
+                            })
+                        );
+                        
+                        console.log("useProducts hook: Setting products state with:", productsWithImages);
+                        setProducts(productsWithImages);
+                    }
+                } catch (error) {
+                    console.error("useProducts hook: Failed to fetch products:", error);
+                }
+            } else {
+                console.warn("useProducts hook: PIM API not found on globalThis or no family selected.");
+                if (!familyCode) {
+                    setProducts([]);
+                }
+            }
+        };
+
+        fetchProductsAndImages();
+    }, [familyCode]);
+
+    return products;
+}
+
+export { useProducts };
