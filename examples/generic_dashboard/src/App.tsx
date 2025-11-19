@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { pimTheme } from 'akeneo-design-system';
+import { AppProvider } from '@shopify/polaris';
+import '@shopify/polaris/build/esm/styles.css';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -19,6 +21,7 @@ import { DesignSystemSelector } from './components/DesignSystemSelector.tsx';
 import { useDesignSystem } from './contexts/DesignSystemContext';
 import { ShadcnDashboard } from './components/dashboards/ShadcnDashboard';
 import { AkeneoDashboard } from './components/dashboards/AkeneoDashboard';
+import { PolarisDashboard } from './components/dashboards/PolarisDashboard';
 
 ChartJS.register(
   ArcElement,
@@ -105,6 +108,19 @@ function App() {
               products={products}
             />
           </ThemeProvider>
+        )}
+
+        {designSystem === 'polaris' && (
+          <AppProvider i18n={{}}>
+            <PolarisDashboard
+              productStatusData={productStatusData}
+              pricingStatusData={pricingStatusData}
+              selectedFamilyLabel={selectedFamilyLabel}
+              completenessData={completenessData}
+              completenessLoading={completenessLoading}
+              products={products}
+            />
+          </AppProvider>
         )}
       </div>
     </>
