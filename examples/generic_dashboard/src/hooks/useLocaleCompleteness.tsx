@@ -66,7 +66,7 @@ const useLocaleCompleteness = (selectedFamily: string | null) => {
 
                         // Process real or fake data
                         for (const score of completenessScores) {
-                            if (score.locale) {
+                            if (score.locale && score.data !== undefined) {
                                 if (!accumulators[score.locale]) {
                                     accumulators[score.locale] = { sum: 0, count: 0 };
                                 }

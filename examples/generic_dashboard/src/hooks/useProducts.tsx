@@ -49,7 +49,10 @@ const useProducts = (familyCode: string | null) => {
                                     const assetCode = imageAssetCollection.data[0];
 
                                     try {
-                                        const asset = await globalThis.PIM.api.asset_v1.get(assetFamily, assetCode);
+                                        const asset = await globalThis.PIM.api.asset_v1.get({
+                                            assetFamilyCode: assetFamily,
+                                            code: assetCode
+                                        });
                                         const firstAttributeValues = Object.values(asset)[0] as any[];
                                         
                                         if (firstAttributeValues && firstAttributeValues.length > 0) {

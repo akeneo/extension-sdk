@@ -98,6 +98,8 @@ function App() {
 
   const selectedFamilyLabel = families.find(f => f.code === selectedFamily)?.label || '...';
 
+  console.log(designSystem);
+
   return (
     <>
       <DesignSystemSelector />
@@ -131,7 +133,6 @@ function App() {
             <AkeneoDashboard
               productStatusData={productStatusData}
               pricingStatusData={pricingStatusData}
-              chartOptions={chartOptions}
               selectedFamilyLabel={selectedFamilyLabel}
               completenessData={completenessData}
               completenessLoading={completenessLoading}
@@ -144,7 +145,6 @@ function App() {
           <PolarisDashboard
             productStatusData={productStatusData}
             pricingStatusData={pricingStatusData}
-            chartOptions={chartOptions}
             selectedFamilyLabel={selectedFamilyLabel}
             completenessData={completenessData}
             completenessLoading={completenessLoading}

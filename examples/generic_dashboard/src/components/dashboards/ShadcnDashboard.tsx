@@ -1,4 +1,8 @@
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+// @ts-expect-error - Type definitions have path resolution issues in react-chartjs-2
 import { Pie } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 import { Loader } from "lucide-react";
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,

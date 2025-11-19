@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 // The raw record structure from the PIM API for families
 interface RawFamilyRecord {
     code: string;
-    labels: {
+    labels?: {
         [locale: string]: string;
     };
 }

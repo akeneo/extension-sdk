@@ -46,55 +46,67 @@ export const PolarisDashboard = ({
   // Extract data from chart objects
   const pricingLabels = pricingStatusData.labels || [];
   const pricingValues = pricingStatusData.datasets?.[0]?.data || [];
+  const pricingTotal = pricingValues.reduce((sum: number, val: number) => sum + val, 0);
 
   const productLabels = productStatusData.labels || [];
   const productValues = productStatusData.datasets?.[0]?.data || [];
+  const productTotal = productValues.reduce((sum: number, val: number) => sum + val, 0);
 
   return (
-    <s-stack direction="vertical" gap="4">
+    <s-stack direction="inline" gap="large">
       {/* Pricing Status Section */}
-      <s-section title="Pricing Status">
+       <s-section heading="Pricing Status">
         <p style={{ marginBottom: '16px', color: '#6d7175' }}>
           Complete products with or without a price.
         </p>
-        <s-table>
+        <s-table variant="auto">
           <s-table-header-row>
             <s-table-header>Status</s-table-header>
-            <s-table-header>Count</s-table-header>
+            <s-table-header format="numeric">Count</s-table-header>
+            <s-table-header format="numeric">Percentage</s-table-header>
           </s-table-header-row>
           <s-table-body>
-            {pricingLabels.map((label: string, index: number) => (
-              <s-table-row>
-                <s-table-cell>{label}</s-table-cell>
-                <s-table-cell>{pricingValues[index] || 0}</s-table-cell>
-              </s-table-row>
-            ))}
+            {pricingLabels.map((label: string, index: number) => {
+              const value = pricingValues[index] || 0;
+              const percentage = pricingTotal > 0 ? ((value / pricingTotal) * 100).toFixed(1) : '0.0';
+              return (
+                <s-table-row key={index}>
+                  <s-table-cell>{label}</s-table-cell>
+                  <s-table-cell>{value}</s-table-cell>
+                  <s-table-cell>{percentage}%</s-table-cell>
+                </s-table-row>
+              );
+            })}
           </s-table-body>
         </s-table>
       </s-section>
 
       {/* Product Status Section */}
-      <s-section title="Distribution by Completeness Status">
-        <s-table>
-          <thead>
-            <tr>
-              <th>Status</th>
-              <th>Count</th>
-            </tr>
-          </thead>
-          <tbody>
-            {productLabels.map((label: string, index: number) => (
-              <tr key={index}>
-                <td>{label}</td>
-                <td>{productValues[index] || 0}</td>
-              </tr>
-            ))}
-          </tbody>
+      <s-section heading="Distribution by Completeness Status">
+        <s-table variant="auto">
+          <s-table-header-row>
+            <s-table-header>Status</s-table-header>
+            <s-table-header format="numeric">Count</s-table-header>
+            <s-table-header format="numeric">Percentage</s-table-header>
+          </s-table-header-row>
+          <s-table-body>
+            {productLabels.map((label: string, index: number) => {
+              const value = productValues[index] || 0;
+              const percentage = productTotal > 0 ? ((value / productTotal) * 100).toFixed(1) : '0.0';
+              return (
+                <s-table-row key={index}>
+                  <s-table-cell>{label}</s-table-cell>
+                  <s-table-cell>{value}</s-table-cell>
+                  <s-table-cell>{percentage}%</s-table-cell>
+                </s-table-row>
+              );
+            })}
+          </s-table-body>
         </s-table>
       </s-section>
 
       {/* Completeness per Locale Section */}
-      <s-section title="Completeness per Locale">
+      <s-section heading="Completeness per Locale">
         <p style={{ marginBottom: '16px', color: '#6d7175' }}>
           Average score for the '{selectedFamilyLabel}' family.
         </p>
@@ -104,46 +116,42 @@ export const PolarisDashboard = ({
             Calculating...
           </p>
         ) : (
-          <s-table>
-            <thead>
-              <tr>
-                <th>Locale</th>
-                <th>Completeness</th>
-              </tr>
-            </thead>
-            <tbody>
+          <s-table variant="auto">
+            <s-table-header-row>
+              <s-table-header>Locale</s-table-header>
+              <s-table-header format="numeric">Completeness</s-table-header>
+            </s-table-header-row>
+            <s-table-body>
               {completenessData.map((item) => (
-                <tr key={item.locale}>
-                  <td>
+                <s-table-row key={item.locale}>
+                  <s-table-cell>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Flag locale={item.locale} />
                       <span>{item.locale}</span>
                     </div>
-                  </td>
-                  <td>{item.completeness}%</td>
-                </tr>
+                  </s-table-cell>
+                  <s-table-cell>{item.completeness}%</s-table-cell>
+                </s-table-row>
               ))}
-            </tbody>
+            </s-table-body>
           </s-table>
         )}
       </s-section>
 
       {/* Products Table Section */}
-      <s-section title={`Recently Updated Products in the ${selectedFamilyLabel} Family`}>
+      <s-section heading={`Recently Updated Products in the ${selectedFamilyLabel} Family`}>
         <p style={{ marginBottom: '16px', color: '#6d7175' }}>
           List of 10 products from the PIM.
         </p>
 
-        <s-table>
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>SKU</th>
-              <th>Name</th>
-              <th>Last Update</th>
-            </tr>
-          </thead>
-          <tbody>
+        <s-table variant="auto">
+          <s-table-header-row>
+            <s-table-header>Image</s-table-header>
+            <s-table-header>SKU</s-table-header>
+            <s-table-header>Name</s-table-header>
+            <s-table-header>Last Update</s-table-header>
+          </s-table-header-row>
+          <s-table-body>
             {products.map((product: any) => {
               const updatedDate = new Date(product.updated);
               const day = String(updatedDate.getDate()).padStart(2, '0');
@@ -156,8 +164,8 @@ export const PolarisDashboard = ({
               const productName = getProductName(product.values);
 
               return (
-                <tr key={product.uuid}>
-                  <td>
+                <s-table-row key={product.uuid}>
+                  <s-table-cell>
                     {product.imageUrl ? (
                       <img
                         src={product.imageUrl}
@@ -167,23 +175,22 @@ export const PolarisDashboard = ({
                     ) : (
                       'N/A'
                     )}
-                  </td>
-                  <td>
+                  </s-table-cell>
+                  <s-table-cell>
                     <a
                       href={`/enrich/product/${product.uuid}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ color: '#008060', textDecoration: 'none' }}
                     >
                       {product.values?.sku?.[0]?.data ?? product.values?.internal_itemid?.[0]?.data ?? product.identifier}
                     </a>
-                  </td>
-                  <td>{productName}</td>
-                  <td>{formattedDate}</td>
-                </tr>
+                  </s-table-cell>
+                  <s-table-cell>{productName}</s-table-cell>
+                  <s-table-cell>{formattedDate}</s-table-cell>
+                </s-table-row>
               );
             })}
-          </tbody>
+          </s-table-body>
         </s-table>
       </s-section>
     </s-stack>
