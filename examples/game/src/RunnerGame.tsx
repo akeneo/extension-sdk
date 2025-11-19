@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Stage, Layer, Rect, Circle, Text } from 'react-konva';
+import { Stage, Layer, Rect, Circle, Text, Image } from 'react-konva';
+import playerImage from './web-assets-about-us-hero.webp';
 
 interface Obstacle {
   x: number;
@@ -16,6 +17,7 @@ const RunnerGame = () => {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null);
 
   const velocityRef = useRef(0);
   const animationFrameRef = useRef<number>();
@@ -23,12 +25,21 @@ const RunnerGame = () => {
 
   const CANVAS_WIDTH = 800;
   const CANVAS_HEIGHT = 300;
-  const PLAYER_SIZE = 30;
+  const PLAYER_SIZE = 50;
   const PLAYER_X = 50;
   const GROUND_Y = 250;
   const JUMP_FORCE = -12;
   const GRAVITY = 0.6;
   const OBSTACLE_SPEED = 5;
+
+  // Load player image
+  useEffect(() => {
+    const img = new window.Image();
+    img.src = playerImage;
+    img.onload = () => {
+      setLoadedImage(img);
+    };
+  }, []);
 
   // Jump handler
   const handleJump = () => {
@@ -186,12 +197,23 @@ const RunnerGame = () => {
           />
 
           {/* Player */}
-          <Circle
-            x={PLAYER_X + PLAYER_SIZE / 2}
-            y={playerY + PLAYER_SIZE / 2}
-            radius={PLAYER_SIZE / 2}
-            fill={gameOver ? '#ff0000' : '#4CAF50'}
-          />
+          {loadedImage ? (
+            <Image
+              image={loadedImage}
+              x={PLAYER_X}
+              y={playerY}
+              width={PLAYER_SIZE}
+              height={PLAYER_SIZE}
+              opacity={gameOver ? 0.5 : 1}
+            />
+          ) : (
+            <Circle
+              x={PLAYER_X + PLAYER_SIZE / 2}
+              y={playerY + PLAYER_SIZE / 2}
+              radius={PLAYER_SIZE / 2}
+              fill={gameOver ? '#ff0000' : '#4CAF50'}
+            />
+          )}
 
           {/* Obstacles */}
           {obstacles.map((obs, i) => (
@@ -201,7 +223,7 @@ const RunnerGame = () => {
               y={obs.y}
               width={obs.width}
               height={obs.height}
-              fill="#D32F2F"
+              fill="#6B8E73"
             />
           ))}
 
