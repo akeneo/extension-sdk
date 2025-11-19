@@ -23,7 +23,6 @@ const useLocaleCompleteness = (selectedFamily: string | null) => {
                 return;
             }
 
-            console.log(`[Completeness] Starting calculation for family: ${selectedFamily}`);
             setIsLoading(true);
             try {
                 const pimApi = globalThis.PIM.api;
@@ -37,7 +36,6 @@ const useLocaleCompleteness = (selectedFamily: string | null) => {
                 let hasMorePages = true;
 
                 while (hasMorePages) {
-                    console.log(`[Completeness] Fetching page ${nextPage}...`);
                     const response = await pimApi.product_uuid_v1.list({
                         limit: 100,
                         page: nextPage,
@@ -45,7 +43,6 @@ const useLocaleCompleteness = (selectedFamily: string | null) => {
                         withCompletenesses: true,
                     });
 
-                    console.log(`[Completeness] Found ${response.items.length} products on page ${nextPage}.`);
                     for (const product of response.items) {
                         let completenessScores = product.completenesses;
 
@@ -80,12 +77,9 @@ const useLocaleCompleteness = (selectedFamily: string | null) => {
                         nextPage++;
                     } else {
                         hasMorePages = false;
-                        console.log("[Completeness] All pages fetched.");
                     }
                 }
                 
-                console.log("[Completeness] Aggregated data before averaging:", accumulators);
-
                 const finalAverages: LocaleCompleteness[] = Object.keys(accumulators).map(locale => {
                     const { sum, count } = accumulators[locale];
                     return {
@@ -94,7 +88,6 @@ const useLocaleCompleteness = (selectedFamily: string | null) => {
                     };
                 });
 
-                console.log("[Completeness] Final calculated averages:", finalAverages);
                 setCompletenessData(finalAverages);
 
             } catch (error) {
@@ -102,7 +95,6 @@ const useLocaleCompleteness = (selectedFamily: string | null) => {
                 setCompletenessData([]);
             } finally {
                 setIsLoading(false);
-                console.log("[Completeness] Calculation process finished.");
             }
         };
 

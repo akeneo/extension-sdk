@@ -98,8 +98,6 @@ function App() {
 
   const selectedFamilyLabel = families.find(f => f.code === selectedFamily)?.label || '...';
 
-  console.log(designSystem);
-
   return (
     <>
       <DesignSystemSelector />

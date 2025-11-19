@@ -1,9 +1,7 @@
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-// @ts-expect-error - Type definitions have path resolution issues in react-chartjs-2
-import { Pie } from 'react-chartjs-2';
-
-ChartJS.register(ArcElement, Tooltip, Legend);
 import { Loader } from "lucide-react";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+// @ts-expect-error - Type definitions have path resolution issues
+import { Pie } from 'react-chartjs-2';
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,
 } from "@/components/ui/card";
@@ -12,6 +10,9 @@ import {
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Flag } from '../Flag.tsx';
+import { getProductName } from '@/lib/productUtils';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface ShadcnDashboardProps {
   productStatusData: any;
@@ -22,32 +23,6 @@ interface ShadcnDashboardProps {
   completenessLoading: boolean;
   products: any[];
 }
-
-const getProductName = (values: { [key: string]: Array<{ locale: string | null; data: string; }> } | undefined): string => {
-  const attributePriority = ['name', 'erp_name', 'product_name', 'marketing_name', 'internal_erpname', 'label'];
-  const localePriority = ['en_US', 'en_GB', 'fr_FR', 'de_DE', 'nl_NL', 'it_IT', 'es_ES'];
-
-  if (!values) {
-    return 'N/A';
-  }
-
-  for (const attribute of attributePriority) {
-    const nameValues = values[attribute];
-    if (nameValues && nameValues.length > 0) {
-      for (const locale of localePriority) {
-        const nameValue = nameValues.find(val => val.locale === locale);
-        if (nameValue && nameValue.data) {
-          return nameValue.data;
-        }
-      }
-      if (nameValues[0] && nameValues[0].data) {
-        return nameValues[0].data;
-      }
-    }
-  }
-
-  return 'N/A';
-};
 
 export const ShadcnDashboard = ({
   productStatusData,

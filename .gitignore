@@ -3,7 +3,7 @@ dist
 *.local
 *.env
 
-*.tsbuildinfo
+**/*.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
@@ -16,3 +16,4 @@ dist
 *.sln
 *.sw?
 .claude/*
+claude.md

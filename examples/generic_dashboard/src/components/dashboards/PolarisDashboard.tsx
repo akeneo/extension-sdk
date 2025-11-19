@@ -1,4 +1,5 @@
 import { Flag } from '../Flag.tsx';
+import { getProductName } from '@/lib/productUtils';
 
 interface PolarisDashboardProps {
   productStatusData: any;
@@ -8,33 +9,6 @@ interface PolarisDashboardProps {
   completenessLoading: boolean;
   products: any[];
 }
-
-const getProductName = (values: { [key: string]: Array<{ locale: string | null; data: string; }> } | undefined): string => {
-  const attributePriority = ['name', 'erp_name', 'product_name', 'marketing_name', 'internal_erpname', 'label'];
-  const localePriority = ['en_US', 'en_GB', 'fr_FR', 'de_DE', 'nl_NL', 'it_IT', 'es_ES'];
-
-  if (!values) {
-    return 'N/A';
-  }
-
-  for (const attribute of attributePriority) {
-    const nameValues = values[attribute];
-    if (nameValues && nameValues.length > 0) {
-      for (const locale of localePriority) {
-        const nameValue = nameValues.find(val => val.locale === locale);
-        if (nameValue && nameValue.data) {
-          return nameValue.data;
-        }
-      }
-      if (nameValues[0] && nameValues[0].data) {
-        return nameValues[0].data;
-      }
-    }
-  }
-
-  return 'N/A';
-};
-
 export const PolarisDashboard = ({
   productStatusData,
   pricingStatusData,

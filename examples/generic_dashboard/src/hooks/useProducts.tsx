@@ -21,11 +21,9 @@ const useProducts = (familyCode: string | null) => {
 
     useEffect(() => {
         const fetchProductsAndImages = async () => {
-            console.log("useProducts hook: Mounting and preparing to fetch...");
 
             if (globalThis.PIM?.api?.product_uuid_v1 && globalThis.PIM?.api?.asset_v1 && familyCode) {
                 try {
-                    console.log(`useProducts hook: PIM API found, calling list() for family ${familyCode}.`);
                     const search = {
                         "family": [{
                             "operator": "IN",
@@ -39,7 +37,6 @@ const useProducts = (familyCode: string | null) => {
                         withCompletenesses: true,
                     });
 
-                    console.log("useProducts hook: API response received:", response);
                     if (response.items) {
                         const productsWithImages = await Promise.all(
                             response.items.map(async (product: any) => {
@@ -62,14 +59,13 @@ const useProducts = (familyCode: string | null) => {
                                             }
                                         }
                                     } catch (error) {
-                                        console.error(`Failed to fetch asset for product ${product.identifier}:`, error);
+                                        // Removed: console.error(`Failed to fetch asset for product ${product.identifier}:`, error);
                                     }
                                 }
                                 return product; // Return product without image URL if something fails
                             })
                         );
                         
-                        console.log("useProducts hook: Setting products state with:", productsWithImages);
                         setProducts(productsWithImages);
                     }
                 } catch (error) {
