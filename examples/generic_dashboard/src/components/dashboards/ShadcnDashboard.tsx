@@ -1,6 +1,5 @@
 import { Loader } from "lucide-react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-// @ts-expect-error - Type definitions have path resolution issues
 import { Pie } from 'react-chartjs-2';
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,
