@@ -6,6 +6,7 @@ export const DesignSystemSelector = () => {
   const tabs = [
     { value: 'akeneo' as DesignSystem, label: 'Akeneo Design System' },
     { value: 'shadcn' as DesignSystem, label: 'shadcn/ui' },
+    { value: 'polaris' as DesignSystem, label: 'Shopify Polaris' },
   ];
 
   return (
