@@ -13,6 +13,7 @@ import {
 import { useProducts } from "./hooks/useProducts.tsx";
 import { useFamilies } from './hooks/useFamilies.tsx';
 import { useLocaleCompleteness } from './hooks/useLocaleCompleteness.tsx';
+import { useMockChartData } from './hooks/useMockChartData.tsx';
 import { FamilyFilter } from './components/FamilyFilter.tsx';
 import { DesignSystemSelector } from './components/DesignSystemSelector.tsx';
 import { useDesignSystem } from './contexts/DesignSystemContext';
@@ -28,20 +29,18 @@ ChartJS.register(
   Title
 );
 
-const productChartColors = ["#9452BA", "#763E9E", "#52267D"];
-const pricingChartColors = ["#9452BA", "#763E9E"];
-
 // --- App Component ---
 function App() {
   const { designSystem } = useDesignSystem();
   const [selectedFamily, setSelectedFamily] = useState<string | null>(null);
 
-  const [productStatusData, setProductStatusData] = useState<any>({ labels: [], datasets: [] });
-  const [pricingStatusData, setPricingStatusData] = useState<any>({ labels: [], datasets: [] });
-
   const { families, loading: familiesLoading } = useFamilies();
   const { completenessData, isLoading: completenessLoading } = useLocaleCompleteness(selectedFamily);
   const products = useProducts(selectedFamily);
+
+  // MOCK DATA: Generate fake chart data for demo purposes
+  // In production, this should be replaced with real API calls
+  const { productStatusData, pricingStatusData } = useMockChartData(selectedFamily);
 
   // Effect to set the initial filter value
   useEffect(() => {
@@ -49,36 +48,6 @@ function App() {
       setSelectedFamily(families[0].code);
     }
   }, [families, selectedFamily]);
-
-  // Generate new fake data whenever the selected family changes
-  useEffect(() => {
-    if (selectedFamily) {
-      console.log(`[Fake Data] Generating new chart data for family: ${selectedFamily}`);
-      
-      const totalProducts = 200 + Math.floor(Math.random() * 50);
-      const completeAll = Math.floor(totalProducts * (0.4 + Math.random() * 0.2));
-      const readyForTranslation = Math.floor(totalProducts * (0.2 + Math.random() * 0.1));
-      const incomplete = totalProducts - completeAll - readyForTranslation;
-      const withPrice = completeAll + readyForTranslation - Math.floor(totalProducts * (0.1 + Math.random() * 0.05));
-      const withoutPrice = totalProducts - withPrice;
-
-      setProductStatusData({
-        labels: ["Complete (all languages)", "Ready for translation (EN)", "Incomplete"],
-        datasets: [{
-          data: [completeAll, readyForTranslation, incomplete],
-          backgroundColor: productChartColors,
-        }],
-      });
-
-      setPricingStatusData({
-        labels: ["Products with price", "Products without price"],
-        datasets: [{
-          data: [withPrice, withoutPrice],
-          backgroundColor: pricingChartColors,
-        }],
-      });
-    }
-  }, [selectedFamily]);
 
   const chartOptions = {
     responsive: true,

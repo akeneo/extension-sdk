@@ -4,8 +4,8 @@ export const DesignSystemSelector = () => {
   const { designSystem, setDesignSystem } = useDesignSystem();
 
   const tabs = [
-    { value: 'shadcn' as DesignSystem, label: 'shadcn/ui' },
     { value: 'akeneo' as DesignSystem, label: 'Akeneo Design System' },
+    { value: 'shadcn' as DesignSystem, label: 'shadcn/ui' },
   ];
 
   return (
@@ -18,8 +18,7 @@ export const DesignSystemSelector = () => {
             className={`
               relative px-6 py-3 text-sm font-medium
               transition-all duration-200
-              rounded-t-lg
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+              rounded-t-lg outline-none
               ${designSystem === tab.value
                 ? 'bg-background text-foreground shadow-lg z-10'
                 : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'

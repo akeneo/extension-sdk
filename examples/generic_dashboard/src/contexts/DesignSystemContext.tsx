@@ -10,7 +10,7 @@ interface DesignSystemContextType {
 const DesignSystemContext = createContext<DesignSystemContextType | undefined>(undefined);
 
 export const DesignSystemProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [designSystem, setDesignSystem] = useState<DesignSystem>('shadcn');
+  const [designSystem, setDesignSystem] = useState<DesignSystem>('akeneo');
 
   return (
     <DesignSystemContext.Provider value={{ designSystem, setDesignSystem }}>

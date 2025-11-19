@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
 
+/**
+ * Hook to fetch and calculate average product completeness per locale for a given family.
+ *
+ * MOCK DATA FALLBACK:
+ * This hook attempts to fetch real completeness data from the PIM API.
+ * However, if a product is missing completeness data, it generates random
+ * completeness scores (0-100%) as a workaround for demo purposes.
+ *
+ * In a production implementation, all products should have real completeness data.
+ */
+
 export interface LocaleCompleteness {
     locale: string;
     completeness: number;
@@ -46,9 +57,9 @@ const useLocaleCompleteness = (selectedFamily: string | null) => {
                     for (const product of response.items) {
                         let completenessScores = product.completenesses;
 
-                        // WORKAROUND: If completeness data is missing, generate it on the fly.
+                        // MOCK DATA FALLBACK: If completeness data is missing, generate random scores for demo purposes
                         if (!completenessScores || completenessScores.length === 0) {
-                            console.warn(`[Completeness WORKAROUND] Product ${product.identifier} is missing data. Generating fake scores.`);
+                            console.warn(`[MOCK DATA] Product ${product.identifier} is missing completeness data. Generating random scores for demo.`);
                             completenessScores = [];
                             for (const channel of channels.items) {
                                 for (const locale of channel.locales) {
