@@ -1,33 +1,34 @@
 import { useDesignSystem, type DesignSystem } from '../contexts/DesignSystemContext';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export const DesignSystemSelector = () => {
   const { designSystem, setDesignSystem } = useDesignSystem();
 
+  const tabs = [
+    { value: 'shadcn' as DesignSystem, label: 'shadcn/ui' },
+    { value: 'akeneo' as DesignSystem, label: 'Akeneo Design System' },
+  ];
+
   return (
-    <div className="w-full bg-muted/30 border-b border-border py-6">
-      <div className="flex flex-col items-center justify-center gap-3 max-w-7xl mx-auto px-4">
-        <label htmlFor="design-system-select" className="text-base font-semibold text-foreground">
-          Choose your design system
-        </label>
-        <Select
-          value={designSystem}
-          onValueChange={(value) => setDesignSystem(value as DesignSystem)}
-        >
-          <SelectTrigger id="design-system-select" className="w-[280px]">
-            <SelectValue placeholder="Select design system" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="shadcn">shadcn/ui</SelectItem>
-            <SelectItem value="akeneo">Akeneo Design System</SelectItem>
-          </SelectContent>
-        </Select>
+    <div className="w-full bg-muted/30">
+      <div className="flex items-end gap-1 pt-4 pl-4">
+        {tabs.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => setDesignSystem(tab.value)}
+            className={`
+              relative px-6 py-3 text-sm font-medium
+              transition-all duration-200
+              rounded-t-lg
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+              ${designSystem === tab.value
+                ? 'bg-background text-foreground shadow-lg z-10'
+                : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+              }
+            `}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
     </div>
   );
