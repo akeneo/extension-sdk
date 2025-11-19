@@ -18,7 +18,6 @@ import { DesignSystemSelector } from './components/DesignSystemSelector.tsx';
 import { useDesignSystem } from './contexts/DesignSystemContext';
 import { ShadcnDashboard } from './components/dashboards/ShadcnDashboard';
 import { AkeneoDashboard } from './components/dashboards/AkeneoDashboard';
-import { PolarisDashboard } from './components/dashboards/PolarisDashboard';
 
 ChartJS.register(
   ArcElement,
@@ -137,17 +136,6 @@ function App() {
               products={products}
             />
           </ThemeProvider>
-        )}
-
-        {designSystem === 'polaris' && (
-          <PolarisDashboard
-            productStatusData={productStatusData}
-            pricingStatusData={pricingStatusData}
-            selectedFamilyLabel={selectedFamilyLabel}
-            completenessData={completenessData}
-            completenessLoading={completenessLoading}
-            products={products}
-          />
         )}
       </div>
     </>

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type DesignSystem = 'shadcn' | 'akeneo' | 'polaris';
+export type DesignSystem = 'shadcn' | 'akeneo';
 
 interface DesignSystemContextType {
   designSystem: DesignSystem;
