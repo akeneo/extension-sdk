@@ -2,21 +2,39 @@
 
 This React + Vite application serves as a dashboard for visualizing product information from an Akeneo PIM. It features several components that provide insights into product status, completeness, and other key metrics.
 
+### Design System Showcase
+
+This dashboard demonstrates **two different design system implementations** that you can switch between using browser-style tabs at the top of the page:
+
+1. **Akeneo Design System** (default) - The official Akeneo PIM design system, providing a consistent look and feel with the PIM interface.
+2. **shadcn/ui** - A modern, accessible component library built with Radix UI and Tailwind CSS.
+
+Both implementations share the same data and functionality, allowing you to compare design approaches and choose the one that best fits your needs.
+
 ### Key Features
 
 - **Family Filtering**: Allows users to filter product data by selecting a specific family.
-- **Product Status Charts**: Visualizes the distribution of products based on their completeness status and pricing information using pie charts.
+- **Product Status Charts**: Visualizes the distribution of products based on their completeness status and pricing information.
 - **Completeness per Locale**: Displays the average completeness score for each locale within the selected family.
 - **Product List**: A table that shows recently updated products, including their image, SKU, name, and last update date.
-- **Workflow Tasks**: A table that lists overdue workflow tasks.
 
 ### Libraries and Components
 
-The dashboard is built with a modern stack of UI libraries to create a clean and interactive user experience:
+The dashboard is built with a modern stack of UI libraries:
 
-- **Charts**: The pie charts for product and pricing status are created using `react-chartjs-2`, a React wrapper for the popular `chart.js` library.
-- **UI Components**: The card blocks, tables, progress bars, and badges are implemented using `shadcn/ui`, which provides a set of accessible and customizable components.
-- **Icons**: Icons throughout the application are provided by `lucide-react`, a lightweight and flexible icon library.
+#### Akeneo Design System Implementation
+- **UI Components**: Tables, section titles, and helpers from the `akeneo-design-system` package.
+- **Styling**: Styled-components with the official Akeneo PIM theme.
+
+#### shadcn/ui Implementation
+- **Charts**: Pie charts created using `react-chartjs-2` and `chart.js`.
+- **UI Components**: Cards, tables, progress bars, and other components from `shadcn/ui` built with Radix UI primitives.
+- **Icons**: Icons provided by `lucide-react`.
+- **Styling**: Tailwind CSS with custom design tokens.
+
+#### Shared
+- **Data Fetching**: All implementations use the same custom hooks to fetch data from the Akeneo PIM API.
+- **Mock Data**: Demo data generation for chart statistics (see `src/hooks/useMockChartData.tsx` for details).
 
 ## React Compiler
 
