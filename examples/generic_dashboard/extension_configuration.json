@@ -1,0 +1,13 @@
+{
+  "position": "pim.activity.navigation.tab",
+  "name": "dashboard",
+  "type": "sdk_script",
+  "file": "dist/demo.js",
+  "configuration": {
+    "default_label": "Custom Dashboard",
+    "labels": {
+      "en_US": "Custom Dashboard"
+    }
+  },
+  "credentials": []
+}

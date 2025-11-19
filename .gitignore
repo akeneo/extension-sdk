@@ -3,8 +3,7 @@ dist
 *.local
 *.env
 
-*tsconfig.app.tsbuildinfo
-*tsconfig.node.tsbuildinfo
+**/*.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
@@ -16,3 +15,5 @@ dist
 *.njsproj
 *.sln
 *.sw?
+.claude/*
+claude.md
