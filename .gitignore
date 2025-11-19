@@ -5,6 +5,7 @@ dist
 
 *tsconfig.app.tsbuildinfo
 *tsconfig.node.tsbuildinfo
+*tsconfig.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
@@ -16,3 +17,4 @@ dist
 *.njsproj
 *.sln
 *.sw?
+.claude/*

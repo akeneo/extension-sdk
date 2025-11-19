@@ -53,7 +53,7 @@ export const PolarisDashboard = ({
   const productTotal = productValues.reduce((sum: number, val: number) => sum + val, 0);
 
   return (
-    <s-stack direction="inline" gap="large">
+    <s-page>
       {/* Pricing Status Section */}
        <s-section heading="Pricing Status">
         <p style={{ marginBottom: '16px', color: '#6d7175' }}>
@@ -193,6 +193,6 @@ export const PolarisDashboard = ({
           </s-table-body>
         </s-table>
       </s-section>
-    </s-stack>
+    </s-page>
   );
 };
