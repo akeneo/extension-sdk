@@ -56,59 +56,62 @@ export const AkeneoDashboard = ({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-      {/* Pricing Status Table */}
-      <div>
-        <SectionTitle>
-          <SectionTitle.Title>Pricing Status</SectionTitle.Title>
-        </SectionTitle>
-        <Helper level="info">Complete products with or without a price.</Helper>
-        <Table>
-          <Table.Header>
-            <Table.HeaderCell>Status</Table.HeaderCell>
-            <Table.HeaderCell>Count</Table.HeaderCell>
-            <Table.HeaderCell>Percentage</Table.HeaderCell>
-          </Table.Header>
-          <Table.Body>
-            {pricingLabels.map((label: string, index: number) => {
-              const value = pricingValues[index] || 0;
-              const percentage = pricingTotal > 0 ? ((value / pricingTotal) * 100).toFixed(1) : '0.0';
-              return (
-                <Table.Row key={index}>
-                  <Table.Cell>{label}</Table.Cell>
-                  <Table.Cell>{value}</Table.Cell>
-                  <Table.Cell>{percentage}%</Table.Cell>
-                </Table.Row>
-              );
-            })}
-          </Table.Body>
-        </Table>
-      </div>
+      {/* Status Tables Side by Side */}
+      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+        {/* Pricing Status Table */}
+        <div style={{ flex: '1', minWidth: '300px' }}>
+          <SectionTitle>
+            <SectionTitle.Title>Pricing Status</SectionTitle.Title>
+          </SectionTitle>
+          <Helper level="info">Complete products with or without a price.</Helper>
+          <Table>
+            <Table.Header>
+              <Table.HeaderCell>Status</Table.HeaderCell>
+              <Table.HeaderCell>Count</Table.HeaderCell>
+              <Table.HeaderCell>Percentage</Table.HeaderCell>
+            </Table.Header>
+            <Table.Body>
+              {pricingLabels.map((label: string, index: number) => {
+                const value = pricingValues[index] || 0;
+                const percentage = pricingTotal > 0 ? ((value / pricingTotal) * 100).toFixed(1) : '0.0';
+                return (
+                  <Table.Row key={index}>
+                    <Table.Cell>{label}</Table.Cell>
+                    <Table.Cell>{value}</Table.Cell>
+                    <Table.Cell>{percentage}%</Table.Cell>
+                  </Table.Row>
+                );
+              })}
+            </Table.Body>
+          </Table>
+        </div>
 
-      {/* Product Status Table */}
-      <div>
-        <SectionTitle>
-          <SectionTitle.Title>Distribution by Completeness Status</SectionTitle.Title>
-        </SectionTitle>
-        <Table>
-          <Table.Header>
-            <Table.HeaderCell>Status</Table.HeaderCell>
-            <Table.HeaderCell>Count</Table.HeaderCell>
-            <Table.HeaderCell>Percentage</Table.HeaderCell>
-          </Table.Header>
-          <Table.Body>
-            {productLabels.map((label: string, index: number) => {
-              const value = productValues[index] || 0;
-              const percentage = productTotal > 0 ? ((value / productTotal) * 100).toFixed(1) : '0.0';
-              return (
-                <Table.Row key={index}>
-                  <Table.Cell>{label}</Table.Cell>
-                  <Table.Cell>{value}</Table.Cell>
-                  <Table.Cell>{percentage}%</Table.Cell>
-                </Table.Row>
-              );
-            })}
-          </Table.Body>
-        </Table>
+        {/* Product Status Table */}
+        <div style={{ flex: '1', minWidth: '300px' }}>
+          <SectionTitle>
+            <SectionTitle.Title>Distribution by Completeness Status</SectionTitle.Title>
+          </SectionTitle>
+          <Table>
+            <Table.Header>
+              <Table.HeaderCell>Status</Table.HeaderCell>
+              <Table.HeaderCell>Count</Table.HeaderCell>
+              <Table.HeaderCell>Percentage</Table.HeaderCell>
+            </Table.Header>
+            <Table.Body>
+              {productLabels.map((label: string, index: number) => {
+                const value = productValues[index] || 0;
+                const percentage = productTotal > 0 ? ((value / productTotal) * 100).toFixed(1) : '0.0';
+                return (
+                  <Table.Row key={index}>
+                    <Table.Cell>{label}</Table.Cell>
+                    <Table.Cell>{value}</Table.Cell>
+                    <Table.Cell>{percentage}%</Table.Cell>
+                  </Table.Row>
+                );
+              })}
+            </Table.Body>
+          </Table>
+        </div>
       </div>
 
       {/* Completeness per Locale Table */}

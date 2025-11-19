@@ -3,9 +3,7 @@ dist
 *.local
 *.env
 
-*tsconfig.app.tsbuildinfo
-*tsconfig.node.tsbuildinfo
-*tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
