@@ -1,5 +1,6 @@
 import '@shopify/polaris/build/esm/styles.css';
 import {
+  AppProvider,
   Page,
   Layout,
   Card,
@@ -54,7 +55,8 @@ export const PolarisDashboard = ({
   });
 
   return (
-    <Page>
+    <AppProvider i18n={{}}>
+      <Page>
       <Layout>
         {/* Pricing Status and Product Status side by side */}
         <Layout.Section variant="oneHalf">
@@ -162,5 +164,6 @@ export const PolarisDashboard = ({
         </Layout.Section>
       </Layout>
     </Page>
+    </AppProvider>
   );
 };

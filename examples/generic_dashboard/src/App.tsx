@@ -1,17 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ThemeProvider } from 'styled-components';
-import { pimTheme } from 'akeneo-design-system';
-import { AppProvider } from '@shopify/polaris';
-import '@shopify/polaris/build/esm/styles.css';
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  Title,
-} from 'chart.js';
 import { useProducts } from "./hooks/useProducts.tsx";
 import { useFamilies } from './hooks/useFamilies.tsx';
 import { useLocaleCompleteness } from './hooks/useLocaleCompleteness.tsx';
@@ -22,15 +9,6 @@ import { useDesignSystem } from './contexts/DesignSystemContext';
 import { ShadcnDashboard } from './components/dashboards/ShadcnDashboard';
 import { AkeneoDashboard } from './components/dashboards/AkeneoDashboard';
 import { PolarisDashboard } from './components/dashboards/PolarisDashboard';
-
-ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  Title
-);
 
 // --- App Component ---
 function App() {
@@ -98,29 +76,25 @@ function App() {
         )}
 
         {designSystem === 'akeneo' && (
-          <ThemeProvider theme={pimTheme}>
-            <AkeneoDashboard
-              productStatusData={productStatusData}
-              pricingStatusData={pricingStatusData}
-              selectedFamilyLabel={selectedFamilyLabel}
-              completenessData={completenessData}
-              completenessLoading={completenessLoading}
-              products={products}
-            />
-          </ThemeProvider>
+          <AkeneoDashboard
+            productStatusData={productStatusData}
+            pricingStatusData={pricingStatusData}
+            selectedFamilyLabel={selectedFamilyLabel}
+            completenessData={completenessData}
+            completenessLoading={completenessLoading}
+            products={products}
+          />
         )}
 
         {designSystem === 'polaris' && (
-          <AppProvider i18n={{}}>
-            <PolarisDashboard
-              productStatusData={productStatusData}
-              pricingStatusData={pricingStatusData}
-              selectedFamilyLabel={selectedFamilyLabel}
-              completenessData={completenessData}
-              completenessLoading={completenessLoading}
-              products={products}
-            />
-          </AppProvider>
+          <PolarisDashboard
+            productStatusData={productStatusData}
+            pricingStatusData={pricingStatusData}
+            selectedFamilyLabel={selectedFamilyLabel}
+            completenessData={completenessData}
+            completenessLoading={completenessLoading}
+            products={products}
+          />
         )}
       </div>
     </>

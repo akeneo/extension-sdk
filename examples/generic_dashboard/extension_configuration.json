@@ -2,7 +2,7 @@
   "position": "pim.activity.navigation.tab",
   "name": "dashboard",
   "type": "sdk_script",
-  "file": "dist/demo.js",
+  "file": "dist/generic_dashboard.js",
   "configuration": {
     "default_label": "Custom Dashboard",
     "labels": {

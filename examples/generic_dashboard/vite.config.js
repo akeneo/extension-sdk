@@ -51,19 +51,67 @@ export default defineConfig(({ mode }) => ({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/main.tsx'),
-      name: 'demo',
+      name: 'generic_dashboard',
       fileName: fileName,
       formats: ['es'],
+    },
+    minify: 'terser',
+    sourcemap: false,
+    cssMinify: true,
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
+        passes: 3,
+        unsafe: true,
+        unsafe_comps: true,
+        unsafe_math: true,
+        unsafe_proto: true,
+      },
+      mangle: {
+        properties: {
+          regex: /^_/,
+        },
+      },
+      format: {
+        comments: false,
+        ecma: 2020,
+      },
+    },
+    rollupOptions: {
+      treeshake: {
+        moduleSideEffects: (id) => {
+          // Force tree-shaking for akeneo-design-system
+          return !id.includes('akeneo-design-system');
+        },
+      },
+      output: {
+        minifyInternalExports: true,
+        compact: true,
+        generatedCode: {
+          constBindings: true,
+        },
+      }
+    },
+    commonjsOptions: {
+      strictRequires: 'auto',
     },
     // Optimizations for development
     ...(mode === 'development' && {
       minify: false,
-      sourcemap: false,  // Changed from 'inline' to false for faster builds
+      sourcemap: false,
       cssCodeSplit: false,
       emptyOutDir: false,
-      reportCompressedSize: false,  // Disable compressed size reporting to speed up build
-      chunkSizeWarningLimit: Infinity,  // Disable chunk size warnings
+      reportCompressedSize: false,
+      chunkSizeWarningLimit: Infinity,
     })
+  },
+  esbuild: {
+    legalComments: 'none',
+    minifyIdentifiers: true,
+    minifySyntax: true,
+    minifyWhitespace: true,
   },
   define: {
     'process.env.NODE_ENV': JSON.stringify(mode),
