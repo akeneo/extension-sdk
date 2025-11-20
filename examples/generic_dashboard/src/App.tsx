@@ -1,15 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ThemeProvider } from 'styled-components';
-import { pimTheme } from 'akeneo-design-system';
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  Title,
-} from 'chart.js';
 import { useProducts } from "./hooks/useProducts.tsx";
 import { useFamilies } from './hooks/useFamilies.tsx';
 import { useLocaleCompleteness } from './hooks/useLocaleCompleteness.tsx';
@@ -19,15 +8,7 @@ import { DesignSystemSelector } from './components/DesignSystemSelector.tsx';
 import { useDesignSystem } from './contexts/DesignSystemContext';
 import { ShadcnDashboard } from './components/dashboards/ShadcnDashboard';
 import { AkeneoDashboard } from './components/dashboards/AkeneoDashboard';
-
-ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  Title
-);
+import { PolarisDashboard } from './components/dashboards/PolarisDashboard';
 
 // --- App Component ---
 function App() {
@@ -95,16 +76,25 @@ function App() {
         )}
 
         {designSystem === 'akeneo' && (
-          <ThemeProvider theme={pimTheme}>
-            <AkeneoDashboard
-              productStatusData={productStatusData}
-              pricingStatusData={pricingStatusData}
-              selectedFamilyLabel={selectedFamilyLabel}
-              completenessData={completenessData}
-              completenessLoading={completenessLoading}
-              products={products}
-            />
-          </ThemeProvider>
+          <AkeneoDashboard
+            productStatusData={productStatusData}
+            pricingStatusData={pricingStatusData}
+            selectedFamilyLabel={selectedFamilyLabel}
+            completenessData={completenessData}
+            completenessLoading={completenessLoading}
+            products={products}
+          />
+        )}
+
+        {designSystem === 'polaris' && (
+          <PolarisDashboard
+            productStatusData={productStatusData}
+            pricingStatusData={pricingStatusData}
+            selectedFamilyLabel={selectedFamilyLabel}
+            completenessData={completenessData}
+            completenessLoading={completenessLoading}
+            products={products}
+          />
         )}
       </div>
     </>

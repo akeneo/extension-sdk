@@ -1,4 +1,5 @@
-import { SectionTitle, Table, Helper } from 'akeneo-design-system';
+import { ThemeProvider } from 'styled-components';
+import { pimTheme, SectionTitle, Table, Helper } from 'akeneo-design-system';
 import { Flag } from '../Flag.tsx';
 import { getProductName } from '@/lib/productUtils';
 
@@ -29,7 +30,8 @@ export const AkeneoDashboard = ({
   const productTotal = productValues.reduce((sum: number, val: number) => sum + val, 0);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <ThemeProvider theme={pimTheme}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
       {/* Status Tables Side by Side */}
       <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
@@ -170,5 +172,6 @@ export const AkeneoDashboard = ({
         </Table>
       </div>
     </div>
+    </ThemeProvider>
   );
 };
