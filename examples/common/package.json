@@ -7,5 +7,13 @@
     "chokidar": "^4.0.3",
     "dotenv": "^17.2.2",
     "form-data": "^4.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/terser": "^3.8.1",
+    "@vitejs/plugin-react": "^5.1.1",
+    "terser": "^5.44.1",
+    "unplugin-swc": "^1.5.8",
+    "vite": "^7.2.4"
   }
 }
