@@ -4,12 +4,13 @@ This React + Vite application serves as a dashboard for visualizing product info
 
 ### Design System Showcase
 
-This dashboard demonstrates **two different design system implementations** that you can switch between using browser-style tabs at the top of the page:
+This dashboard demonstrates **three different design system implementations** that you can switch between using browser-style tabs at the top of the page:
 
 1. **Akeneo Design System** (default) - The official Akeneo PIM design system, providing a consistent look and feel with the PIM interface.
 2. **shadcn/ui** - A modern, accessible component library built with Radix UI and Tailwind CSS.
+3. **Shopify Polaris** - Shopify's official React component library for building admin interfaces.
 
-Both implementations share the same data and functionality, allowing you to compare design approaches and choose the one that best fits your needs.
+All three implementations share the same data and functionality, allowing you to compare design approaches and choose the one that best fits your needs.
 
 ### Key Features
 
@@ -31,6 +32,10 @@ The dashboard is built with a modern stack of UI libraries:
 - **UI Components**: Cards, tables, progress bars, and other components from `shadcn/ui` built with Radix UI primitives.
 - **Icons**: Icons provided by `lucide-react`.
 - **Styling**: Tailwind CSS with custom design tokens.
+
+#### Shopify Polaris Implementation
+- **UI Components**: Page, Layout, Card, DataTable, ProgressBar, and other components from `@shopify/polaris`.
+- **Styling**: Polaris design tokens and pre-built styles.
 
 #### Shared
 - **Data Fetching**: All implementations use the same custom hooks to fetch data from the Akeneo PIM API.
