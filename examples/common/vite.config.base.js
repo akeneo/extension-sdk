@@ -18,11 +18,13 @@
  * ```
  */
 
-import { resolve } from 'path';
+import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { readFileSync } from 'fs';
-import path from 'path';
+
+// Target ECMAScript version for all build tools
+const ES_TARGET = 'es2020';
 
 /**
  * Creates an optimized Vite configuration for Akeneo extensions
@@ -55,12 +57,6 @@ export function createViteConfig(options = {}) {
         // React plugin with automatic JSX runtime
         react({
           jsxRuntime: 'automatic',
-          jsxImportSource: 'react',
-          babel: {
-            plugins: [
-              ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
-            ]
-          }
         }),
         // Include additional project-specific plugins
         ...plugins,
@@ -73,7 +69,7 @@ export function createViteConfig(options = {}) {
       },
       build: {
         lib: {
-          entry: resolve(process.cwd(), 'src/main.tsx'),
+          entry: path.resolve(process.cwd(), 'src/main.tsx'),
           name: projectName,
           fileName: fileName,
           formats: ['es'],
@@ -100,7 +96,7 @@ export function createViteConfig(options = {}) {
             },
             format: {
               comments: false,
-              ecma: 2020,
+              ecma: 2020, // Must be number for Terser
             },
           },
         }),
@@ -138,18 +134,18 @@ export function createViteConfig(options = {}) {
       define: {
         'process.env.NODE_ENV': JSON.stringify(mode),
       },
-      // Development cache optimization
+      // Development: Cache and build optimization
       ...(isDevelopment && {
         optimizeDeps: {
           include: ['react', 'react-dom'],
           force: false,
           esbuildOptions: {
-            target: 'es2020',
+            target: ES_TARGET,
           }
         },
         esbuild: {
           logOverride: { 'this-is-undefined-in-esm': 'silent' },
-          target: 'es2020',
+          target: ES_TARGET,
           legalComments: 'none',
         }
       })
