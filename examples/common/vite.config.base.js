@@ -21,7 +21,6 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import swc from 'unplugin-swc';
 import { readFileSync } from 'fs';
 import path from 'path';
 
@@ -43,6 +42,9 @@ export function createViteConfig(options = {}) {
   } = options;
 
   return defineConfig(({ mode }) => {
+    const isProduction = mode === 'production';
+    const isDevelopment = mode === 'development';
+
     // Read extension configuration to get output filename
     const fullConfigPath = path.resolve(process.cwd(), configPath);
     const configuration = JSON.parse(readFileSync(fullConfigPath, 'utf8'));
@@ -58,21 +60,6 @@ export function createViteConfig(options = {}) {
             plugins: [
               ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
             ]
-          }
-        }),
-        // SWC for fast TypeScript/JSX transpilation
-        swc.vite({
-          jsc: {
-            target: 'es2020',
-            parser: {
-              syntax: 'typescript',
-              tsx: true,
-            },
-            transform: {
-              react: {
-                runtime: 'automatic'
-              }
-            }
           }
         }),
         // Include additional project-specific plugins
@@ -91,13 +78,11 @@ export function createViteConfig(options = {}) {
           fileName: fileName,
           formats: ['es'],
         },
-        // Production vs Development configurations
-        ...(mode === 'production' ? {
-          // PRODUCTION: Optimize for size
-          minify: 'terser',
-          cssMinify: true,
+        // Production: Optimize for size
+        minify: isProduction ? 'terser' : false,
+        cssMinify: isProduction,
+        ...(isProduction && {
           terserOptions: {
-            // @ts-ignore - terser options are correctly typed but Vite's types may be outdated
             compress: {
               drop_console: true,
               drop_debugger: true,
@@ -118,18 +103,17 @@ export function createViteConfig(options = {}) {
               ecma: 2020,
             },
           },
-        } : {
-          // DEVELOPMENT: Optimize for speed
-          minify: false,
-          cssMinify: false,
+        }),
+        // Development: Optimize for speed
+        ...(isDevelopment && {
           cssCodeSplit: false,
           emptyOutDir: false,
           reportCompressedSize: false,
           chunkSizeWarningLimit: Infinity,
         }),
-        sourcemap: false,  // Set to 'inline' in dev if you need debugging (3x larger bundle)
+        sourcemap: isDevelopment ? 'inline' : false,
         rollupOptions: {
-          ...(mode === 'production' && {
+          ...(isProduction && {
             treeshake: {
               moduleSideEffects: (id) => {
                 // Force tree-shaking for design system libraries
@@ -153,25 +137,19 @@ export function createViteConfig(options = {}) {
       },
       define: {
         'process.env.NODE_ENV': JSON.stringify(mode),
-        global: {},
-        process: {
-          env: {},
-        },
       },
       // Development cache optimization
-      ...(mode === 'development' && {
+      ...(isDevelopment && {
         optimizeDeps: {
           include: ['react', 'react-dom'],
           force: false,
           esbuildOptions: {
             target: 'es2020',
-            treeShaking: false
           }
         },
         esbuild: {
           logOverride: { 'this-is-undefined-in-esm': 'silent' },
           target: 'es2020',
-          treeShaking: false,
           legalComments: 'none',
         }
       })
