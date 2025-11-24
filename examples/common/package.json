@@ -13,7 +13,6 @@
     "@types/terser": "^3.8.1",
     "@vitejs/plugin-react": "^5.1.1",
     "terser": "^5.44.1",
-    "unplugin-swc": "^1.5.8",
     "vite": "^7.2.4"
   }
 }
