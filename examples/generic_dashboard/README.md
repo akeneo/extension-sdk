@@ -1,10 +1,10 @@
-## Project Overview
+# SDK script example: Generic Dashboard
 
-This React + Vite application serves as a dashboard for visualizing product information from an Akeneo PIM. It features several components that provide insights into product status, completeness, and other key metrics.
+This is an example of a UI extension that displays a comprehensive dashboard for visualizing product information from Akeneo PIM. It features a unique showcase of **three different design system implementations** that you can switch between.
 
-### Design System Showcase
+## Design System Showcase
 
-This dashboard demonstrates **three different design system implementations** that you can switch between using browser-style tabs at the top of the page:
+This dashboard demonstrates three different design system implementations that you can switch between using browser-style tabs at the top of the page:
 
 1. **Akeneo Design System** (default) - The official Akeneo PIM design system, providing a consistent look and feel with the PIM interface.
 2. **shadcn/ui** - A modern, accessible component library built with Radix UI and Tailwind CSS.
@@ -12,39 +12,205 @@ This dashboard demonstrates **three different design system implementations** th
 
 All three implementations share the same data and functionality, allowing you to compare design approaches and choose the one that best fits your needs.
 
-### Key Features
+### Dashboard Features
 
 - **Family Filtering**: Allows users to filter product data by selecting a specific family.
 - **Product Status Charts**: Visualizes the distribution of products based on their completeness status and pricing information.
 - **Completeness per Locale**: Displays the average completeness score for each locale within the selected family.
 - **Product List**: A table that shows recently updated products, including their image, SKU, name, and last update date.
 
-### Libraries and Components
+## Prerequisites
 
-The dashboard is built with a modern stack of UI libraries:
+Before you begin, you need an active connection to an Akeneo PIM sandbox.
+To learn more about setting up your connection, please follow the instructions in the [official documentation](https://api.akeneo.com/getting-started/connect-the-pim-4x/step-1.html#you-said-connection).
 
-#### Akeneo Design System Implementation
-- **UI Components**: Tables, section titles, and helpers from the `akeneo-design-system` package.
-- **Styling**: Styled-components with the official Akeneo PIM theme.
+## Get started
 
-#### shadcn/ui Implementation
-- **Charts**: Pie charts created using `react-chartjs-2` and `chart.js`.
-- **UI Components**: Cards, tables, progress bars, and other components from `shadcn/ui` built with Radix UI primitives.
-- **Icons**: Icons provided by `lucide-react`.
-- **Styling**: Tailwind CSS with custom design tokens.
+To begin, run the setup command:
+```bash
+make start
+```
+...and follow the interactive instructions in your terminal. This will install dependencies, configure your environment, and create the extension in your PIM for the first time.
 
-#### Shopify Polaris Implementation
-- **UI Components**: Page, Layout, Card, DataTable, ProgressBar, and other components from `@shopify/polaris`.
-- **Styling**: Polaris design tokens and pre-built styles.
+### Manual setup commands
 
-#### Shared
-- **Data Fetching**: All implementations use the same custom hooks to fetch data from the Akeneo PIM API.
-- **Mock Data**: Demo data generation for chart statistics (see `src/hooks/useMockChartData.tsx` for details).
+If you prefer to set up your environment manually or need more control over individual steps, you can use these commands:
 
-## React Compiler
+**Copy environment configuration:**
+```bash
+make copy-env
+```
+This copies `.env.example` to `.env` so you can manually configure your environment variables.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Install dependencies:**
+```bash
+make install
+```
+This installs all npm dependencies required for the project.
 
-## Expanding the ESLint configuration
+**Get API token:**
+```bash
+make get-token
+```
+This retrieves an API token from your Akeneo PIM instance.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**Create extension (development mode):**
+```bash
+make create-dev
+```
+This creates the extension in development mode in your PIM. This is what `make start` uses internally.
+
+**Create extension with credentials (development mode):**
+```bash
+make create-dev-with-credentials
+```
+This creates the extension in development mode, including any credentials defined in your `extension_configuration.json`.
+
+**Create extension (production mode):**
+```bash
+make create
+```
+This creates the extension in production mode in your PIM.
+
+**Create extension with credentials (production mode):**
+```bash
+make create-with-credentials
+```
+This creates the extension in production mode, including any credentials defined in your `extension_configuration.json`.
+
+## Development
+
+### Uploading changes
+
+To upload your changes to Akeneo, use the following command. This will build the extension for development and push it to the PIM.
+```bash
+make update-dev
+```
+
+**Update with credentials (development mode):**
+```bash
+make update-dev-with-credentials
+```
+This builds the extension for development and updates it in the PIM, including any credentials defined in your `extension_configuration.json`.
+
+### Development server
+
+To run the development server locally:
+```bash
+make dev
+```
+This starts a local development server (typically on port 3000) where you can test your extension.
+
+### Development build
+
+To build the extension for development without uploading:
+```bash
+make build-dev
+```
+This creates a development build with source maps and debugging tools enabled.
+
+### Automatic updates (hot-reload)
+
+To have your extension automatically update every time you save a code change, run the watch command:
+```bash
+make watch
+```
+This is highly recommended for an efficient development workflow.
+
+## Customization
+
+### Application logic
+
+The dashboard application is organized into several key directories:
+- **`src/App.tsx`**: Main application component with family filtering and design system switching
+- **`src/components/dashboards/`**: Implementation for each design system (Akeneo, shadcn/ui, Polaris)
+- **`src/components/`**: Shared components like charts, filters, and flags
+- **`src/hooks/`**: Custom hooks for data fetching (families, products, completeness)
+- **`src/contexts/`**: React context for managing the active design system
+
+### Extension configuration
+
+The `extension_configuration.json` file is crucial for defining how your UI extension behaves and appears within Akeneo PIM. Below is a detailed breakdown of its properties.
+
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `name` | `string` | A unique identifier for your extension. It's recommended to use a descriptive name, like `my-app-name`. | Yes |
+| `type` | `string` | Defines the type of extension. For SDK scripts, this should always be `sdk_script`. | Yes |
+| `position` | `string` | Determines where the extension will be displayed in the PIM interface. Examples: `pim.product.panel`, `pim.activity.navigation.tab`. See the [official documentation](https://api.akeneo.com/extensions/positions.html#available-positions-for-ui-extensions) for all available positions. | Yes |
+| `file` | `string` | The path to the compiled JavaScript file for your extension, relative to the project root. This is used by the build process (Vite) to name the output file. Example: `dist/my-app.js`. | Yes |
+| `configuration` | `object` | An object containing display settings for your extension. | Yes |
+| `configuration.default_label` | `string` | The default label for your extension, displayed if no translation is available for the user's locale. | Yes |
+| `configuration.labels` | `object` | A key-value map of translations for your extension's label. The key is the locale (e.g., `en_US`, `fr_FR`) and the value is the translated label. | No |
+| `credentials` | `array` | An array of objects defining credentials that your extension may need to interact with external services. Each object represents a credential. | No |
+
+#### Credentials object
+
+Each object in the `credentials` array can have the following properties:
+
+| Key | Type | Description |
+| --- | --- | --- |
+| `code` | `string` | A unique code to identify the credential within your extension. |
+| `type` | `string` | The type of authentication. Supported values are `Bearer Token`, `Basic Auth`, and `Custom Header`. |
+| `value` | `string` or `object` | The value(s) for the credential. For `Bearer Token` or `Custom Header`, this is a string. For `Basic Auth`, this is an object with `username` and `password`. |
+
+**Example of `credentials`:**
+```json
+{
+  "credentials": [
+    {
+      "code": "code_to_identify_the_credential",
+      "type": "Bearer Token",
+      "value": "your_auth_token"
+    },
+    {
+      "code": "code_to_identify_the_credential",
+      "type": "Basic Auth",
+      "value": {
+        "username": "your_username",
+        "password": "your_password"
+      }
+    },
+    {
+        "code": "code_to_identify_the_credential",
+        "type": "Custom Header",
+        "value": {
+          "header_key": "your_header_key",
+          "header_value": "your_header_value"
+        }
+    }
+  ]
+}
+```
+
+## Build for production
+
+Once your project is finished, you can build it for production with the command:
+```bash
+make build
+```
+This will create an optimized production build.
+
+To deploy this production version, use:
+```bash
+make update
+```
+
+**Update with credentials (production mode):**
+```bash
+make update-with-credentials
+```
+This builds the extension for production and updates it in the PIM, including any credentials defined in your `extension_configuration.json`.
+
+## Understanding SES (Secure ECMAScript)
+
+**Important**: Akeneo PIM uses SES (Secure ECMAScript) to run UI extensions in a secure sandbox environment. SES provides isolation and security by restricting access to potentially dangerous JavaScript features. See [here](https://www.npmjs.com/package/ses/v/1.14.0) and [here](https://github.com/endojs/endo/tree/master/packages/ses#ses) for more information.
+
+### What this means for your extension:
+
+- **Security First**: Your extension script runs in a controlled environment that prevents access to sensitive browser APIs and global objects.
+- **Error Messages**: If you encounter errors mentioning "SES" in the browser console, these are typically related to:
+  - Module loading or import statements that SES cannot resolve
+  - Use of restricted JavaScript features or APIs
+  - Dynamic code evaluation or unsafe patterns
+
+If you encounter SES-related errors, review your build configuration and ensure your code doesn't rely on restricted features or dynamic code execution patterns.
