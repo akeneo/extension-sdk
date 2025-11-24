@@ -96,6 +96,19 @@ function App() {
             products={products}
           />
         )}
+
+        {designSystem === 'polaris' && (
+          <AppProvider i18n={{}}>
+            <PolarisDashboard
+              productStatusData={productStatusData}
+              pricingStatusData={pricingStatusData}
+              selectedFamilyLabel={selectedFamilyLabel}
+              completenessData={completenessData}
+              completenessLoading={completenessLoading}
+              products={products}
+            />
+          </AppProvider>
+        )}
       </div>
     </>
   );
