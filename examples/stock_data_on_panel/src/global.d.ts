@@ -1215,6 +1215,8 @@ declare interface ExecutionWorkflow {
     uuid: string;
 }
 
+export declare type EXTENSION_VARIABLES = Record<string | number, string | number | Array<string | number>>;
+
 declare type externalGateway = {
     call: (requestParameters?: externalGatewayRequest) => Promise<any>;
 };
@@ -1689,6 +1691,7 @@ export declare type PIM_SDK = {
         workflow_executions_v1: SdkApiWorkflowExecutions;
     };
     navigate: pimNavigate;
+    custom_variables: EXTENSION_VARIABLES;
 };
 
 export declare type PIM_USER = {
@@ -1696,10 +1699,15 @@ export declare type PIM_USER = {
     uuid: string;
     first_name: string;
     last_name: string;
+    groups: Array<{
+        id: number;
+        name: string;
+    }>;
 };
 
 declare type pimNavigate = {
     internal: (path: string) => void;
+    external: (rawUrl: string) => void;
 };
 
 /**
