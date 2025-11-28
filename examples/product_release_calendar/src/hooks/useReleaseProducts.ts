@@ -16,6 +16,41 @@ interface UseReleaseProductsResult {
 }
 
 /**
+ * Extract identifier from product values when product.identifier is empty
+ * Workaround for known bug where identifier field is not always filled
+ */
+function getProductIdentifier(product: any): string {
+  // First try the identifier field
+  if (product.identifier && product.identifier.trim().length > 0) {
+    return product.identifier;
+  }
+
+  // Fallback: search through product values for pim_catalog_identifier attribute
+  if (product.values) {
+    for (const [, attributeValue] of Object.entries(product.values)) {
+      if (Array.isArray(attributeValue) && attributeValue.length > 0) {
+        const firstValue = attributeValue[0];
+        if (
+          firstValue &&
+          typeof firstValue === 'object' &&
+          'attribute_type' in firstValue &&
+          firstValue.attribute_type === 'pim_catalog_identifier' &&
+          'data' in firstValue
+        ) {
+          const data = firstValue.data;
+          if (typeof data === 'string' && data.trim().length > 0) {
+            return data.trim();
+          }
+        }
+      }
+    }
+  }
+
+  // Last resort: use UUID or empty string
+  return product.uuid || '';
+}
+
+/**
  * Hook to fetch products with release tracking information
  */
 export function useReleaseProducts(
@@ -71,8 +106,12 @@ export function useReleaseProducts(
         const riskInfo = isProductAtRisk(product, currentStage, config);
         const liveLocales = getLiveLocales(product, config);
 
+        // Get identifier with fallback for empty identifier field
+        const identifier = getProductIdentifier(product);
+
         return {
           ...product,
+          identifier,
           currentStage,
           completenessPerLocale,
           goLiveDates,
