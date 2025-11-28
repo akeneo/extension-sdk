@@ -1,10 +1,21 @@
 /**
+ * Release date configuration
+ * Defines when products should go live based on locale, family, or channel
+ */
+export interface ReleaseDate {
+  date: string; // ISO date string (YYYY-MM-DD)
+  locale?: string; // Optional: specific locale
+  family?: string; // Optional: specific family
+  channel?: string; // Optional: specific channel
+}
+
+/**
  * Configuration interface for the Product Release Calendar
  * Maps PIM-agnostic concepts to specific PIM attributes using custom_variables
  */
 export interface ReleaseCalendarConfig {
-  // Date attribute for go-live (should be scopable per locale/channel)
-  goLiveDateAttribute: string;
+  // Release dates configuration
+  releaseDates: ReleaseDate[];
 
   // Master locale for initial content creation
   masterLocale: string;
@@ -113,8 +124,8 @@ interface BaseProduct {
   };
   completenesses?: Array<{
     locale: string;
-    channel?: string;
-    ratio: number;
+    scope?: string;
+    data: number;
   }>;
   created?: string;
   updated?: string;

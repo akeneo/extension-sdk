@@ -51,13 +51,18 @@ The Product Release Calendar helps merchandising and product teams track product
 
 ### Custom Variables
 
-The extension uses `custom_variables` to map to your PIM structure. Here's how to configure it:
+The extension uses `custom_variables` to map to your PIM structure. Release dates are configured directly in custom_variables, allowing you to define release schedules by locale, family, or channel.
 
-#### Example 1: Basic Configuration
+#### Example 1: Release Dates by Locale
 
 ```json
 {
-  "goLiveDateAttribute": "launch_date",
+  "releaseDates": [
+    { "date": "2025-12-01", "locale": "en_US" },
+    { "date": "2025-12-15", "locale": "fr_FR" },
+    { "date": "2025-12-15", "locale": "de_DE" },
+    { "date": "2025-12-20", "locale": "es_ES" }
+  ],
   "masterLocale": "en_US",
   "targetLocales": ["fr_FR", "de_DE", "es_ES"],
   "masterRequiredAttributes": ["name", "description", "price"],
@@ -71,23 +76,19 @@ The extension uses `custom_variables` to map to your PIM structure. Here's how t
 }
 ```
 
-#### Example 2: Advanced Configuration with Asset Manager
+#### Example 2: Release Dates by Family
 
 ```json
 {
-  "goLiveDateAttribute": "release_date",
-  "masterLocale": "en_GB",
-  "targetLocales": ["fr_FR", "de_DE", "it_IT", "es_ES", "nl_NL"],
-  "validationStatusAttribute": "workflow_status",
-  "centralValidationAttribute": "approved_for_release",
-  "masterRequiredAttributes": [
-    "name",
-    "short_description",
-    "long_description",
-    "technical_specs",
-    "price",
-    "sku"
+  "releaseDates": [
+    { "date": "2025-11-15", "family": "winter_collection" },
+    { "date": "2025-12-01", "family": "holiday_specials" },
+    { "date": "2026-01-15", "family": "new_year_products" },
+    { "date": "2025-12-10" }
   ],
+  "masterLocale": "en_GB",
+  "targetLocales": ["fr_FR", "de_DE", "it_IT", "es_ES"],
+  "masterRequiredAttributes": ["name", "short_description", "long_description"],
   "imageAttributes": ["product_images", "lifestyle_images"],
   "imageAssetFamily": "product_assets",
   "channel": "website",
@@ -99,14 +100,20 @@ The extension uses `custom_variables` to map to your PIM structure. Here's how t
 }
 ```
 
-#### Example 3: Multi-Channel Configuration
+#### Example 3: Mixed Release Dates (Family + Locale)
 
 ```json
 {
-  "goLiveDateAttribute": "ecommerce_launch_date",
+  "releaseDates": [
+    { "date": "2025-11-15", "family": "shoes", "locale": "en_US" },
+    { "date": "2025-11-20", "family": "shoes", "locale": "fr_FR" },
+    { "date": "2025-12-01", "family": "accessories" },
+    { "date": "2025-12-15", "locale": "de_DE" },
+    { "date": "2026-01-01" }
+  ],
   "masterLocale": "en_US",
-  "targetLocales": ["en_CA", "fr_CA", "es_MX"],
-  "masterRequiredAttributes": ["title", "description", "price", "weight", "dimensions"],
+  "targetLocales": ["fr_FR", "de_DE", "es_ES"],
+  "masterRequiredAttributes": ["title", "description", "price"],
   "imageAttributes": ["main_image", "gallery"],
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 40,
@@ -117,11 +124,32 @@ The extension uses `custom_variables` to map to your PIM structure. Here's how t
 }
 ```
 
+#### Example 4: Alternative Locale-based Format
+
+For simpler configurations, you can also use individual variables per locale:
+
+```json
+{
+  "releaseDate_en_US": "2025-12-01",
+  "releaseDate_fr_FR": "2025-12-15",
+  "releaseDate_de_DE": "2025-12-15",
+  "masterLocale": "en_US",
+  "targetLocales": ["fr_FR", "de_DE"],
+  "masterRequiredAttributes": ["name", "description"],
+  "imageAttributes": ["main_image"],
+  "thresholdMasterEnrichment": 40,
+  "thresholdMasterVisuals": 60,
+  "thresholdMasterValidation": 80,
+  "thresholdLocalization": 80,
+  "thresholdCentralValidation": 100
+}
+```
+
 ### Configuration Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `goLiveDateAttribute` | string | Yes | Attribute code for go-live date (should be scopable per locale) |
+| `releaseDates` | ReleaseDate[] | Yes | Array of release date configurations (see below) |
 | `masterLocale` | string | Yes | Master locale code for initial content creation |
 | `targetLocales` | string[] | Yes | Array of target locale codes for translations |
 | `masterRequiredAttributes` | string[] | Yes | Attribute codes required for master enrichment stage |
@@ -136,31 +164,56 @@ The extension uses `custom_variables` to map to your PIM structure. Here's how t
 | `thresholdLocalization` | number | No | Completeness % threshold for localization (default: 80) |
 | `thresholdCentralValidation` | number | No | Completeness % threshold for central validation (default: 100) |
 
+#### ReleaseDate Object
+
+Each release date object can specify:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `date` | string | Yes | ISO date string (YYYY-MM-DD) for the release |
+| `locale` | string | No | Specific locale for this release date |
+| `family` | string | No | Specific product family for this release date |
+| `channel` | string | No | Specific channel for this release date |
+
+**Matching Priority**: The system matches products to release dates using the most specific criteria first:
+1. Family + Locale + Channel (most specific)
+2. Family + Locale
+3. Locale + Channel
+4. Locale only
+5. Family + Channel
+6. Family only
+7. Channel only
+8. Default (no criteria) - applies to all products
+
 ## PIM Attribute Setup
 
 ### Required Attributes
 
-1. **Go-Live Date Attribute**
-   - Type: Date
-   - Scopable: Yes (per locale/channel) - Recommended
-   - Localizable: Optional
-   - Example codes: `release_date`, `launch_date`, `go_live_date`
-
-2. **Master Required Attributes**
+1. **Master Required Attributes**
    - Typically: name, description, short_description
    - Should be text/textarea attributes
    - Localizable: Yes
 
-3. **Image Attributes**
+2. **Image Attributes**
    - Type: Image, Asset Collection, or Media File
    - Examples: `main_image`, `images`, `product_photos`
 
 ### Optional Attributes
 
-4. **Validation Status Attributes**
+3. **Validation Status Attributes**
    - Type: Simple select or Boolean
    - Example values: "pending", "validated", "rejected"
    - Can be used to track validation checkpoints
+
+### Release Dates
+
+Release dates are are configured in `custom_variables` and applied to products based on their family, locale, and channel. This allows you to:
+
+- Define release schedules centrally without modifying products
+- Update release dates globally by changing configuration
+- Apply different release dates to different product families
+- Coordinate multi-locale releases from a single configuration
+- Avoid creating and maintaining date attributes per product
 
 ## How Stage Inference Works
 

@@ -13,8 +13,8 @@ interface Product {
   };
   completenesses?: Array<{
     locale: string;
-    channel?: string;
-    ratio: number;
+    scope?: string;
+    data: number;
   }>;
 }
 
@@ -98,15 +98,18 @@ export function inferProductStage(
  * Get completeness for master locale
  */
 function getMasterCompleteness(product: Product, config: ReleaseCalendarConfig): number {
+  console.log("product completenesse", product.completenesses);
   if (!product.completenesses) return 0;
 
+  console.log("config", config);
   const masterCompleteness = product.completenesses.find(
     (c: any) =>
       c.locale === config.masterLocale &&
-      (!config.channel || c.channel === config.channel)
+      (!config.channel || c.scope === config.channel)
   );
 
-  return masterCompleteness?.ratio || 0;
+  console.log("master completenesse",masterCompleteness);
+  return masterCompleteness?.data || 0;
 }
 
 /**
@@ -179,10 +182,10 @@ function checkLocalizationComplete(product: Product, config: ReleaseCalendarConf
     const localeCompleteness = product.completenesses?.find(
       (c: any) =>
         c.locale === locale &&
-        (!config.channel || c.channel === config.channel)
+        (!config.channel || c.scope === config.channel)
     );
 
-    return (localeCompleteness?.ratio || 0) >= config.thresholds.localization;
+    return (localeCompleteness?.data || 0) >= config.thresholds.localization;
   });
 }
 
@@ -215,7 +218,8 @@ function checkHasPassedGoLiveDate(product: Product, config: ReleaseCalendarConfi
 }
 
 /**
- * Extract go-live dates per locale from product
+ * Extract go-live dates per locale from configured release dates
+ * Matches products against release dates based on family, locale, and channel
  */
 export function extractGoLiveDates(
   product: Product,
@@ -223,28 +227,72 @@ export function extractGoLiveDates(
 ): { [locale: string]: string | null } {
   const dates: { [locale: string]: string | null } = {};
 
-  if (!product.values || !config.goLiveDateAttribute) {
-    return dates;
-  }
+  // Get all relevant locales
+  const allLocales = [config.masterLocale, ...config.targetLocales];
 
-  const dateAttr = product.values[config.goLiveDateAttribute];
-  if (!dateAttr) return dates;
+  // Match release dates to product
+  allLocales.forEach((locale) => {
+    // Try to find a matching release date with most specific criteria first
 
-  // Handle scopable date attribute (array of values per locale)
-  if (Array.isArray(dateAttr)) {
-    dateAttr.forEach((value: any) => {
-      if (value.locale && value.data) {
-        dates[value.locale] = value.data;
-      }
-    });
-  }
-  // Handle simple date attribute (same for all locales)
-  else if (dateAttr.data) {
-    config.targetLocales.forEach((locale) => {
-      dates[locale] = dateAttr.data;
-    });
-    dates[config.masterLocale] = dateAttr.data;
-  }
+    // 1. Match by family + locale + channel (most specific)
+    let matchedDate = config.releaseDates.find(
+      (rd) =>
+        rd.family === product.family &&
+        rd.locale === locale &&
+        rd.channel === config.channel
+    );
+
+    // 2. Match by family + locale
+    if (!matchedDate) {
+      matchedDate = config.releaseDates.find(
+        (rd) => rd.family === product.family && rd.locale === locale && !rd.channel
+      );
+    }
+
+    // 3. Match by locale + channel
+    if (!matchedDate) {
+      matchedDate = config.releaseDates.find(
+        (rd) => !rd.family && rd.locale === locale && rd.channel === config.channel
+      );
+    }
+
+    // 4. Match by locale only
+    if (!matchedDate) {
+      matchedDate = config.releaseDates.find(
+        (rd) => !rd.family && rd.locale === locale && !rd.channel
+      );
+    }
+
+    // 5. Match by family + channel (applies to all locales)
+    if (!matchedDate) {
+      matchedDate = config.releaseDates.find(
+        (rd) => rd.family === product.family && !rd.locale && rd.channel === config.channel
+      );
+    }
+
+    // 6. Match by family only (applies to all locales)
+    if (!matchedDate) {
+      matchedDate = config.releaseDates.find(
+        (rd) => rd.family === product.family && !rd.locale && !rd.channel
+      );
+    }
+
+    // 7. Match by channel only (applies to all locales and families)
+    if (!matchedDate) {
+      matchedDate = config.releaseDates.find(
+        (rd) => !rd.family && !rd.locale && rd.channel === config.channel
+      );
+    }
+
+    // 8. Default release date (no criteria)
+    if (!matchedDate) {
+      matchedDate = config.releaseDates.find(
+        (rd) => !rd.family && !rd.locale && !rd.channel
+      );
+    }
+
+    dates[locale] = matchedDate ? matchedDate.date : null;
+  });
 
   return dates;
 }
@@ -266,10 +314,10 @@ export function extractCompletenessPerLocale(
     const completeness = product.completenesses?.find(
       (c: any) =>
         c.locale === locale &&
-        (!config.channel || c.channel === config.channel)
+        (!config.channel || c.scope === config.channel)
     );
 
-    completenessMap[locale] = completeness?.ratio || 0;
+    completenessMap[locale] = completeness?.data || 0;
   });
 
   return completenessMap;
