@@ -1,4 +1,4 @@
-import { FilterState, ReleaseStage, STAGE_CONFIG, ReleaseCalendarConfig } from '../types';
+import { FilterState, ReleaseStage, STAGE_CONFIG, ReleaseCalendarConfig, ViewMode } from '../types';
 import { TextInput, SelectInput } from 'akeneo-design-system';
 import styled from 'styled-components';
 import { Search } from 'lucide-react';
@@ -7,7 +7,9 @@ interface FiltersProps {
   filters: FilterState;
   onFiltersChange: (filters: FilterState) => void;
   families: { code: string; label: string }[];
+  categories: { code: string; label: string }[];
   config: ReleaseCalendarConfig;
+  viewMode: ViewMode;
 }
 
 const Container = styled.div`
@@ -44,7 +46,7 @@ const StyledTextInput = styled(TextInput)`
   }
 `;
 
-export function Filters({ filters, onFiltersChange, families, config }: FiltersProps) {
+export function Filters({ filters, onFiltersChange, families, categories, config, viewMode }: FiltersProps) {
   const stageOptions = [
     { value: '', label: 'All Stages' },
     ...Object.values(ReleaseStage).map((stage) => ({
@@ -53,11 +55,16 @@ export function Filters({ filters, onFiltersChange, families, config }: FiltersP
     })),
   ];
 
-  const familyOptions = [
-    { value: '', label: 'All Families' },
-    ...families.map((family) => ({
-      value: family.code,
-      label: family.label,
+  const familyOptions = families.map((family) => ({
+    value: family.code,
+    label: family.label,
+  }));
+
+  const categoryOptions = [
+    { value: '', label: 'All Categories' },
+    ...categories.map((category) => ({
+      value: category.code,
+      label: category.label,
     })),
   ];
 
@@ -72,24 +79,13 @@ export function Filters({ filters, onFiltersChange, families, config }: FiltersP
 
   return (
     <Container>
-      <SearchContainer>
-        <SearchIcon>
-          <Search size={16} />
-        </SearchIcon>
-        <StyledTextInput
-          placeholder="Search by product identifier..."
-          value={filters.searchQuery || ''}
-          onChange={(value: string) => {
-            onFiltersChange({ ...filters, searchQuery: value });
-          }}
-        />
-      </SearchContainer>
-
       <FilterGroup>
         <SelectInput
-          value={filters.family || ''}
+          value={filters.family}
           onChange={(value: string) => {
-            onFiltersChange({ ...filters, family: value || undefined });
+            if (value) {
+              onFiltersChange({ ...filters, family: value });
+            }
           }}
           emptyResultLabel="No families found"
           openLabel="Open"
@@ -105,21 +101,41 @@ export function Filters({ filters, onFiltersChange, families, config }: FiltersP
 
       <FilterGroup>
         <SelectInput
-          value={filters.stage || ''}
+          value={filters.category || ''}
           onChange={(value: string) => {
-            onFiltersChange({ ...filters, stage: (value as ReleaseStage) || undefined });
+            onFiltersChange({ ...filters, category: value || undefined });
           }}
-          emptyResultLabel="No stages found"
+          emptyResultLabel="No categories found"
           openLabel="Open"
           clearable={false}
         >
-          {stageOptions.map((option) => (
+          {categoryOptions.map((option) => (
             <SelectInput.Option key={option.value} value={option.value} title={option.label}>
               {option.label}
             </SelectInput.Option>
           ))}
         </SelectInput>
       </FilterGroup>
+
+      {viewMode === ViewMode.TIMELINE && (
+        <FilterGroup>
+          <SelectInput
+            value={filters.stage || ''}
+            onChange={(value: string) => {
+              onFiltersChange({ ...filters, stage: (value as ReleaseStage) || undefined });
+            }}
+            emptyResultLabel="No stages found"
+            openLabel="Open"
+            clearable={false}
+          >
+            {stageOptions.map((option) => (
+              <SelectInput.Option key={option.value} value={option.value} title={option.label}>
+                {option.label}
+              </SelectInput.Option>
+            ))}
+          </SelectInput>
+        </FilterGroup>
+      )}
 
       <FilterGroup>
         <SelectInput
@@ -138,6 +154,19 @@ export function Filters({ filters, onFiltersChange, families, config }: FiltersP
           ))}
         </SelectInput>
       </FilterGroup>
+
+      <SearchContainer>
+        <SearchIcon>
+          <Search size={16} />
+        </SearchIcon>
+        <StyledTextInput
+          placeholder="Search by product identifier..."
+          value={filters.searchQuery || ''}
+          onChange={(value: string) => {
+            onFiltersChange({ ...filters, searchQuery: value });
+          }}
+        />
+      </SearchContainer>
     </Container>
   );
 }

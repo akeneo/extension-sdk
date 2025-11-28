@@ -174,7 +174,8 @@ export enum ViewMode {
  * Filter state
  */
 export interface FilterState {
-  family?: string;
+  family: string;  // Required - always has a family selected
+  category?: string;
   stage?: ReleaseStage;
   locale?: string;
   searchQuery?: string;

@@ -21,8 +21,8 @@ The Product Release Calendar helps merchandising and product teams track product
   8. Live - Published on channels
 
 - **Dual View Modes**:
-  - **Pipeline View**: Kanban-style board showing products grouped by current stage
-  - **Timeline View**: Calendar view showing products by their go-live dates
+  - **Pipeline View**: Kanban-style board showing products grouped by current stage. Best for monitoring workflow progress and identifying bottlenecks across all stages.
+  - **Timeline View**: Calendar view showing products by their go-live dates. Best for planning releases and ensuring products are ready by their target dates. Includes stage filtering for focused views.
 
 - **Multi-Locale Support**: Track completeness and go-live dates per locale
 
@@ -37,8 +37,9 @@ The Product Release Calendar helps merchandising and product teams track product
 
 ### User Interface
 
-- Search by product identifier
-- Filter by family, stage, or locale
+- **Required family selection**: Products are loaded based on the selected family
+- Filter by category, locale, and search by product identifier
+- **Stage filter** (timeline view only): Filter products by their current stage
 - Click products to navigate to edit forms
 - Visual indicators for:
   - Current stage (color-coded)
@@ -164,7 +165,18 @@ Each release date object can specify:
 7. Channel only
 8. Default (no criteria) - applies to all products
 
-## PIM Attribute Setup
+## PIM Setup Requirements
+
+### Product Families
+
+The extension requires at least one product family to be configured in your PIM. Products must be assigned to families for the extension to display them.
+
+### Categories (Optional)
+
+If you want to use category filtering:
+- Set up product categories in your PIM
+- Assign products to categories
+- The extension will automatically fetch and display available categories in the filter dropdown
 
 ### Required Attributes
 
@@ -172,10 +184,12 @@ Each release date object can specify:
    - Typically: name, description, short_description
    - Should be text/textarea attributes
    - Localizable: Yes
+   - Configure these in `masterRequiredAttributes` in custom_variables
 
 2. **Image Attributes**
    - Type: Image, Asset Collection, or Media File
    - Examples: `main_image`, `images`, `product_photos`
+   - Configure these in `imageAttributes` in custom_variables
 
 ### Optional Attributes
 
@@ -183,6 +197,7 @@ Each release date object can specify:
    - Type: Simple select or Boolean
    - Example values: "pending", "validated", "rejected"
    - Can be used to track validation checkpoints
+   - Configure these in `validationStatusAttribute` and `centralValidationAttribute` in custom_variables
 
 ### Release Dates
 
@@ -193,6 +208,30 @@ Release dates are are configured in `custom_variables` and applied to products b
 - Apply different release dates to different product families
 - Coordinate multi-locale releases from a single configuration
 - Avoid creating and maintaining date attributes per product
+
+## Filtering and Data Loading
+
+### Filter Behavior
+
+The extension provides several filtering options to help you navigate your product catalog:
+
+1. **Family (Required)**: Products are only loaded when a family is selected. The first family is automatically selected when the extension loads. Use this to focus on specific product types.
+
+2. **Category (Optional)**: Filter products by category within the selected family. Shows all categories available in your PIM.
+
+3. **Stage (Timeline View Only)**: In timeline view, filter products by their current stage in the release pipeline. This filter is hidden in pipeline view where stages are already visually separated.
+
+4. **Locale (Optional)**: Filter products by checking completeness for a specific locale. Useful for tracking localization progress.
+
+5. **Search**: Search products by their identifier. This filter appears last in the filter bar for quick access.
+
+### Data Loading
+
+- Products are fetched from the PIM API based on the selected family (required) and category (optional)
+- The extension fetches up to 100 products per request
+- Completeness data is retrieved for all configured locales and channels
+- Release dates are applied from `custom_variables` configuration based on product family, locale, and channel
+- Use the Refresh button to reload data and see the latest changes from your PIM
 
 ## How Stage Inference Works
 
@@ -325,15 +364,51 @@ The extension integrates with Akeneo's navigation system:
 - Uses `PIM.navigate` API for seamless navigation
 - Maintains context when returning to the calendar
 
+## Technical Implementation Notes
+
+### Product Identifier Handling
+
+The extension includes a workaround for cases where the `identifier` field may be empty. It automatically searches the product's `values` object for attributes with type `pim_catalog_identifier` to retrieve the correct identifier:
+
+```typescript
+// Fallback mechanism for empty identifier field
+if (!product.identifier || product.identifier.trim().length === 0) {
+  // Search product.values for pim_catalog_identifier attribute type
+  for (const attributeValue of Object.values(product.values)) {
+    if (attributeValue.attribute_type === 'pim_catalog_identifier') {
+      return attributeValue.data;
+    }
+  }
+}
+```
+
+### Completeness API Structure
+
+The extension works with Akeneo's completeness API which returns data in the following structure:
+
+```typescript
+completenesses: [
+  {
+    locale: "en_US",
+    scope: "ecommerce",  // Channel/scope
+    data: 85              // Completeness percentage (0-100)
+  }
+]
+```
+
+Ensure your `channel` configuration in custom_variables matches the `scope` values in your PIM.
+
 ## Limitations and Considerations
 
-1. **Performance**: Fetches up to 100 products at a time. For larger catalogs, use family filters.
+1. **Performance**: Fetches up to 100 products at a time. For larger catalogs, use family and category filters to narrow results.
 
-2. **Scopable Date Attributes**: Works best with scopable date attributes (different go-live dates per locale). Falls back to single date for all locales if not scopable.
+2. **Family Selection Required**: Products are only loaded when a family is selected. The extension automatically selects the first available family on load.
 
-3. **Completeness Calculation**: Relies on Akeneo's completeness API. Ensure completeness is correctly configured in your PIM.
+3. **Release Date Configuration**: Release dates are configured in `custom_variables`, not stored as product attributes. This allows centralized schedule management but requires configuration updates to change dates.
 
-4. **Real-time Updates**: Data is fetched on load and when filters change. Use the refresh button for latest data.
+4. **Completeness Calculation**: Relies on Akeneo's completeness API. Ensure completeness is correctly configured in your PIM for the specified channel/scope.
+
+5. **Real-time Updates**: Data is fetched on load and when filters change. Use the refresh button for latest data.
 
 ## Customization Ideas
 
@@ -348,20 +423,37 @@ The extension integrates with Akeneo's navigation system:
 
 ### No Products Showing
 
-- Check that `custom_variables` are correctly configured
-- Verify products exist in the selected family
-- Check browser console for API errors
-- Ensure your user has permission to view products
+- **Check family selection**: Ensure a family is selected. The extension requires a family to be selected before loading products.
+- **Verify products exist**: Confirm that products exist in the selected family in your PIM
+- **Check category filter**: If using category filter, verify products are assigned to that category
+- **Check custom_variables**: Ensure `custom_variables` are correctly configured with valid attribute codes
+- **Browser console**: Check the browser console for API errors or permission issues
+- **User permissions**: Ensure your user has permission to view products and access the API
 
 ### Incorrect Stage Assignment
 
-- Verify `thresholdX` values match your requirements
-- Check that required attributes exist on products
-- Ensure completeness is calculated for the configured channel
-- Review `masterRequiredAttributes` and `imageAttributes` configuration
+- **Verify thresholds**: Check that `thresholdMasterEnrichment`, `thresholdMasterVisuals`, etc. match your requirements
+- **Check attributes**: Verify that `masterRequiredAttributes` and `imageAttributes` exist on your products
+- **Channel configuration**: Ensure the `channel` in custom_variables matches a valid scope in your PIM
+- **Completeness setup**: Verify completeness is calculated correctly in your PIM for the configured channel
+- **Locale configuration**: Confirm `masterLocale` and `targetLocales` match your PIM's locale setup
+
+### Empty or Missing Product Identifiers
+
+The extension includes a fallback mechanism for empty identifiers. If you see products without identifiers:
+- Check that the `pim_catalog_identifier` attribute type exists in product values
+- Verify products have identifier values set in the PIM
+- Check browser console for warnings about identifier extraction
+
+### Stage Filter Not Visible
+
+The stage filter only appears in **Timeline View**. If you don't see it:
+- Switch to Timeline View using the view switcher in the header
+- In Pipeline View, products are already organized by stage in columns
 
 ### Navigation Not Working
 
-- Verify `PIM.navigate` API is available
+- Verify `PIM.navigate` API is available in your PIM version
 - Check that product UUIDs are valid
 - Ensure user has permission to edit products
+- Check browser console for navigation errors

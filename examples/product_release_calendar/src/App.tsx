@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { SectionTitle, Helper, Placeholder, UsersIllustration } from 'akeneo-design-system';
 import styled from 'styled-components';
 import { ViewMode, FilterState } from './types';
@@ -6,6 +6,7 @@ import { loadConfig } from './utils/config';
 import { navigateToProduct } from './utils/navigation';
 import { useReleaseProducts } from './hooks/useReleaseProducts';
 import { useFamilies } from './hooks/useFamilies';
+import { useCategories } from './hooks/useCategories';
 import { ViewSwitcher } from './components/ViewSwitcher';
 import { Filters } from './components/Filters';
 import { PipelineView } from './components/PipelineView';
@@ -91,16 +92,27 @@ const AtRiskCount = styled(StatValue)`
 function App() {
   console.log("app is loading");
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.PIPELINE);
-  const [filters, setFilters] = useState<FilterState>({});
+  const [filters, setFilters] = useState<FilterState>({ family: '' });
 
   // Load configuration from custom_variables
   const config = useMemo(() => loadConfig(), []);
 
-  // Fetch families for filtering
+  // Fetch families and categories for filtering
   const { families } = useFamilies();
+  const { categories } = useCategories();
 
-  // Fetch products with release tracking
-  const { products, loading, error, refetch } = useReleaseProducts(config, filters);
+  // Set initial family when families are loaded
+  useEffect(() => {
+    if (families.length > 0 && !filters.family) {
+      setFilters({ ...filters, family: families[0].code });
+    }
+  }, [families]);
+
+  // Fetch products with release tracking (only if family is selected)
+  const { products, loading, error, refetch } = useReleaseProducts(
+    config,
+    filters.family ? filters : { ...filters, family: families[0]?.code || '' }
+  );
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -173,10 +185,19 @@ function App() {
         filters={filters}
         onFiltersChange={setFilters}
         families={families}
+        categories={categories}
         config={config}
+        viewMode={viewMode}
       />
 
-      {loading ? (
+      {!filters.family ? (
+        <Placeholder
+          illustration={<UsersIllustration />}
+          title="Select a family"
+        >
+          Please select a product family to view the release calendar.
+        </Placeholder>
+      ) : loading ? (
         <Placeholder
           illustration={<UsersIllustration />}
           title="Loading products..."
@@ -186,9 +207,9 @@ function App() {
           illustration={<UsersIllustration />}
           title="No products found"
         >
-          {filters.family || filters.stage || filters.locale || filters.searchQuery
+          {filters.category || filters.stage || filters.locale || filters.searchQuery
             ? 'Try adjusting your filters to see more products.'
-            : 'No products match the current configuration. Check your custom_variables setup.'}
+            : `No products found in the ${families.find(f => f.code === filters.family)?.label || filters.family} family.`}
         </Placeholder>
       ) : viewMode === ViewMode.PIPELINE ? (
         <PipelineView products={products} onNavigateToProduct={handleNavigateToProduct} />
