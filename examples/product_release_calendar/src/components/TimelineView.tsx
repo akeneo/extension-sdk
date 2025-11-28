@@ -8,6 +8,22 @@ interface TimelineViewProps {
   onNavigateToProduct: (productUuid: string) => void;
 }
 
+/**
+ * Get ISO week number for a given date
+ * ISO week 1 is the week with the first Thursday of the year
+ */
+function getISOWeekNumber(date: Date): number {
+  const target = new Date(date.valueOf());
+  const dayNumber = (date.getDay() + 6) % 7;
+  target.setDate(target.getDate() - dayNumber + 3);
+  const firstThursday = target.valueOf();
+  target.setMonth(0, 1);
+  if (target.getDay() !== 4) {
+    target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
+  }
+  return 1 + Math.ceil((firstThursday - target.valueOf()) / 604800000);
+}
+
 const Container = styled.div`
   padding: 16px 0;
 `;
@@ -75,6 +91,33 @@ const Timeline = styled.div`
   gap: 12px;
 `;
 
+const DayHeaders = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+`;
+
+const DayHeaderSpacer = styled.div`
+  min-width: 80px;
+`;
+
+const DayHeadersContainer = styled.div`
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+`;
+
+const DayHeader = styled.div<{ $isWeekend?: boolean }>`
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: ${({ $isWeekend }) => ($isWeekend ? '#67768E' : '#11324D')};
+  padding: 8px 4px;
+  background: ${({ $isWeekend }) => ($isWeekend ? '#E8E8E8' : '#F5F5F5')};
+  border-radius: 4px;
+`;
+
 const WeekRow = styled.div`
   display: flex;
   gap: 8px;
@@ -101,12 +144,16 @@ const DaysContainer = styled.div`
   gap: 4px;
 `;
 
-const DayCell = styled.div<{ $isToday?: boolean; $isCurrentMonth?: boolean }>`
+const DayCell = styled.div<{ $isToday?: boolean; $isCurrentMonth?: boolean; $isWeekend?: boolean }>`
   min-height: 80px;
   border: 1px solid ${({ $isToday }) => ($isToday ? '#5992C1' : '#DDDDDD')};
   border-radius: 4px;
   padding: 4px;
-  background: ${({ $isCurrentMonth }) => ($isCurrentMonth ? 'white' : '#F5F5F5')};
+  background: ${({ $isCurrentMonth, $isWeekend }) => {
+    if (!$isCurrentMonth) return '#FAFAFA';
+    if ($isWeekend) return '#EEEEEE';
+    return 'white';
+  }};
   position: relative;
   overflow: hidden;
 
@@ -117,10 +164,14 @@ const DayCell = styled.div<{ $isToday?: boolean; $isCurrentMonth?: boolean }>`
   `}
 `;
 
-const DayNumber = styled.div<{ $isToday?: boolean }>`
+const DayNumber = styled.div<{ $isToday?: boolean; $isCurrentMonth?: boolean }>`
   font-size: 11px;
   font-weight: ${({ $isToday }) => ($isToday ? '700' : '600')};
-  color: ${({ $isToday }) => ($isToday ? '#2E4E6C' : '#425A70')};
+  color: ${({ $isToday, $isCurrentMonth }) => {
+    if ($isToday) return '#2E4E6C';
+    if (!$isCurrentMonth) return '#BBBBBB';
+    return '#425A70';
+  }};
   margin-bottom: 4px;
 `;
 
@@ -261,15 +312,29 @@ export function TimelineView({ products, onNavigateToProduct }: TimelineViewProp
         </Legend>
       </Controls>
 
+      <DayHeaders>
+        <DayHeaderSpacer />
+        <DayHeadersContainer>
+          <DayHeader>Mon</DayHeader>
+          <DayHeader>Tue</DayHeader>
+          <DayHeader>Wed</DayHeader>
+          <DayHeader>Thu</DayHeader>
+          <DayHeader>Fri</DayHeader>
+          <DayHeader $isWeekend>Sat</DayHeader>
+          <DayHeader $isWeekend>Sun</DayHeader>
+        </DayHeadersContainer>
+      </DayHeaders>
+
       <Timeline>
         {weeks.map((week, weekIdx) => {
           const weekStart = week[0].date;
           const weekEnd = week[6].date;
+          const isoWeekNumber = getISOWeekNumber(weekStart);
 
           return (
             <WeekRow key={weekIdx}>
               <WeekLabel>
-                <div>Week {weekIdx + 1}</div>
+                <div>Week {isoWeekNumber}</div>
                 <div style={{ fontSize: '10px', fontWeight: 'normal', marginTop: '4px' }}>
                   {weekStart.getDate()}/{weekStart.getMonth() + 1} - {weekEnd.getDate()}/
                   {weekEnd.getMonth() + 1}
@@ -280,10 +345,19 @@ export function TimelineView({ products, onNavigateToProduct }: TimelineViewProp
                 {week.map((day, dayIdx) => {
                   const dateStr = day.date.toISOString().split('T')[0];
                   const isToday = dateStr === today;
+                  const dayOfWeek = day.date.getDay();
+                  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
                   return (
-                    <DayCell key={dayIdx} $isToday={isToday} $isCurrentMonth={day.isCurrentMonth}>
-                      <DayNumber $isToday={isToday}>{day.date.getDate()}</DayNumber>
+                    <DayCell
+                      key={dayIdx}
+                      $isToday={isToday}
+                      $isCurrentMonth={day.isCurrentMonth}
+                      $isWeekend={isWeekend}
+                    >
+                      <DayNumber $isToday={isToday} $isCurrentMonth={day.isCurrentMonth}>
+                        {day.date.getDate()}
+                      </DayNumber>
                       {day.products.slice(0, 3).map((product) => {
                         const stageConfig = STAGE_CONFIG[product.currentStage];
                         const color = product.isAtRisk

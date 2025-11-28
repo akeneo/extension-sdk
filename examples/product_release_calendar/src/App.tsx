@@ -139,7 +139,7 @@ function App() {
           </SectionTitle>
           <Helper level="info" inline={false}>
             Track products through the release pipeline from creation to go-live. Configure
-            attributes and thresholds using custom_variables.
+            release dates, attributes and thresholds using Extension Custom Variables.
           </Helper>
         </HeaderLeft>
         <HeaderRight>
