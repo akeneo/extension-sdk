@@ -1,0 +1,24 @@
+{
+  "name": "product-release-panel",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "akeneo-design-system": "^4.0.0",
+    "lucide-react": "^0.263.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "styled-components": "^6.1.13"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.50",
+    "@types/react-dom": "^17.0.17",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5"
+  }
+}
