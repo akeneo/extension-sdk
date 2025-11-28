@@ -1,12 +1,13 @@
 /**
  * Release date configuration
- * Defines when products should go live based on locale, family, or channel
+ * Defines when products should go live based on locale, family, category, or channel
  */
 export interface ReleaseDate {
   date: string; // ISO date string (YYYY-MM-DD)
   locale?: string; // Optional: specific locale
   family?: string; // Optional: specific family
-  channel?: string; // Optional: specific channel
+  category?: string; // Optional: specific category
+  channel?: string; // Optional: specific channel/scope
 }
 
 /**
@@ -118,6 +119,7 @@ interface BaseProduct {
   uuid: string;
   identifier: string;
   family?: string;
+  categories?: string[]; // Array of category codes
   enabled: boolean;
   values?: {
     [key: string]: any;

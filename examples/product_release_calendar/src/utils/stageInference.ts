@@ -1,4 +1,4 @@
-import { ReleaseStage, ReleaseCalendarConfig } from '../types';
+import { ReleaseStage, ReleaseCalendarConfig, ReleaseDate } from '../types';
 
 /**
  * Product interface matching PIM API product structure
@@ -7,6 +7,7 @@ interface Product {
   uuid: string;
   identifier: string;
   family?: string;
+  categories?: string[];
   enabled: boolean;
   values?: {
     [key: string]: any;
@@ -218,8 +219,52 @@ function checkHasPassedGoLiveDate(product: Product, config: ReleaseCalendarConfi
 }
 
 /**
+ * Check if a product belongs to a specific category
+ * In Akeneo, products can belong to multiple categories in a tree structure
+ */
+function isProductInCategory(product: Product, categoryCode: string): boolean {
+  if (!product.categories || !categoryCode) return false;
+  return product.categories.includes(categoryCode);
+}
+
+/**
+ * Check if a release date matches a product for a given locale
+ * All specified criteria must match for the release date to be valid
+ */
+function doesReleaseDateMatch(
+  releaseDate: ReleaseDate,
+  product: Product,
+  locale: string,
+  config: ReleaseCalendarConfig
+): boolean {
+  // Check family match (if specified)
+  if (releaseDate.family && releaseDate.family !== product.family) {
+    return false;
+  }
+
+  // Check locale match (if specified)
+  if (releaseDate.locale && releaseDate.locale !== locale) {
+    return false;
+  }
+
+  // Check category match (if specified)
+  if (releaseDate.category && !isProductInCategory(product, releaseDate.category)) {
+    return false;
+  }
+
+  // Check channel match (if specified)
+  if (releaseDate.channel && releaseDate.channel !== config.channel) {
+    return false;
+  }
+
+  // All specified criteria match
+  return true;
+}
+
+/**
  * Extract go-live dates per locale from configured release dates
- * Matches products against release dates based on family, locale, and channel
+ * Uses priority-based matching: first release date that matches wins
+ * If no release date matches, returns null (product won't appear on calendar)
  */
 export function extractGoLiveDates(
   product: Product,
@@ -230,69 +275,20 @@ export function extractGoLiveDates(
   // Get all relevant locales
   const allLocales = [config.masterLocale, ...config.targetLocales];
 
-  // Match release dates to product
-  allLocales.forEach((locale) => {
-    // Try to find a matching release date with most specific criteria first
+  // Match release dates to product using priority order
+  for (const locale of allLocales) {
+    let matchedDate: string | null = null;
 
-    // 1. Match by family + locale + channel (most specific)
-    let matchedDate = config.releaseDates.find(
-      (rd) =>
-        rd.family === product.family &&
-        rd.locale === locale &&
-        rd.channel === config.channel
-    );
-
-    // 2. Match by family + locale
-    if (!matchedDate) {
-      matchedDate = config.releaseDates.find(
-        (rd) => rd.family === product.family && rd.locale === locale && !rd.channel
-      );
+    // Find the first release date that matches (priority order)
+    for (const releaseDate of config.releaseDates) {
+      if (doesReleaseDateMatch(releaseDate, product, locale, config)) {
+        matchedDate = releaseDate.date;
+        break; // First match wins
+      }
     }
 
-    // 3. Match by locale + channel
-    if (!matchedDate) {
-      matchedDate = config.releaseDates.find(
-        (rd) => !rd.family && rd.locale === locale && rd.channel === config.channel
-      );
-    }
-
-    // 4. Match by locale only
-    if (!matchedDate) {
-      matchedDate = config.releaseDates.find(
-        (rd) => !rd.family && rd.locale === locale && !rd.channel
-      );
-    }
-
-    // 5. Match by family + channel (applies to all locales)
-    if (!matchedDate) {
-      matchedDate = config.releaseDates.find(
-        (rd) => rd.family === product.family && !rd.locale && rd.channel === config.channel
-      );
-    }
-
-    // 6. Match by family only (applies to all locales)
-    if (!matchedDate) {
-      matchedDate = config.releaseDates.find(
-        (rd) => rd.family === product.family && !rd.locale && !rd.channel
-      );
-    }
-
-    // 7. Match by channel only (applies to all locales and families)
-    if (!matchedDate) {
-      matchedDate = config.releaseDates.find(
-        (rd) => !rd.family && !rd.locale && rd.channel === config.channel
-      );
-    }
-
-    // 8. Default release date (no criteria)
-    if (!matchedDate) {
-      matchedDate = config.releaseDates.find(
-        (rd) => !rd.family && !rd.locale && !rd.channel
-      );
-    }
-
-    dates[locale] = matchedDate ? matchedDate.date : null;
-  });
+    dates[locale] = matchedDate;
+  }
 
   return dates;
 }

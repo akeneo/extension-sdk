@@ -20,20 +20,24 @@ const Container = styled.div`
 `;
 
 const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 24px;
 `;
 
-const HeaderLeft = styled.div`
-  flex: 1;
+const HeaderTop = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
 `;
 
-const HeaderRight = styled.div`
+const HeaderActions = styled.div`
   display: flex;
   gap: 12px;
   align-items: center;
+`;
+
+const HelperSection = styled.div`
+  width: 100%;
 `;
 
 const RefreshButton = styled.button`
@@ -133,22 +137,24 @@ function App() {
   return (
     <Container>
       <Header>
-        <HeaderLeft>
+        <HeaderTop>
           <SectionTitle>
             <SectionTitle.Title>Product Release Calendar</SectionTitle.Title>
           </SectionTitle>
+          <HeaderActions>
+            <ViewSwitcher currentView={viewMode} onViewChange={setViewMode} />
+            <RefreshButton onClick={refetch} disabled={loading}>
+              <RefreshCw size={16} />
+              Refresh
+            </RefreshButton>
+          </HeaderActions>
+        </HeaderTop>
+        <HelperSection>
           <Helper level="info" inline={false}>
             Track products through the release pipeline from creation to go-live. Configure
             release dates, attributes and thresholds using Extension Custom Variables.
           </Helper>
-        </HeaderLeft>
-        <HeaderRight>
-          <ViewSwitcher currentView={viewMode} onViewChange={setViewMode} />
-          <RefreshButton onClick={refetch} disabled={loading}>
-            <RefreshCw size={16} />
-            Refresh
-          </RefreshButton>
-        </HeaderRight>
+        </HelperSection>
       </Header>
 
       {error && (

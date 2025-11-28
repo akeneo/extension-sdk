@@ -52,7 +52,7 @@ The Product Release Calendar helps merchandising and product teams track product
 
 ### Custom Variables
 
-The extension uses `custom_variables` to map to your PIM structure. Release dates are configured directly in custom_variables, allowing you to define release schedules by locale, family, or channel.
+The extension uses `custom_variables` to map to your PIM structure. Release dates are configured directly in custom_variables, allowing you to define release schedules by locale, family, category, or channel.
 
 #### Example 1: Release Dates by Locale
 
@@ -125,6 +125,38 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
 }
 ```
 
+#### Example 4: Advanced - Categories and Combined Parameters
+
+```json
+{
+  "releaseDates": [
+    { "date": "2025-11-01", "family": "camcoders", "category": "lenovo", "locale": "en_US", "channel": "ecommerce" },
+    { "date": "2025-11-15", "family": "camcoders", "locale": "en_US" },
+    { "date": "2025-12-01", "category": "sony", "locale": "fr_FR" },
+    { "date": "2026-01-10", "family": "loudspeakers" },
+    { "date": "2026-02-15", "locale": "de_DE" }
+  ],
+  "masterLocale": "en_US",
+  "targetLocales": ["fr_FR", "de_DE", "es_ES", "it_IT"],
+  "masterRequiredAttributes": ["name", "description", "specifications"],
+  "imageAttributes": ["main_image", "gallery_images"],
+  "channel": "ecommerce",
+  "thresholdMasterEnrichment": 50,
+  "thresholdMasterVisuals": 70,
+  "thresholdMasterValidation": 85,
+  "thresholdLocalization": 85,
+  "thresholdCentralValidation": 100
+}
+```
+
+In this example (priority order):
+1. Products in the "cameras" family within the "digital_cameras" category for "en_US" on "ecommerce" channel → **Nov 1** (most specific)
+2. Products in "cameras" family for "en_US" (any category) → **Nov 15**
+3. Products in "digital_cameras" category for "fr_FR" (any family) → **Dec 1**
+4. All other "cameras" products → **Jan 10**
+5. All other "de_DE" locale products → **Feb 15**
+6. Products that don't match any rule → **Not shown on calendar**
+
 ### Configuration Parameters
 
 | Parameter | Type | Required | Description |
@@ -153,17 +185,36 @@ Each release date object can specify:
 | `date` | string | Yes | ISO date string (YYYY-MM-DD) for the release |
 | `locale` | string | No | Specific locale for this release date |
 | `family` | string | No | Specific product family for this release date |
-| `channel` | string | No | Specific channel for this release date |
+| `category` | string | No | Specific category for this release date |
+| `channel` | string | No | Specific channel/scope for this release date |
 
-**Matching Priority**: The system matches products to release dates using the most specific criteria first:
-1. Family + Locale + Channel (most specific)
-2. Family + Locale
-3. Locale + Channel
-4. Locale only
-5. Family + Channel
-6. Family only
-7. Channel only
-8. Default (no criteria) - applies to all products
+**Matching System**: The system uses a **priority-based matching** system:
+
+- Release dates are evaluated **in order** (top to bottom in the array)
+- The **first release date** where ALL specified criteria match is used
+- For a match to occur, ALL specified criteria must match the product:
+  - If `family` is specified, product must be in that family
+  - If `locale` is specified, it must match the locale being checked
+  - If `category` is specified, product must be in that category
+  - If `channel` is specified, it must match the configured channel
+- If **no release date matches**, the product will **not appear** on the calendar
+
+**Priority Order Example**:
+
+```json
+"releaseDates": [
+  { "date": "2025-11-01", "family": "cameras", "category": "digital", "locale": "en_US" },  // Most specific - checked first
+  { "date": "2025-11-15", "family": "cameras", "locale": "en_US" },                         // Less specific
+  { "date": "2025-12-01", "family": "cameras" },                                            // Even less specific
+  { "date": "2026-01-10", "locale": "en_US" }                                               // Least specific - checked last
+]
+```
+
+For a product in the "cameras" family, "digital" category, for locale "en_US":
+- ✅ First rule matches (all criteria match) → Use Nov 1
+- Other rules are never evaluated
+
+**Important**: Order matters! Place more specific rules first, more general rules last.
 
 ## PIM Setup Requirements
 
