@@ -48,20 +48,6 @@ function parseReleaseDates(customVars: any): ReleaseDate[] {
     });
   }
 
-  // Fallback: check for individual locale-based release dates
-  if (releaseDates.length === 0) {
-    const locales = ['en_US', 'fr_FR', 'de_DE', 'es_ES', 'it_IT', 'nl_NL', 'pt_PT'];
-    locales.forEach((locale) => {
-      const dateKey = `releaseDate_${locale}`;
-      if (customVars[dateKey]) {
-        releaseDates.push({
-          date: customVars[dateKey] as string,
-          locale: locale,
-        });
-      }
-    });
-  }
-
   return releaseDates.length > 0 ? releaseDates : DEFAULT_CONFIG.releaseDates;
 }
 

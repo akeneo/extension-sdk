@@ -124,27 +124,6 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
 }
 ```
 
-#### Example 4: Alternative Locale-based Format
-
-For simpler configurations, you can also use individual variables per locale:
-
-```json
-{
-  "releaseDate_en_US": "2025-12-01",
-  "releaseDate_fr_FR": "2025-12-15",
-  "releaseDate_de_DE": "2025-12-15",
-  "masterLocale": "en_US",
-  "targetLocales": ["fr_FR", "de_DE"],
-  "masterRequiredAttributes": ["name", "description"],
-  "imageAttributes": ["main_image"],
-  "thresholdMasterEnrichment": 40,
-  "thresholdMasterVisuals": 60,
-  "thresholdMasterValidation": 80,
-  "thresholdLocalization": 80,
-  "thresholdCentralValidation": 100
-}
-```
-
 ### Configuration Parameters
 
 | Parameter | Type | Required | Description |
@@ -386,14 +365,3 @@ The extension integrates with Akeneo's navigation system:
 - Verify `PIM.navigate` API is available
 - Check that product UUIDs are valid
 - Ensure user has permission to edit products
-
-## Support
-
-For issues related to:
-- **Extension SDK**: See [Akeneo Extension Documentation](https://api.akeneo.com/extensions/overview.html)
-- **PIM API**: See [Akeneo API Documentation](https://api.akeneo.com/)
-- **This Example**: Open an issue in the repository
-
-## License
-
-This example is part of the Akeneo Extension SDK and follows the same license terms.
