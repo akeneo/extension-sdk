@@ -135,7 +135,6 @@ export function useReleaseProducts(
         };
       });
 
-        console.log(productsWithRelease)
 
       // Apply additional filters
       let filtered = productsWithRelease;

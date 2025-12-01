@@ -47,7 +47,6 @@ function parseReleaseDates(customVars: any): ReleaseDate[] {
     });
   }
 
-  console.log(releaseDates.length > 0 ? "release_date" : "deafault_config")
   return releaseDates.length > 0 ? releaseDates : DEFAULT_CONFIG.releaseDates;
 }
 

@@ -94,7 +94,6 @@ const AtRiskCount = styled(StatValue)`
 `;
 
 function App() {
-  console.log("app is loading");
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.PIPELINE);
   const [filters, setFilters] = useState<FilterState>({ family: '' });
 
@@ -132,7 +131,6 @@ function App() {
     navigateToProduct(productUuid);
   };
 
-  console.log(products)
 
   return (
     <Container>

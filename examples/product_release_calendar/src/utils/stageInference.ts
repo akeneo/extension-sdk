@@ -105,6 +105,7 @@ export function inferProductStage(
  * Get completeness for master locale
  */
 function getMasterCompleteness(product: Product, config: ReleaseCalendarConfig): number {
+  console.log("product", product);
   console.log("product completenesse", product.completenesses);
   if (!product.completenesses) return 0;
 
@@ -322,6 +323,7 @@ export function extractCompletenessPerLocale(
     completenessMap[locale] = completeness?.data || 0;
   });
 
+  console.log(product.uuid, completenessMap);
   return completenessMap;
 }
 
@@ -344,17 +346,13 @@ export function isProductAtRisk(
   if (!nearestDateInfo) {
     return { isAtRisk: false, missingItems: [] };
   }
-  console.log(nearestDateInfo);
 
   // Check if within 7 days of go-live
   const daysUntilGoLive = Math.ceil((nearestDateInfo.date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  console.log("daysUntilGoLive", daysUntilGoLive);
   const isNearGoLive = daysUntilGoLive <= 7;
-  console.log("isNearGoLive", isNearGoLive);
 
   // Check what's missing based on current stage
   if (isNearGoLive) {
-    console.log("check what is missing");
     const masterCompleteness = getMasterCompleteness(product, config);
     const hasImages = checkHasImages(product, config);
     const localizationComplete = checkLocalizationComplete(product, config);
