@@ -1,4 +1,4 @@
-import { ProductWithRelease, STAGE_CONFIG } from '../types';
+import { ProductWithRelease, STAGE_CONFIG, ReleaseStage } from '../types';
 import styled from 'styled-components';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, useMemo } from 'react';
@@ -63,6 +63,24 @@ const NavButton = styled.button`
 
   &:hover {
     background: #F5F5F5;
+    border-color: #5992C1;
+  }
+`;
+
+const TodayButton = styled.button`
+  background: white;
+  border: 1px solid #C7CBD4;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #11324D;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #5992C1;
+    color: white;
     border-color: #5992C1;
   }
 `;
@@ -283,6 +301,10 @@ export function TimelineView({ products, onNavigateToProduct }: TimelineViewProp
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   };
 
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  };
+
   const today = formatLocalDate(new Date());
 
   // Filter products with go-live dates
@@ -308,16 +330,20 @@ export function TimelineView({ products, onNavigateToProduct }: TimelineViewProp
             <ChevronLeft size={16} />
           </NavButton>
           <CurrentMonth>
-            {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            {new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate)}
           </CurrentMonth>
           <NavButton onClick={goToNextMonth}>
             <ChevronRight size={16} />
           </NavButton>
+          <TodayButton onClick={goToToday}>Today</TodayButton>
         </MonthSelector>
 
         <Legend>
-          <LegendItem $color={STAGE_CONFIG.go_live.color}>Ready to Go Live</LegendItem>
-          <LegendItem $color={STAGE_CONFIG.live.color}>Live</LegendItem>
+          {Object.entries(STAGE_CONFIG).map(([stageKey, stageConfig]) => (
+            <LegendItem key={stageKey} $color={stageConfig.color}>
+              {stageConfig.label}
+            </LegendItem>
+          ))}
           <LegendItem $color="#EE5D50">At Risk</LegendItem>
         </Legend>
       </Controls>
