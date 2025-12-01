@@ -13,8 +13,7 @@ export const DEFAULT_CONFIG: ReleaseCalendarConfig = {
   ],
   masterLocale: 'en_US',
   targetLocales: ['fr_FR', 'de_DE', 'es_ES', 'it_IT'],
-  validationStatusAttribute: 'validation_status',
-  centralValidationAttribute: 'central_validation',
+  validationAttribute: 'validation_status',
   masterRequiredAttributes: ['description', 'short_description', 'name'],
   imageAttributes: ['image', 'main_image', 'images'],
   imageAssetFamily: 'product_images',
@@ -68,8 +67,7 @@ export function loadConfig(): ReleaseCalendarConfig {
     targetLocales: Array.isArray(customVars.targetLocales)
       ? (customVars.targetLocales as string[])
       : DEFAULT_CONFIG.targetLocales,
-    validationStatusAttribute: (customVars.validationStatusAttribute as string) || DEFAULT_CONFIG.validationStatusAttribute,
-    centralValidationAttribute: (customVars.centralValidationAttribute as string) || DEFAULT_CONFIG.centralValidationAttribute,
+    validationAttribute: (customVars.validationAttribute as string) || DEFAULT_CONFIG.validationAttribute,
     masterRequiredAttributes: Array.isArray(customVars.masterRequiredAttributes)
       ? (customVars.masterRequiredAttributes as string[])
       : DEFAULT_CONFIG.masterRequiredAttributes,

@@ -1,10 +1,12 @@
-import { ProductWithRelease, ReleaseStage, STAGE_CONFIG } from '../types';
+import { ProductWithRelease, ReleaseStage, STAGE_CONFIG, ReleaseCalendarConfig } from '../types';
 import { ProductCard } from './ProductCard';
 import styled from 'styled-components';
 
 interface PipelineViewProps {
   products: ProductWithRelease[];
+  config: ReleaseCalendarConfig;
   onNavigateToProduct: (productUuid: string) => void;
+  onRefresh: () => void;
 }
 
 const Container = styled.div`
@@ -64,13 +66,14 @@ const EmptyState = styled.div`
   font-style: italic;
 `;
 
-export function PipelineView({ products, onNavigateToProduct }: PipelineViewProps) {
+export function PipelineView({ products, config, onNavigateToProduct, onRefresh }: PipelineViewProps) {
   // Group products by stage
   const productsByStage: { [key in ReleaseStage]: ProductWithRelease[] } = {
     [ReleaseStage.CREATION]: [],
     [ReleaseStage.MASTER_ENRICHMENT]: [],
     [ReleaseStage.MASTER_VALIDATION]: [],
     [ReleaseStage.LOCALIZATION]: [],
+    [ReleaseStage.GLOBAL_VALIDATION]: [],
     [ReleaseStage.GO_LIVE]: [],
     [ReleaseStage.LIVE]: [],
   };
@@ -103,15 +106,15 @@ export function PipelineView({ products, onNavigateToProduct }: PipelineViewProp
   return (
     <Container>
       {stages.map((stage) => {
-        const config = STAGE_CONFIG[stage];
+        const stageConfig = STAGE_CONFIG[stage];
         const stageProducts = productsByStage[stage];
 
         return (
           <Column key={stage}>
-            <ColumnHeader $color={config.color}>
-              {config.label}
+            <ColumnHeader $color={stageConfig.color}>
+              {stageConfig.label}
               <Count>({stageProducts.length})</Count>
-              <ColumnDescription>{config.description}</ColumnDescription>
+              <ColumnDescription>{stageConfig.description}</ColumnDescription>
             </ColumnHeader>
             <ColumnBody>
               {stageProducts.length === 0 ? (
@@ -121,7 +124,10 @@ export function PipelineView({ products, onNavigateToProduct }: PipelineViewProp
                   <ProductCard
                     key={product.uuid}
                     product={product}
+                    config={config}
                     onNavigate={onNavigateToProduct}
+                    onRefresh={onRefresh}
+                    showLocales={false}
                   />
                 ))
               )}

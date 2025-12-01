@@ -24,11 +24,9 @@ export interface ReleaseCalendarConfig {
   // Target locales for translations
   targetLocales: string[];
 
-  // Optional: Attribute that stores validation status
-  validationStatusAttribute?: string;
-
-  // Optional: Attribute that stores central validation status
-  centralValidationAttribute?: string;
+  // Attribute code for validation status (localizable, scopable)
+  // This attribute will be filled when validation buttons are clicked
+  validationAttribute: string;
 
   // Required attributes for master enrichment stage
   masterRequiredAttributes: string[];
@@ -58,6 +56,7 @@ export enum ReleaseStage {
   MASTER_ENRICHMENT = 'master_enrichment',
   MASTER_VALIDATION = 'master_validation',
   LOCALIZATION = 'localization',
+  GLOBAL_VALIDATION = 'global_validation',
   GO_LIVE = 'go_live',
   LIVE = 'live'
 }
@@ -79,17 +78,22 @@ export const STAGE_CONFIG = {
   [ReleaseStage.MASTER_VALIDATION]: {
     label: 'Master Validation',
     color: '#FFB74D',
-    description: 'Master content validation',
+    description: 'Master content ready for validation',
   },
   [ReleaseStage.LOCALIZATION]: {
     label: 'Localization',
     color: '#64B5F6',
-    description: 'Translations + visuals for other locales',
+    description: 'Translations and visuals for other locales',
+  },
+  [ReleaseStage.GLOBAL_VALIDATION]: {
+    label: 'Global Validation',
+    color: '#4DB6AC',
+    description: 'All locales ready for validation',
   },
   [ReleaseStage.GO_LIVE]: {
     label: 'Ready to Go Live',
     color: '#9575CD',
-    description: 'Validated and awaiting publication by webmaster',
+    description: 'Validated and awaiting publication',
   },
   [ReleaseStage.LIVE]: {
     label: 'Live',

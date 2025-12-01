@@ -216,9 +216,17 @@ function App() {
             : `No products found in the ${families.find(f => f.code === filters.family)?.label || filters.family} family.`}
         </Placeholder>
       ) : viewMode === ViewMode.PIPELINE ? (
-        <PipelineView products={products} onNavigateToProduct={handleNavigateToProduct} />
+        <PipelineView
+          products={products}
+          config={config}
+          onNavigateToProduct={handleNavigateToProduct}
+          onRefresh={refetch}
+        />
       ) : (
-        <TimelineView products={products} onNavigateToProduct={handleNavigateToProduct} />
+        <TimelineView
+          products={products}
+          onNavigateToProduct={handleNavigateToProduct}
+        />
       )}
     </Container>
   );

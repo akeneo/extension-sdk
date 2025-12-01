@@ -54,41 +54,34 @@ export function inferProductStage(
   config: ReleaseCalendarConfig
 ): ReleaseStage {
   const masterCompleteness = getMasterCompleteness(product, config);
-  const hasRequiredAttributes = checkRequiredAttributes(product, config);
-  const hasImages = checkHasImages(product, config);
   const localizationComplete = checkLocalizationComplete(product, config);
   const hasFutureGoLiveDate = checkHasFutureGoLiveDate(product, config);
   const hasPassedGoLiveDate = checkHasPassedGoLiveDate(product, config);
+  const isMasterValidated = checkIsValidated(product, config, config.masterLocale);
+  const areAllLocalesValidated = checkAreAllLocalesValidated(product, config);
 
-  // Stage 6: Live - product has passed go-live date and is published
-  if (hasPassedGoLiveDate && masterCompleteness >= config.thresholds.masterValidation) {
+  // Stage 7: Live - product has passed go-live date
+  if (hasPassedGoLiveDate) {
     return ReleaseStage.LIVE;
   }
 
-  // Stage 5: Ready to Go Live - all validations done, waiting for go-live date
-  if (
-    masterCompleteness >= config.thresholds.masterValidation &&
-    localizationComplete &&
-    hasFutureGoLiveDate
-  ) {
+  // Stage 6: Ready to Go Live - all locales validated, waiting for go-live date
+  if (areAllLocalesValidated && hasFutureGoLiveDate) {
     return ReleaseStage.GO_LIVE;
   }
 
-  // Stage 4: Localization - master is validated, working on translations
-  if (
-    masterCompleteness >= config.thresholds.masterValidation &&
-    hasImages &&
-    !localizationComplete
-  ) {
+  // Stage 5: Global Validation - master validated, all locales complete, but not all validated
+  if (isMasterValidated && localizationComplete && !areAllLocalesValidated) {
+    return ReleaseStage.GLOBAL_VALIDATION;
+  }
+
+  // Stage 4: Localization - master validated, working on translations
+  if (isMasterValidated && !localizationComplete) {
     return ReleaseStage.LOCALIZATION;
   }
 
-  // Stage 3: Master Validation - master content + images complete
-  if (
-    masterCompleteness >= config.thresholds.masterValidation &&
-    hasImages &&
-    hasRequiredAttributes
-  ) {
+  // Stage 3: Master Validation - master enrichment complete, awaiting validation
+  if (masterCompleteness >= config.thresholds.masterEnrichment && !isMasterValidated) {
     return ReleaseStage.MASTER_VALIDATION;
   }
 
@@ -195,6 +188,49 @@ function checkLocalizationComplete(product: Product, config: ReleaseCalendarConf
 
     return (localeCompleteness?.data || 0) >= config.thresholds.localization;
   });
+}
+
+/**
+ * Check if a product is validated for a specific locale
+ * Validation is determined by the presence of a value in the validationAttribute
+ */
+function checkIsValidated(product: Product, config: ReleaseCalendarConfig, locale: string): boolean {
+  if (!product.values || !config.validationAttribute) {
+    return false;
+  }
+
+  const validationAttr = product.values[config.validationAttribute];
+  if (!validationAttr) return false;
+
+  // Handle array of values (localizable/scopable attributes)
+  if (Array.isArray(validationAttr)) {
+    const localeValue = validationAttr.find((v: any) =>
+      v.locale === locale &&
+      (!config.channel || !v.scope || v.scope === config.channel)
+    );
+    return localeValue && localeValue.data !== null && localeValue.data !== '';
+  }
+
+  // Handle single value
+  return validationAttr.data !== null && validationAttr.data !== '';
+}
+
+/**
+ * Check if all target locales are validated
+ */
+function checkAreAllLocalesValidated(product: Product, config: ReleaseCalendarConfig): boolean {
+  if (!config.targetLocales || config.targetLocales.length === 0) {
+    return false;
+  }
+
+  // Check if master locale is validated
+  const isMasterValidated = checkIsValidated(product, config, config.masterLocale);
+  if (!isMasterValidated) return false;
+
+  // Check if all target locales are validated
+  return config.targetLocales.every((locale) =>
+    checkIsValidated(product, config, locale)
+  );
 }
 
 /**

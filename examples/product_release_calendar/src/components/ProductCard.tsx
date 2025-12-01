@@ -1,12 +1,16 @@
-import { ProductWithRelease } from '../types';
+import { ProductWithRelease, ReleaseStage, ReleaseCalendarConfig } from '../types';
 import { Badge } from 'akeneo-design-system';
 import styled from 'styled-components';
 import { AlertCircle, Calendar, CheckCircle } from 'lucide-react';
 import { findNearestGoLiveDate } from '../utils/stageInference';
+import { validateMasterLocale, validateAllLocales, triggerGoLive } from '../utils/validationActions';
+import { useState } from 'react';
 
 interface ProductCardProps {
   product: ProductWithRelease;
   onNavigate: (productUuid: string) => void;
+  config: ReleaseCalendarConfig;
+  onRefresh: () => void;
   showLocales?: boolean;
 }
 
@@ -40,14 +44,6 @@ const Identifier = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-`;
-
-const StatusRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  flex-wrap: wrap;
 `;
 
 const RiskIndicator = styled.div`
@@ -91,9 +87,71 @@ const DateBadge = styled.div`
   color: #67768E;
 `;
 
-export function ProductCard({ product, onNavigate, showLocales = true }: ProductCardProps) {
+const ValidationButton = styled.button`
+  width: 100%;
+  padding: 8px 12px;
+  margin-top: 8px;
+  background: #5992C1;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  &:hover {
+    background: #4A7A9E;
+  }
+
+  &:disabled {
+    background: #CCCCCC;
+    cursor: not-allowed;
+  }
+`;
+
+export function ProductCard({ product, onNavigate, config, onRefresh, showLocales = true }: ProductCardProps) {
+  const [isValidating, setIsValidating] = useState(false);
+
   // Find nearest go-live date (any date, past or future)
   const nearestDate = findNearestGoLiveDate(product.goLiveDates);
+
+  const handleValidateMaster = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsValidating(true);
+    try {
+      await validateMasterLocale(product.uuid, config);
+      onRefresh(); // Refresh to update the product stage
+    } catch (error) {
+      console.error('Failed to validate master locale:', error);
+      alert('Failed to validate. Please try again.');
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const handleValidateAll = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsValidating(true);
+    try {
+      await validateAllLocales(product.uuid, config);
+      onRefresh(); // Refresh to update the product stage
+    } catch (error) {
+      console.error('Failed to validate all locales:', error);
+      alert('Failed to validate. Please try again.');
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const handleGoLive = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    triggerGoLive(product.identifier);
+  };
 
   return (
     <Card $isAtRisk={product.isAtRisk} onClick={() => onNavigate(product.uuid)}>
@@ -107,15 +165,6 @@ export function ProductCard({ product, onNavigate, showLocales = true }: Product
           )}
         </span>
       </Header>
-
-      <StatusRow>
-        {product.validation.masterValidated && (
-          <Badge level="tertiary">Master ✓</Badge>
-        )}
-        {product.validation.centralValidated && (
-          <Badge level="tertiary">Central ✓</Badge>
-        )}
-      </StatusRow>
 
       {nearestDate && (
         <DateBadge>
@@ -148,6 +197,28 @@ export function ProductCard({ product, onNavigate, showLocales = true }: Product
             );
           })}
         </LocaleInfo>
+      )}
+
+      {/* Validation buttons based on current stage */}
+      {product.currentStage === ReleaseStage.MASTER_VALIDATION && (
+        <ValidationButton onClick={handleValidateMaster} disabled={isValidating}>
+          <CheckCircle size={16} />
+          {isValidating ? 'Validating...' : 'Validate Master'}
+        </ValidationButton>
+      )}
+
+      {product.currentStage === ReleaseStage.GLOBAL_VALIDATION && (
+        <ValidationButton onClick={handleValidateAll} disabled={isValidating}>
+          <CheckCircle size={16} />
+          {isValidating ? 'Validating...' : 'Validate All Locales'}
+        </ValidationButton>
+      )}
+
+      {product.currentStage === ReleaseStage.GO_LIVE && (
+        <ValidationButton onClick={handleGoLive}>
+          <Calendar size={16} />
+          Go Live
+        </ValidationButton>
       )}
     </Card>
   );
