@@ -85,6 +85,16 @@ export function useReleaseProducts(
         ];
       }
 
+      // Filter by category if specified
+      if (filters.category) {
+        search.categories = [
+          {
+            operator: 'IN',
+            value: [filters.category],
+          },
+        ];
+      }
+
       // Fetch products with completeness data
       const response = await globalThis.PIM.api.product_uuid_v1.list({
         limit: 100,
@@ -161,7 +171,7 @@ export function useReleaseProducts(
 
   useEffect(() => {
     fetchProducts();
-  }, [config, filters.family, filters.stage, filters.locale, filters.searchQuery]);
+  }, [config, filters.family, filters.category, filters.stage, filters.locale, filters.searchQuery]);
 
   return {
     products,

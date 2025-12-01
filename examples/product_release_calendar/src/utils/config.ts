@@ -40,6 +40,7 @@ function parseReleaseDates(customVars: any): ReleaseDate[] {
           date: item.date as string,
           locale: item.locale as string | undefined,
           family: item.family as string | undefined,
+          category: item.category as string | undefined,
           channel: item.channel as string | undefined,
         });
       }

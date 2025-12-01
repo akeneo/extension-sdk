@@ -2,6 +2,7 @@ import { ProductWithRelease } from '../types';
 import { Badge } from 'akeneo-design-system';
 import styled from 'styled-components';
 import { AlertCircle, Calendar, CheckCircle } from 'lucide-react';
+import { findNearestGoLiveDate } from '../utils/stageInference';
 
 interface ProductCardProps {
   product: ProductWithRelease;
@@ -91,11 +92,8 @@ const DateBadge = styled.div`
 `;
 
 export function ProductCard({ product, onNavigate, showLocales = true }: ProductCardProps) {
-  // Find nearest go-live date
-  const nearestDate = Object.entries(product.goLiveDates)
-    .filter(([_, date]) => date !== null)
-    .map(([locale, date]) => ({ locale, date: new Date(date!) }))
-    .sort((a, b) => a.date.getTime() - b.date.getTime())[0];
+  // Find nearest go-live date (any date, past or future)
+  const nearestDate = findNearestGoLiveDate(product.goLiveDates);
 
   return (
     <Card $isAtRisk={product.isAtRisk} onClick={() => onNavigate(product.uuid)}>

@@ -20,6 +20,29 @@ interface Product {
 }
 
 /**
+ * Find the nearest go-live date from a collection of dates
+ * @param goLiveDates - Object mapping locales to date strings
+ * @param onlyFuture - If true, only consider future dates (including today)
+ * @returns Object with locale and date, or null if no dates found
+ */
+export function findNearestGoLiveDate(
+  goLiveDates: { [locale: string]: string | null },
+  onlyFuture: boolean = false
+): { locale: string; date: Date } | null {
+  const now = new Date();
+  // Set to start of today for comparison (midnight)
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const dates = Object.entries(goLiveDates)
+    .filter(([_, dateStr]) => dateStr !== null)
+    .map(([locale, dateStr]) => ({ locale, date: new Date(dateStr!) }))
+    .filter(({ date }) => !onlyFuture || date >= today)
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  return dates.length > 0 ? dates[0] : null;
+}
+
+/**
  * Infers the current release stage of a product based on:
  * - Completeness per locale
  * - Presence of required attributes
@@ -314,28 +337,24 @@ export function isProductAtRisk(
   const goLiveDates = extractGoLiveDates(product, config);
   const now = new Date();
 
-  // Find nearest go-live date
-  let nearestDate: Date | null = null;
-  Object.values(goLiveDates).forEach((dateStr: string | null) => {
-    if (!dateStr) return;
-    const date: Date = new Date(dateStr);
-    if (date > now && (!nearestDate || date.getTime() < nearestDate.getTime())) {
-      nearestDate = date;
-    }
-  });
+  // Find nearest future go-live date
+  const nearestDateInfo = findNearestGoLiveDate(goLiveDates, true);
 
   // If no future go-live date, not at risk
-  if (!nearestDate) {
+  if (!nearestDateInfo) {
     return { isAtRisk: false, missingItems: [] };
   }
+  console.log(nearestDateInfo);
 
   // Check if within 7 days of go-live
-  const nearestDateValue: Date = nearestDate as Date;
-  const daysUntilGoLive = Math.ceil((nearestDateValue.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  const daysUntilGoLive = Math.ceil((nearestDateInfo.date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  console.log("daysUntilGoLive", daysUntilGoLive);
   const isNearGoLive = daysUntilGoLive <= 7;
+  console.log("isNearGoLive", isNearGoLive);
 
   // Check what's missing based on current stage
   if (isNearGoLive) {
+    console.log("check what is missing");
     const masterCompleteness = getMasterCompleteness(product, config);
     const hasImages = checkHasImages(product, config);
     const localizationComplete = checkLocalizationComplete(product, config);
