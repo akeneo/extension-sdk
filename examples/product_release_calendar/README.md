@@ -19,9 +19,18 @@ The Product Release Calendar helps merchandising and product teams track product
   6. **Ready to Go Live** - Fully validated and awaiting publication (shows go-live button)
   7. **Live** - Published on channels (future: automatic based on go-live date)
 
-- **Dual View Modes**:
-  - **Pipeline View**: Kanban-style board showing products grouped by current stage. Best for monitoring workflow progress and identifying bottlenecks across all stages.
-  - **Timeline View**: Calendar view showing products by their go-live dates. Best for planning releases and ensuring products are ready by their target dates. Includes stage filtering for focused views.
+- **Dual Display Modes**:
+  - **Board Mode** (`displayMode: "board"`): Full-featured view for activity.navigation.tab position
+    - **Pipeline View**: Kanban-style board showing products grouped by current stage
+    - **Timeline View**: Calendar view showing products by their go-live dates
+    - Complete statistics, filters, and bulk product management
+  - **Panel Mode** (`displayMode: "panel"`): Simplified view for product.panel position
+    - Shows current product's release status and stage
+    - Displays all release dates per locale
+    - Shows completeness per locale with progress bars
+    - Lists missing items needed to complete stages
+    - Displays validation buttons when applicable
+    - Automatically syncs with the current product being viewed
 
 - **Multi-Locale Support**: Track completeness and go-live dates per locale
 
@@ -74,7 +83,8 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "imageAttributes": ["main_image", "product_images"],
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 40,
-  "thresholdLocalization": 80
+  "thresholdLocalization": 80,
+  "displayMode": "board"
 }
 ```
 
@@ -95,7 +105,8 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "imageAssetFamily": "product_assets",
   "channel": "website",
   "thresholdMasterEnrichment": 50,
-  "thresholdLocalization": 85
+  "thresholdLocalization": 85,
+  "displayMode": "board"
 }
 ```
 
@@ -116,7 +127,8 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "imageAttributes": ["main_image", "gallery"],
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 40,
-  "thresholdLocalization": 75
+  "thresholdLocalization": 75,
+  "displayMode": "board"
 }
 ```
 
@@ -137,7 +149,8 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "imageAttributes": ["main_image", "gallery_images"],
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 50,
-  "thresholdLocalization": 85
+  "thresholdLocalization": 85,
+  "displayMode": "board"
 }
 ```
 
@@ -148,6 +161,36 @@ In this example (priority order):
 4. All other "cameras" products → **Jan 10**
 5. All other "de_DE" locale products → **Feb 15**
 6. Products that don't match any rule → **Not shown on calendar**
+
+#### Example 5: Panel Mode Configuration
+
+For product.panel position (simplified view showing current product):
+
+```json
+{
+  "releaseDates": [
+    { "date": "2025-12-01", "locale": "en_US" },
+    { "date": "2025-12-15", "locale": "fr_FR" },
+    { "date": "2025-12-20", "locale": "de_DE" }
+  ],
+  "masterLocale": "en_US",
+  "targetLocales": ["fr_FR", "de_DE", "es_ES"],
+  "validationAttribute": "validation_status",
+  "imageAttributes": ["main_image"],
+  "channel": "ecommerce",
+  "thresholdMasterEnrichment": 40,
+  "thresholdLocalization": 80,
+  "displayMode": "panel"
+}
+```
+
+**Panel mode features:**
+- Shows current product's stage and status
+- Displays all release dates per locale
+- Shows completeness progress bars per locale
+- Lists missing items to complete stages
+- Displays validation buttons when product is ready
+- Automatically updates when viewing different products
 
 ### Configuration Parameters
 
@@ -162,6 +205,7 @@ In this example (priority order):
 | `channel` | string | No | Channel code to use for completeness calculations |
 | `thresholdMasterEnrichment` | number | No | Completeness % threshold to reach master validation stage (default: 40) |
 | `thresholdLocalization` | number | No | Completeness % threshold for localization per locale (default: 80) |
+| `displayMode` | string | No | Display mode: "board" for full view (activity.navigation.tab) or "panel" for simplified product view (product.panel) (default: "board") |
 
 #### ReleaseDate Object
 
@@ -333,8 +377,20 @@ Products are flagged as "at risk" when they are within 7 days of their go-live d
    - Upload the built extension bundle
    - Configure the custom_variables in the extension settings
 
-3. **Add to Dashboard**:
-   - Add the extension as a custom component to your PIM dashboard
+3. **Add to PIM**:
+   The extension can be added to two different positions:
+
+   **Board Mode** (Full view):
+   - Position: `activity.navigation.tab`
+   - Configuration: Set `displayMode: "board"`
+   - Use case: Team dashboard for managing all products across the release pipeline
+   - Features: Full statistics, filters, pipeline/timeline views, bulk management
+
+   **Panel Mode** (Product view):
+   - Position: `product.panel`
+   - Configuration: Set `displayMode: "panel"`
+   - Use case: Individual product release tracking within product edit form
+   - Features: Simplified view showing current product's status, dates, and validation buttons
 
 ## Development
 

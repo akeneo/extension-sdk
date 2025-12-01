@@ -1,5 +1,4 @@
 import { ProductWithRelease, ReleaseStage, ReleaseCalendarConfig } from '../types';
-import { Badge } from 'akeneo-design-system';
 import styled from 'styled-components';
 import { AlertCircle, Calendar, CheckCircle } from 'lucide-react';
 import { findNearestGoLiveDate } from '../utils/stageInference';

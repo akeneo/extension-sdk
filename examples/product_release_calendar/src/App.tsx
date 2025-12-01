@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { SectionTitle, Helper, Placeholder, UsersIllustration } from 'akeneo-design-system';
 import styled from 'styled-components';
-import { ViewMode, FilterState } from './types';
+import { ViewMode, FilterState, DisplayMode } from './types';
 import { loadConfig } from './utils/config';
 import { navigateToProduct } from './utils/navigation';
 import { useReleaseProducts } from './hooks/useReleaseProducts';
@@ -11,6 +11,7 @@ import { ViewSwitcher } from './components/ViewSwitcher';
 import { Filters } from './components/Filters';
 import { PipelineView } from './components/PipelineView';
 import { TimelineView } from './components/TimelineView';
+import { PanelMode } from './components/PanelMode';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 
 const Container = styled.div`
@@ -96,9 +97,16 @@ const AtRiskCount = styled(StatValue)`
 function App() {
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.PIPELINE);
   const [filters, setFilters] = useState<FilterState>({ family: '' });
+    console.log("coucou")
 
   // Load configuration from custom_variables
   const config = useMemo(() => loadConfig(), []);
+
+  // If in panel mode, render simplified view for single product
+  if (config.displayMode === DisplayMode.PANEL) {
+    console.log("coucou")
+    return <PanelMode config={config} />;
+  }
 
   // Fetch families and categories for filtering
   const { families } = useFamilies();

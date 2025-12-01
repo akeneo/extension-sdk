@@ -217,7 +217,10 @@ function checkHasFutureGoLiveDate(product: Product, config: ReleaseCalendarConfi
 
 /**
  * Check if product has passed its go-live date
+ * Reserved for future use
+ * @ts-expect-error - Function reserved for future implementation
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function checkHasPassedGoLiveDate(product: Product, config: ReleaseCalendarConfig): boolean {
   const goLiveDates = extractGoLiveDates(product, config);
   const now = new Date();

@@ -1,4 +1,4 @@
-import { ReleaseCalendarConfig, ReleaseDate } from '../types';
+import { ReleaseCalendarConfig, ReleaseDate, DisplayMode } from '../types';
 
 /**
  * Default configuration
@@ -21,6 +21,7 @@ export const DEFAULT_CONFIG: ReleaseCalendarConfig = {
     localization: 80,
   },
   channel: 'ecommerce',
+  displayMode: DisplayMode.BOARD,
 };
 
 /**
@@ -75,5 +76,6 @@ export function loadConfig(): ReleaseCalendarConfig {
       localization: (customVars.thresholdLocalization as number) || DEFAULT_CONFIG.thresholds.localization,
     },
     channel: (customVars.channel as string) || DEFAULT_CONFIG.channel,
+    displayMode: (customVars.displayMode as DisplayMode) || DEFAULT_CONFIG.displayMode,
   };
 }

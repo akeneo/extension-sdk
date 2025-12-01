@@ -1,4 +1,4 @@
-import { ProductWithRelease, STAGE_CONFIG, ReleaseStage } from '../types';
+import { ProductWithRelease, STAGE_CONFIG } from '../types';
 import styled from 'styled-components';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, useMemo } from 'react';
