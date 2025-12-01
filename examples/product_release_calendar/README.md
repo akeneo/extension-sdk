@@ -10,15 +10,13 @@ The Product Release Calendar helps merchandising and product teams track product
 
 ### Core Functionality
 
-- **Multi-Stage Pipeline**: Tracks products through 8 distinct stages:
+- **Multi-Stage Pipeline**: Tracks products through 6 distinct stages:
   1. Creation - Product page created (empty)
-  2. Master Enrichment - Adding information in master locale (English)
-  3. Master Visuals - Adding visuals for master locale
-  4. Master Validation - Validation of master content
-  5. Localization - Translations + visuals for other regions
-  6. Central Validation - Final global validation
-  7. Ready to Go Live - Awaiting publication by webmaster
-  8. Live - Published on channels
+  2. Master Enrichment - Adding information and visuals in master locale (English)
+  3. Master Validation - Validation of master content
+  4. Localization - Translations + visuals for other regions
+  5. Ready to Go Live - Validated and awaiting publication by webmaster
+  6. Live - Published on channels
 
 - **Dual View Modes**:
   - **Pipeline View**: Kanban-style board showing products grouped by current stage. Best for monitoring workflow progress and identifying bottlenecks across all stages.
@@ -70,10 +68,8 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "imageAttributes": ["main_image", "product_images"],
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 40,
-  "thresholdMasterVisuals": 60,
   "thresholdMasterValidation": 80,
-  "thresholdLocalization": 80,
-  "thresholdCentralValidation": 100
+  "thresholdLocalization": 80
 }
 ```
 
@@ -94,10 +90,8 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "imageAssetFamily": "product_assets",
   "channel": "website",
   "thresholdMasterEnrichment": 50,
-  "thresholdMasterVisuals": 70,
   "thresholdMasterValidation": 90,
-  "thresholdLocalization": 85,
-  "thresholdCentralValidation": 100
+  "thresholdLocalization": 85
 }
 ```
 
@@ -118,10 +112,8 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "imageAttributes": ["main_image", "gallery"],
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 40,
-  "thresholdMasterVisuals": 60,
   "thresholdMasterValidation": 75,
-  "thresholdLocalization": 75,
-  "thresholdCentralValidation": 95
+  "thresholdLocalization": 75
 }
 ```
 
@@ -142,10 +134,8 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "imageAttributes": ["main_image", "gallery_images"],
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 50,
-  "thresholdMasterVisuals": 70,
   "thresholdMasterValidation": 85,
-  "thresholdLocalization": 85,
-  "thresholdCentralValidation": 100
+  "thresholdLocalization": 85
 }
 ```
 
@@ -171,10 +161,8 @@ In this example (priority order):
 | `imageAssetFamily` | string | No | Asset family code (if using Asset Manager) |
 | `channel` | string | No | Channel code to use for completeness calculations |
 | `thresholdMasterEnrichment` | number | No | Completeness % threshold for master enrichment (default: 40) |
-| `thresholdMasterVisuals` | number | No | Completeness % threshold for master visuals (default: 60) |
 | `thresholdMasterValidation` | number | No | Completeness % threshold for master validation (default: 80) |
 | `thresholdLocalization` | number | No | Completeness % threshold for localization (default: 80) |
-| `thresholdCentralValidation` | number | No | Completeness % threshold for central validation (default: 100) |
 
 #### ReleaseDate Object
 
@@ -297,37 +285,28 @@ The extension automatically determines which stage a product is in by analyzing:
 ### Stage Determination Logic
 
 ```
-LIVE (8)
+LIVE (6)
 ├─ Has passed go-live date
-└─ Completeness >= central validation threshold
+└─ Completeness >= master validation threshold
 
-READY TO GO LIVE (7)
-├─ Completeness >= central validation threshold
+READY TO GO LIVE (5)
+├─ Completeness >= master validation threshold
 ├─ All locales complete
 └─ Has future go-live date
 
-CENTRAL VALIDATION (6)
-├─ Master completeness >= master validation threshold
-└─ All target locales >= localization threshold
-
-LOCALIZATION (5)
+LOCALIZATION (4)
 ├─ Master completeness >= master validation threshold
 ├─ Has images
 └─ Target locales < localization threshold
 
-MASTER VALIDATION (4)
-├─ Master completeness >= master visuals threshold
+MASTER VALIDATION (3)
+├─ Master completeness >= master validation threshold
 ├─ Has images
 └─ Required attributes filled
 
-MASTER VISUALS (3)
-├─ Master completeness >= master enrichment threshold
-├─ Required attributes filled
-└─ Missing images
-
 MASTER ENRICHMENT (2)
 ├─ Master completeness > 0
-└─ Master completeness < master visuals threshold
+└─ Adding information and visuals in master locale
 
 CREATION (1)
 └─ Product exists but is empty

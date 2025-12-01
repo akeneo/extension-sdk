@@ -101,11 +101,13 @@ export function ProductCard({ product, onNavigate, showLocales = true }: Product
     <Card $isAtRisk={product.isAtRisk} onClick={() => onNavigate(product.uuid)}>
       <Header>
         <Identifier title={product.identifier}>{product.identifier}</Identifier>
-        {product.enabled ? (
-          <CheckCircle size={16} color="#67B373" />
-        ) : (
-          <AlertCircle size={16} color="#67768E" />
-        )}
+        <span title={product.enabled ? "Product is enabled" : "Product is disabled"}>
+          {product.enabled ? (
+            <CheckCircle size={16} color="#67B373" />
+          ) : (
+            <AlertCircle size={16} color="#67768E" />
+          )}
+        </span>
       </Header>
 
       <StatusRow>

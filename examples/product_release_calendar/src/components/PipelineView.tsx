@@ -69,10 +69,8 @@ export function PipelineView({ products, onNavigateToProduct }: PipelineViewProp
   const productsByStage: { [key in ReleaseStage]: ProductWithRelease[] } = {
     [ReleaseStage.CREATION]: [],
     [ReleaseStage.MASTER_ENRICHMENT]: [],
-    [ReleaseStage.MASTER_VISUALS]: [],
     [ReleaseStage.MASTER_VALIDATION]: [],
     [ReleaseStage.LOCALIZATION]: [],
-    [ReleaseStage.CENTRAL_VALIDATION]: [],
     [ReleaseStage.GO_LIVE]: [],
     [ReleaseStage.LIVE]: [],
   };

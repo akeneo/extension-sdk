@@ -42,10 +42,8 @@ export interface ReleaseCalendarConfig {
   // Completeness thresholds per stage
   thresholds: {
     masterEnrichment: number; // e.g., 50
-    masterVisuals: number; // e.g., 70
     masterValidation: number; // e.g., 90
     localization: number; // e.g., 90 per locale
-    centralValidation: number; // e.g., 100
   };
 
   // Optional: Channel to consider for completeness
@@ -58,10 +56,8 @@ export interface ReleaseCalendarConfig {
 export enum ReleaseStage {
   CREATION = 'creation',
   MASTER_ENRICHMENT = 'master_enrichment',
-  MASTER_VISUALS = 'master_visuals',
   MASTER_VALIDATION = 'master_validation',
   LOCALIZATION = 'localization',
-  CENTRAL_VALIDATION = 'central_validation',
   GO_LIVE = 'go_live',
   LIVE = 'live'
 }
@@ -78,16 +74,11 @@ export const STAGE_CONFIG = {
   [ReleaseStage.MASTER_ENRICHMENT]: {
     label: 'Master Enrichment',
     color: '#FFE082',
-    description: 'Adding information in master locale',
-  },
-  [ReleaseStage.MASTER_VISUALS]: {
-    label: 'Master Visuals',
-    color: '#FFB74D',
-    description: 'Adding visuals for master locale',
+    description: 'Adding information and visuals in master locale',
   },
   [ReleaseStage.MASTER_VALIDATION]: {
     label: 'Master Validation',
-    color: '#81C784',
+    color: '#FFB74D',
     description: 'Master content validation',
   },
   [ReleaseStage.LOCALIZATION]: {
@@ -95,15 +86,10 @@ export const STAGE_CONFIG = {
     color: '#64B5F6',
     description: 'Translations + visuals for other locales',
   },
-  [ReleaseStage.CENTRAL_VALIDATION]: {
-    label: 'Central Validation',
-    color: '#4DB6AC',
-    description: 'Central validation across all locales',
-  },
   [ReleaseStage.GO_LIVE]: {
     label: 'Ready to Go Live',
     color: '#9575CD',
-    description: 'Awaiting publication by webmaster',
+    description: 'Validated and awaiting publication by webmaster',
   },
   [ReleaseStage.LIVE]: {
     label: 'Live',

@@ -37,29 +37,21 @@ export function inferProductStage(
   const hasFutureGoLiveDate = checkHasFutureGoLiveDate(product, config);
   const hasPassedGoLiveDate = checkHasPassedGoLiveDate(product, config);
 
-  // Stage 8: Live - product has passed go-live date and is published
-  if (hasPassedGoLiveDate && masterCompleteness >= config.thresholds.centralValidation) {
+  // Stage 6: Live - product has passed go-live date and is published
+  if (hasPassedGoLiveDate && masterCompleteness >= config.thresholds.masterValidation) {
     return ReleaseStage.LIVE;
   }
 
-  // Stage 7: Ready to Go Live - all validations done, waiting for go-live date
+  // Stage 5: Ready to Go Live - all validations done, waiting for go-live date
   if (
-    masterCompleteness >= config.thresholds.centralValidation &&
+    masterCompleteness >= config.thresholds.masterValidation &&
     localizationComplete &&
     hasFutureGoLiveDate
   ) {
     return ReleaseStage.GO_LIVE;
   }
 
-  // Stage 6: Central Validation - all locales enriched, final validation
-  if (
-    masterCompleteness >= config.thresholds.masterValidation &&
-    localizationComplete
-  ) {
-    return ReleaseStage.CENTRAL_VALIDATION;
-  }
-
-  // Stage 5: Localization - master is validated, working on translations
+  // Stage 4: Localization - master is validated, working on translations
   if (
     masterCompleteness >= config.thresholds.masterValidation &&
     hasImages &&
@@ -68,26 +60,17 @@ export function inferProductStage(
     return ReleaseStage.LOCALIZATION;
   }
 
-  // Stage 4: Master Validation - master content + images complete
+  // Stage 3: Master Validation - master content + images complete
   if (
-    masterCompleteness >= config.thresholds.masterVisuals &&
+    masterCompleteness >= config.thresholds.masterValidation &&
     hasImages &&
     hasRequiredAttributes
   ) {
     return ReleaseStage.MASTER_VALIDATION;
   }
 
-  // Stage 3: Master Visuals - master content present, adding images
-  if (
-    masterCompleteness >= config.thresholds.masterEnrichment &&
-    hasRequiredAttributes &&
-    !hasImages
-  ) {
-    return ReleaseStage.MASTER_VISUALS;
-  }
-
-  // Stage 2: Master Enrichment - adding basic information in master locale
-  if (masterCompleteness > 0 && masterCompleteness < config.thresholds.masterVisuals) {
+  // Stage 2: Master Enrichment - adding information and visuals in master locale
+  if (masterCompleteness > 0) {
     return ReleaseStage.MASTER_ENRICHMENT;
   }
 

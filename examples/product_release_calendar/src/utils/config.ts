@@ -20,10 +20,8 @@ export const DEFAULT_CONFIG: ReleaseCalendarConfig = {
   imageAssetFamily: 'product_images',
   thresholds: {
     masterEnrichment: 40,
-    masterVisuals: 60,
     masterValidation: 80,
     localization: 80,
-    centralValidation: 100,
   },
   channel: 'ecommerce',
 };
@@ -48,6 +46,7 @@ function parseReleaseDates(customVars: any): ReleaseDate[] {
     });
   }
 
+  console.log(releaseDates.length > 0 ? "release_date" : "deafault_config")
   return releaseDates.length > 0 ? releaseDates : DEFAULT_CONFIG.releaseDates;
 }
 
@@ -80,10 +79,8 @@ export function loadConfig(): ReleaseCalendarConfig {
     imageAssetFamily: (customVars.imageAssetFamily as string) || DEFAULT_CONFIG.imageAssetFamily,
     thresholds: {
       masterEnrichment: (customVars.thresholdMasterEnrichment as number) || DEFAULT_CONFIG.thresholds.masterEnrichment,
-      masterVisuals: (customVars.thresholdMasterVisuals as number) || DEFAULT_CONFIG.thresholds.masterVisuals,
       masterValidation: (customVars.thresholdMasterValidation as number) || DEFAULT_CONFIG.thresholds.masterValidation,
       localization: (customVars.thresholdLocalization as number) || DEFAULT_CONFIG.thresholds.localization,
-      centralValidation: (customVars.thresholdCentralValidation as number) || DEFAULT_CONFIG.thresholds.centralValidation,
     },
     channel: (customVars.channel as string) || DEFAULT_CONFIG.channel,
   };

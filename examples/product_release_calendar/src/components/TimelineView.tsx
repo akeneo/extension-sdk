@@ -9,6 +9,16 @@ interface TimelineViewProps {
 }
 
 /**
+ * Format a date as YYYY-MM-DD using local time (not UTC)
+ */
+function formatLocalDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
  * Get ISO week number for a given date
  * ISO week 1 is the week with the first Thursday of the year
  */
@@ -236,13 +246,13 @@ export function TimelineView({ products, onNavigateToProduct }: TimelineViewProp
     const current = new Date(startDate);
 
     while (current <= endDate) {
-      const dateStr = current.toISOString().split('T')[0];
+      const dateStr = formatLocalDate(current);
 
       // Find products with go-live dates on this day
       const dayProducts = products.filter((product) => {
         return Object.values(product.goLiveDates).some((goLiveDate) => {
           if (!goLiveDate) return false;
-          const productDateStr = new Date(goLiveDate).toISOString().split('T')[0];
+          const productDateStr = formatLocalDate(new Date(goLiveDate));
           return productDateStr === dateStr;
         });
       });
@@ -273,7 +283,7 @@ export function TimelineView({ products, onNavigateToProduct }: TimelineViewProp
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   };
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = formatLocalDate(new Date());
 
   // Filter products with go-live dates
   const productsWithDates = products.filter((p) =>
@@ -343,7 +353,7 @@ export function TimelineView({ products, onNavigateToProduct }: TimelineViewProp
 
               <DaysContainer>
                 {week.map((day, dayIdx) => {
-                  const dateStr = day.date.toISOString().split('T')[0];
+                  const dateStr = formatLocalDate(day.date);
                   const isToday = dateStr === today;
                   const dayOfWeek = day.date.getDay();
                   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
