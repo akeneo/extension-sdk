@@ -10,13 +10,14 @@ The Product Release Calendar helps merchandising and product teams track product
 
 ### Core Functionality
 
-- **Multi-Stage Pipeline**: Tracks products through 6 distinct stages:
-  1. Creation - Product page created (empty)
-  2. Master Enrichment - Adding information and visuals in master locale (English)
-  3. Master Validation - Validation of master content
-  4. Localization - Translations + visuals for other regions
-  5. Ready to Go Live - Validated and awaiting publication by webmaster
-  6. Live - Published on channels
+- **Multi-Stage Pipeline**: Tracks products through 7 distinct stages with validation workflows:
+  1. **Creation** - Product page created (empty)
+  2. **Master Enrichment** - Adding information and visuals in master locale
+  3. **Master Validation** - Master content ready for validation (shows validation button)
+  4. **Localization** - Working on translations and visuals for other locales
+  5. **Global Validation** - All locales ready for validation (shows validate all button)
+  6. **Ready to Go Live** - Fully validated and awaiting publication (shows go-live button)
+  7. **Live** - Published on channels (future: automatic based on go-live date)
 
 - **Dual View Modes**:
   - **Pipeline View**: Kanban-style board showing products grouped by current stage. Best for monitoring workflow progress and identifying bottlenecks across all stages.
@@ -27,11 +28,16 @@ The Product Release Calendar helps merchandising and product teams track product
 - **Risk Detection**: Automatically identifies products at risk (near go-live date with missing content)
 
 - **Smart Stage Inference**: Determines product stage based on:
-  - Completeness percentage per locale
-  - Presence of required attributes
-  - Image/visual attributes
-  - Validation status
-  - Go-live dates
+  - Completeness percentage per locale (master and target locales)
+  - Validation status (tracked via a yes/no attribute)
+  - Localization completeness across all target locales
+  - Go-live dates configuration
+
+- **Interactive Validation Workflow**:
+  - **Master Validation**: Click "Validate Master" button to approve master locale content
+  - **Global Validation**: Click "Validate All Locales" button to approve all locale content
+  - **Go Live**: Click "Go Live" button when ready to publish (displays confirmation message)
+  - Validation status is stored in a configurable yes/no attribute (localizable & scopable)
 
 ### User Interface
 
@@ -64,11 +70,10 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   ],
   "masterLocale": "en_US",
   "targetLocales": ["fr_FR", "de_DE", "es_ES"],
-  "masterRequiredAttributes": ["name", "description", "price"],
+  "validationAttribute": "validation_status",
   "imageAttributes": ["main_image", "product_images"],
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 40,
-  "thresholdMasterValidation": 80,
   "thresholdLocalization": 80
 }
 ```
@@ -85,12 +90,11 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   ],
   "masterLocale": "en_GB",
   "targetLocales": ["fr_FR", "de_DE", "it_IT", "es_ES"],
-  "masterRequiredAttributes": ["name", "short_description", "long_description"],
+  "validationAttribute": "validation_status",
   "imageAttributes": ["product_images", "lifestyle_images"],
   "imageAssetFamily": "product_assets",
   "channel": "website",
   "thresholdMasterEnrichment": 50,
-  "thresholdMasterValidation": 90,
   "thresholdLocalization": 85
 }
 ```
@@ -108,11 +112,10 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   ],
   "masterLocale": "en_US",
   "targetLocales": ["fr_FR", "de_DE", "es_ES"],
-  "masterRequiredAttributes": ["title", "description", "price"],
+  "validationAttribute": "validation_status",
   "imageAttributes": ["main_image", "gallery"],
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 40,
-  "thresholdMasterValidation": 75,
   "thresholdLocalization": 75
 }
 ```
@@ -130,11 +133,10 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   ],
   "masterLocale": "en_US",
   "targetLocales": ["fr_FR", "de_DE", "es_ES", "it_IT"],
-  "masterRequiredAttributes": ["name", "description", "specifications"],
+  "validationAttribute": "validation_status",
   "imageAttributes": ["main_image", "gallery_images"],
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 50,
-  "thresholdMasterValidation": 85,
   "thresholdLocalization": 85
 }
 ```
@@ -154,15 +156,12 @@ In this example (priority order):
 | `releaseDates` | ReleaseDate[] | Yes | Array of release date configurations (see below) |
 | `masterLocale` | string | Yes | Master locale code for initial content creation |
 | `targetLocales` | string[] | Yes | Array of target locale codes for translations |
-| `masterRequiredAttributes` | string[] | Yes | Attribute codes required for master enrichment stage |
+| `validationAttribute` | string | Yes | Attribute code for validation status (yes/no type, localizable, scopable) |
 | `imageAttributes` | string[] | Yes | Attribute codes for images/visuals |
-| `validationStatusAttribute` | string | No | Attribute storing validation status |
-| `centralValidationAttribute` | string | No | Attribute storing central validation status |
 | `imageAssetFamily` | string | No | Asset family code (if using Asset Manager) |
 | `channel` | string | No | Channel code to use for completeness calculations |
-| `thresholdMasterEnrichment` | number | No | Completeness % threshold for master enrichment (default: 40) |
-| `thresholdMasterValidation` | number | No | Completeness % threshold for master validation (default: 80) |
-| `thresholdLocalization` | number | No | Completeness % threshold for localization (default: 80) |
+| `thresholdMasterEnrichment` | number | No | Completeness % threshold to reach master validation stage (default: 40) |
+| `thresholdLocalization` | number | No | Completeness % threshold for localization per locale (default: 80) |
 
 #### ReleaseDate Object
 
@@ -219,24 +218,18 @@ If you want to use category filtering:
 
 ### Required Attributes
 
-1. **Master Required Attributes**
-   - Typically: name, description, short_description
-   - Should be text/textarea attributes
-   - Localizable: Yes
-   - Configure these in `masterRequiredAttributes` in custom_variables
+1. **Validation Attribute** (Required for workflow)
+   - Type: **Yes/No** (boolean)
+   - Localizable: **Yes** (required)
+   - Scopable: **Yes** (required if using channels)
+   - Example code: `validation_status`
+   - Purpose: Tracks validation approval for each locale/channel
+   - Configure in `validationAttribute` in custom_variables
 
 2. **Image Attributes**
    - Type: Image, Asset Collection, or Media File
    - Examples: `main_image`, `images`, `product_photos`
    - Configure these in `imageAttributes` in custom_variables
-
-### Optional Attributes
-
-3. **Validation Status Attributes**
-   - Type: Simple select or Boolean
-   - Example values: "pending", "validated", "rejected"
-   - Can be used to track validation checkpoints
-   - Configure these in `validationStatusAttribute` and `centralValidationAttribute` in custom_variables
 
 ### Release Dates
 
@@ -285,31 +278,37 @@ The extension automatically determines which stage a product is in by analyzing:
 ### Stage Determination Logic
 
 ```
-LIVE (6)
-├─ Has passed go-live date
-└─ Completeness >= master validation threshold
+LIVE (7)
+└─ Reserved for future use (e.g., automatic based on go-live date or API status)
 
-READY TO GO LIVE (5)
-├─ Completeness >= master validation threshold
-├─ All locales complete
+READY TO GO LIVE (6)
+├─ All locales validated (validation attribute = true)
 └─ Has future go-live date
+└─ Shows "Go Live" button
+
+GLOBAL VALIDATION (5)
+├─ Master locale validated
+├─ All target locales completeness >= localization threshold
+└─ Not all target locales validated yet
+└─ Shows "Validate All Locales" button
 
 LOCALIZATION (4)
-├─ Master completeness >= master validation threshold
-├─ Has images
-└─ Target locales < localization threshold
+├─ Master locale validated (validation attribute = true for master)
+└─ Target locales completeness < localization threshold
+└─ Working on translations
 
 MASTER VALIDATION (3)
-├─ Master completeness >= master validation threshold
-├─ Has images
-└─ Required attributes filled
+├─ Master completeness >= master enrichment threshold
+└─ Master locale not validated yet
+└─ Shows "Validate Master" button
 
 MASTER ENRICHMENT (2)
 ├─ Master completeness > 0
-└─ Adding information and visuals in master locale
+└─ Master completeness < master enrichment threshold
+└─ Adding content and visuals
 
 CREATION (1)
-└─ Product exists but is empty
+└─ Product exists but is empty (0% completeness)
 ```
 
 ## Risk Detection
@@ -462,8 +461,8 @@ Ensure your `channel` configuration in custom_variables matches the `scope` valu
 
 ### Incorrect Stage Assignment
 
-- **Verify thresholds**: Check that `thresholdMasterEnrichment`, `thresholdMasterVisuals`, etc. match your requirements
-- **Check attributes**: Verify that `masterRequiredAttributes` and `imageAttributes` exist on your products
+- **Verify thresholds**: Check that `thresholdMasterEnrichment` and `thresholdLocalization` match your requirements
+- **Check attributes**: Verify that `imageAttributes` exist on your products
 - **Channel configuration**: Ensure the `channel` in custom_variables matches a valid scope in your PIM
 - **Completeness setup**: Verify completeness is calculated correctly in your PIM for the configured channel
 - **Locale configuration**: Confirm `masterLocale` and `targetLocales` match your PIM's locale setup

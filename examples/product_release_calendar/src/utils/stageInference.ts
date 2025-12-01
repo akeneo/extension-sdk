@@ -99,18 +99,14 @@ export function inferProductStage(
  * Get completeness for master locale
  */
 function getMasterCompleteness(product: Product, config: ReleaseCalendarConfig): number {
-  console.log("product", product);
-  console.log("product completenesse", product.completenesses);
   if (!product.completenesses) return 0;
 
-  console.log("config", config);
   const masterCompleteness = product.completenesses.find(
     (c: any) =>
       c.locale === config.masterLocale &&
       (!config.channel || c.scope === config.channel)
   );
 
-  console.log("master completenesse",masterCompleteness);
   return masterCompleteness?.data || 0;
 }
 
@@ -331,7 +327,6 @@ export function extractCompletenessPerLocale(
     completenessMap[locale] = completeness?.data || 0;
   });
 
-  console.log(product.uuid, completenessMap);
   return completenessMap;
 }
 
@@ -365,8 +360,8 @@ export function isProductAtRisk(
     const hasImages = checkHasImages(product, config);
     const localizationComplete = checkLocalizationComplete(product, config);
 
-    if (masterCompleteness < config.thresholds.masterValidation) {
-      missingItems.push(`Master completeness (${masterCompleteness}% / ${config.thresholds.masterValidation}%)`);
+    if (masterCompleteness < config.thresholds.masterEnrichment) {
+      missingItems.push(`Master completeness (${masterCompleteness}% / ${config.thresholds.masterEnrichment}%)`);
     }
 
     if (!hasImages) {

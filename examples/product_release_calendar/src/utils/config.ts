@@ -14,12 +14,10 @@ export const DEFAULT_CONFIG: ReleaseCalendarConfig = {
   masterLocale: 'en_US',
   targetLocales: ['fr_FR', 'de_DE', 'es_ES', 'it_IT'],
   validationAttribute: 'validation_status',
-  masterRequiredAttributes: ['description', 'short_description', 'name'],
   imageAttributes: ['image', 'main_image', 'images'],
   imageAssetFamily: 'product_images',
   thresholds: {
     masterEnrichment: 40,
-    masterValidation: 80,
     localization: 80,
   },
   channel: 'ecommerce',
@@ -68,16 +66,12 @@ export function loadConfig(): ReleaseCalendarConfig {
       ? (customVars.targetLocales as string[])
       : DEFAULT_CONFIG.targetLocales,
     validationAttribute: (customVars.validationAttribute as string) || DEFAULT_CONFIG.validationAttribute,
-    masterRequiredAttributes: Array.isArray(customVars.masterRequiredAttributes)
-      ? (customVars.masterRequiredAttributes as string[])
-      : DEFAULT_CONFIG.masterRequiredAttributes,
     imageAttributes: Array.isArray(customVars.imageAttributes)
       ? (customVars.imageAttributes as string[])
       : DEFAULT_CONFIG.imageAttributes,
     imageAssetFamily: (customVars.imageAssetFamily as string) || DEFAULT_CONFIG.imageAssetFamily,
     thresholds: {
       masterEnrichment: (customVars.thresholdMasterEnrichment as number) || DEFAULT_CONFIG.thresholds.masterEnrichment,
-      masterValidation: (customVars.thresholdMasterValidation as number) || DEFAULT_CONFIG.thresholds.masterValidation,
       localization: (customVars.thresholdLocalization as number) || DEFAULT_CONFIG.thresholds.localization,
     },
     channel: (customVars.channel as string) || DEFAULT_CONFIG.channel,

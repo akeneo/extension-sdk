@@ -28,9 +28,6 @@ export interface ReleaseCalendarConfig {
   // This attribute will be filled when validation buttons are clicked
   validationAttribute: string;
 
-  // Required attributes for master enrichment stage
-  masterRequiredAttributes: string[];
-
   // Image/asset attributes for visuals
   imageAttributes: string[];
 
@@ -40,7 +37,6 @@ export interface ReleaseCalendarConfig {
   // Completeness thresholds per stage
   thresholds: {
     masterEnrichment: number; // e.g., 50
-    masterValidation: number; // e.g., 90
     localization: number; // e.g., 90 per locale
   };
 
