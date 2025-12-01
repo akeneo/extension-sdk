@@ -56,14 +56,15 @@ export function inferProductStage(
   const masterCompleteness = getMasterCompleteness(product, config);
   const localizationComplete = checkLocalizationComplete(product, config);
   const hasFutureGoLiveDate = checkHasFutureGoLiveDate(product, config);
-  const hasPassedGoLiveDate = checkHasPassedGoLiveDate(product, config);
+  //const hasPassedGoLiveDate = checkHasPassedGoLiveDate(product, config);
   const isMasterValidated = checkIsValidated(product, config, config.masterLocale);
   const areAllLocalesValidated = checkAreAllLocalesValidated(product, config);
 
   // Stage 7: Live - product has passed go-live date
-  if (hasPassedGoLiveDate) {
+  // This status should be linked to a mock control variable or an API.
+/*   if (hasPassedGoLiveDate) {
     return ReleaseStage.LIVE;
-  }
+  } */
 
   // Stage 6: Ready to Go Live - all locales validated, waiting for go-live date
   if (areAllLocalesValidated && hasFutureGoLiveDate) {
@@ -111,35 +112,6 @@ function getMasterCompleteness(product: Product, config: ReleaseCalendarConfig):
 
   console.log("master completenesse",masterCompleteness);
   return masterCompleteness?.data || 0;
-}
-
-/**
- * Check if product has required master attributes filled
- */
-function checkRequiredAttributes(product: Product, config: ReleaseCalendarConfig): boolean {
-  if (!product.values || config.masterRequiredAttributes.length === 0) {
-    return false;
-  }
-
-  return config.masterRequiredAttributes.every((attrCode) => {
-    const attrValue = product.values![attrCode];
-    if (!attrValue) return false;
-
-    // Check if master locale value exists
-    const masterValue = Array.isArray(attrValue)
-      ? attrValue.find((v: any) =>
-          !v.locale || v.locale === config.masterLocale
-        )
-      : attrValue;
-
-    // Check if value is not empty
-    if (!masterValue) return false;
-    if (masterValue.data === null || masterValue.data === undefined) return false;
-    if (typeof masterValue.data === 'string' && masterValue.data.trim() === '') return false;
-    if (Array.isArray(masterValue.data) && masterValue.data.length === 0) return false;
-
-    return true;
-  });
 }
 
 /**
