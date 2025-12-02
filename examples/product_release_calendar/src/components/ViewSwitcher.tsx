@@ -13,7 +13,9 @@ const Container = styled.div`
   gap: 8px;
 `;
 
-const ViewButton = styled(Button)<{ $active: boolean }>`
+const ViewButton = styled(Button).withConfig({
+  shouldForwardProp: (prop) => !['borderless', 'ghost', 'disabled', 'level', 'size'].includes(prop),
+})<{ $active: boolean }>`
   opacity: ${({ $active }) => ($active ? 1 : 0.6)};
 `;
 

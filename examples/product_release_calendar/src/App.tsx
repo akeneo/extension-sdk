@@ -97,14 +97,12 @@ const AtRiskCount = styled(StatValue)`
 function App() {
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.PIPELINE);
   const [filters, setFilters] = useState<FilterState>({ family: '' });
-    console.log("coucou")
 
   // Load configuration from custom_variables
   const config = useMemo(() => loadConfig(), []);
 
   // If in panel mode, render simplified view for single product
   if (config.displayMode === DisplayMode.PANEL) {
-    console.log("coucou")
     return <PanelMode config={config} />;
   }
 

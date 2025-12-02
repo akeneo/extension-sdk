@@ -201,7 +201,6 @@ export function ProductCard({ product, onNavigate, config, onRefresh, showLocale
       {/* Validation buttons based on current stage */}
       {product.currentStage === ReleaseStage.MASTER_VALIDATION && (
         <ValidationButton onClick={handleValidateMaster} disabled={isValidating}>
-          <CheckCircle size={16} />
           {isValidating ? 'Validating...' : 'Validate Master'}
         </ValidationButton>
       )}

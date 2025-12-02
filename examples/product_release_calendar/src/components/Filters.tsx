@@ -40,7 +40,9 @@ const SearchIcon = styled.div`
   pointer-events: none;
 `;
 
-const StyledTextInput = styled(TextInput)`
+const StyledTextInput = styled(TextInput).withConfig({
+  shouldForwardProp: (prop) => !['isPlaceholderVisible'].includes(prop),
+})`
   input {
     padding-left: 36px;
   }
@@ -89,7 +91,6 @@ export function Filters({ filters, onFiltersChange, families, categories, config
           }}
           emptyResultLabel="No families found"
           openLabel="Open"
-          clearable={false}
         >
           {familyOptions.map((option) => (
             <SelectInput.Option key={option.value} value={option.value} title={option.label}>
@@ -107,7 +108,6 @@ export function Filters({ filters, onFiltersChange, families, categories, config
           }}
           emptyResultLabel="No categories found"
           openLabel="Open"
-          clearable={false}
         >
           {categoryOptions.map((option) => (
             <SelectInput.Option key={option.value} value={option.value} title={option.label}>
@@ -126,7 +126,6 @@ export function Filters({ filters, onFiltersChange, families, categories, config
             }}
             emptyResultLabel="No stages found"
             openLabel="Open"
-            clearable={false}
           >
             {stageOptions.map((option) => (
               <SelectInput.Option key={option.value} value={option.value} title={option.label}>
@@ -145,7 +144,6 @@ export function Filters({ filters, onFiltersChange, families, categories, config
           }}
           emptyResultLabel="No locales found"
           openLabel="Open"
-          clearable={false}
         >
           {localeOptions.map((option) => (
             <SelectInput.Option key={option.value} value={option.value} title={option.label}>
