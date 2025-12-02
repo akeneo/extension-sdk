@@ -1659,18 +1659,9 @@ export declare type PIM_SDK = {
     user: PIM_USER;
     context: PIM_CONTEXT;
     api: {
-        product_uuid: SdkApiProductUuid;
-        attribute: SdkApiAttribute;
-        family: SdkApiFamily;
-        category: SdkApiCategory;
-        reference_entity: SdkApiReferenceEntity;
-        reference_entity_record: SdkApiReferenceEntityRecord;
-        reference_entity_attribute: SdkApiReferenceEntityAttribute;
-        locale: SdkApiLocale;
-        channel: SdkApiChannel;
         external: externalGateway;
         system_v1: SdkApiSystem;
-        channel_v1: SdkApiChannel_2;
+        channel_v1: SdkApiChannel;
         currency_v1: SdkApiCurrency;
         product_model_v1: SdkApiProductModel;
         attribute_option_v1: SdkApiAttributeOption;
@@ -1684,15 +1675,15 @@ export declare type PIM_SDK = {
         asset_attribute_v1: SdkApiAssetAttribute;
         asset_attribute_option_v1: SdkApiAssetAttributeOption;
         asset_media_file_v1: SdkApiAssetMediaFile;
-        category_v1: SdkApiCategory_2;
-        product_uuid_v1: SdkApiProductUuid_2;
-        locale_v1: SdkApiLocale_2;
-        family_v1: SdkApiFamily_2;
-        reference_entity_v1: SdkApiReferenceEntity_2;
-        reference_entity_attribute_v1: SdkApiReferenceEntityAttribute_2;
-        reference_entity_record_v1: SdkApiReferenceEntityRecord_2;
+        category_v1: SdkApiCategory;
+        product_uuid_v1: SdkApiProductUuid;
+        locale_v1: SdkApiLocale;
+        family_v1: SdkApiFamily;
+        reference_entity_v1: SdkApiReferenceEntity;
+        reference_entity_attribute_v1: SdkApiReferenceEntityAttribute;
+        reference_entity_record_v1: SdkApiReferenceEntityRecord;
         reference_entity_attribute_option_v1: SdkApiReferenceEntityAttributeOption;
-        attribute_v1: SdkApiAttribute_2;
+        attribute_v1: SdkApiAttribute;
         workflows_v1: SdkApiWorkflows;
         workflow_tasks_v1: SdkApiWorkflowTasks;
         workflow_executions_v1: SdkApiWorkflowExecutions;
@@ -1705,12 +1696,10 @@ export declare type PIM_USER = {
     uuid: string;
     first_name: string;
     last_name: string;
-    groups: string[];
 };
 
 declare type pimNavigate = {
     internal: (path: string) => void;
-    external: (rawUrl: string) => void;
 };
 
 /**
@@ -2665,7 +2654,7 @@ declare interface SdkApiAssociationType {
 /**
  * SDK interface for attribute operations
  */
-declare interface SdkApiAttribute_2 {
+declare interface SdkApiAttribute {
     /**
      * Get a single attribute by code
      */
@@ -2731,7 +2720,7 @@ declare interface SdkApiAttributeOption {
 /**
  * SDK interface for category operations
  */
-declare interface SdkApiCategory_2 {
+declare interface SdkApiCategory {
     /**
      * Get a single category by code
      */
@@ -2753,7 +2742,7 @@ declare interface SdkApiCategory_2 {
 /**
  * SDK interface for channel operations
  */
-declare interface SdkApiChannel_2 {
+declare interface SdkApiChannel {
     /**
      * Get a single channel by code
      */
@@ -2789,7 +2778,7 @@ declare interface SdkApiCurrency {
 /**
  * SDK interface for family operations
  */
-declare interface SdkApiFamily_2 {
+declare interface SdkApiFamily {
     /**
      * Get a single family by code
      */
@@ -2833,7 +2822,7 @@ declare interface SdkApiFamilyVariant {
 /**
  * SDK interface for locale operations
  */
-declare interface SdkApiLocale_2 {
+declare interface SdkApiLocale {
     /**
      * Get a single locale by code
      */
@@ -2909,7 +2898,7 @@ declare interface SdkApiProductModel {
 /**
  * SDK interface for product UUID operations
  */
-declare interface SdkApiProductUuid_2 {
+declare interface SdkApiProductUuid {
     /**
      * Get a single product by UUID
      */
@@ -2935,7 +2924,7 @@ declare interface SdkApiProductUuid_2 {
 /**
  * Interface defining the available methods for the Reference Entity SDK
  */
-declare interface SdkApiReferenceEntity_2 {
+declare interface SdkApiReferenceEntity {
     /**
      * Get a reference entity by code
      */
@@ -2956,7 +2945,7 @@ declare interface SdkApiReferenceEntity_2 {
 /**
  * Interface defining the available methods for the Reference Entity Attribute SDK
  */
-declare interface SdkApiReferenceEntityAttribute_2 {
+declare interface SdkApiReferenceEntityAttribute {
     /**
      * Get a reference entity attribute by code
      */
@@ -2984,7 +2973,7 @@ declare interface SdkApiReferenceEntityAttributeOption {
 /**
  * Interface defining the available methods for the Reference Entity Record SDK
  */
-declare interface SdkApiReferenceEntityRecord_2 {
+declare interface SdkApiReferenceEntityRecord {
     /**
      * Get a reference entity record by code
      */
