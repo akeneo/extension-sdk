@@ -1,5 +1,5 @@
 {
-  "position": "pim.activity.navigation.tab",
+  "position": "pim.product.panel",
   "name": "sdk_script_extension_product_release_calendar",
   "type": "sdk_script",
   "file": "dist/product-release-calendar.js",

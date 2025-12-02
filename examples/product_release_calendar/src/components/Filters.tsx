@@ -48,10 +48,6 @@ const StyledTextInput = styled(TextInput).withConfig({
   }
 `;
 
-const StyledSelectInput = styled(SelectInput).withConfig({
-  shouldForwardProp: (prop) => !['clearable'].includes(prop),
-})``;
-
 export function Filters({ filters, onFiltersChange, families, categories, config, viewMode }: FiltersProps) {
   const stageOptions = [
     { value: '', label: 'All Stages' },
@@ -86,7 +82,7 @@ export function Filters({ filters, onFiltersChange, families, categories, config
   return (
     <Container>
       <FilterGroup>
-        <StyledSelectInput
+        <SelectInput
           value={filters.family}
           onChange={(value: string) => {
             if (value) {
@@ -97,15 +93,15 @@ export function Filters({ filters, onFiltersChange, families, categories, config
           openLabel="Open"
         >
           {familyOptions.map((option) => (
-            <StyledSelectInput.Option key={option.value} value={option.value} title={option.label}>
+            <SelectInput.Option key={option.value} value={option.value} title={option.label}>
               {option.label}
-            </StyledSelectInput.Option>
+            </SelectInput.Option>
           ))}
-        </StyledSelectInput>
+        </SelectInput>
       </FilterGroup>
 
       <FilterGroup>
-        <StyledSelectInput
+        <SelectInput
           value={filters.category || ''}
           onChange={(value: string) => {
             onFiltersChange({ ...filters, category: value || undefined });
@@ -114,16 +110,16 @@ export function Filters({ filters, onFiltersChange, families, categories, config
           openLabel="Open"
         >
           {categoryOptions.map((option) => (
-            <StyledSelectInput.Option key={option.value} value={option.value} title={option.label}>
+            <SelectInput.Option key={option.value} value={option.value} title={option.label}>
               {option.label}
-            </StyledSelectInput.Option>
+            </SelectInput.Option>
           ))}
-        </StyledSelectInput>
+        </SelectInput>
       </FilterGroup>
 
       {viewMode === ViewMode.TIMELINE && (
         <FilterGroup>
-          <StyledSelectInput
+          <SelectInput
             value={filters.stage || ''}
             onChange={(value: string) => {
               onFiltersChange({ ...filters, stage: (value as ReleaseStage) || undefined });
@@ -132,16 +128,16 @@ export function Filters({ filters, onFiltersChange, families, categories, config
             openLabel="Open"
           >
             {stageOptions.map((option) => (
-              <StyledSelectInput.Option key={option.value} value={option.value} title={option.label}>
+              <SelectInput.Option key={option.value} value={option.value} title={option.label}>
                 {option.label}
-              </StyledSelectInput.Option>
+              </SelectInput.Option>
             ))}
-          </StyledSelectInput>
+          </SelectInput>
         </FilterGroup>
       )}
 
       <FilterGroup>
-        <StyledSelectInput
+        <SelectInput
           value={filters.locale || ''}
           onChange={(value: string) => {
             onFiltersChange({ ...filters, locale: value || undefined });
@@ -150,11 +146,11 @@ export function Filters({ filters, onFiltersChange, families, categories, config
           openLabel="Open"
         >
           {localeOptions.map((option) => (
-            <StyledSelectInput.Option key={option.value} value={option.value} title={option.label}>
+            <SelectInput.Option key={option.value} value={option.value} title={option.label}>
               {option.label}
-            </StyledSelectInput.Option>
+            </SelectInput.Option>
           ))}
-        </StyledSelectInput>
+        </SelectInput>
       </FilterGroup>
 
       <SearchContainer>

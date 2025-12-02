@@ -3,7 +3,7 @@ import { ReleaseCalendarConfig, ProductWithRelease, STAGE_CONFIG } from '../type
 import styled from 'styled-components';
 import { AlertCircle, Calendar, CheckCircle } from 'lucide-react';
 import { Placeholder, UsersIllustration } from 'akeneo-design-system';
-import { inferProductStage, extractGoLiveDates, extractCompletenessPerLocale, isProductAtRisk, getLiveLocales } from '../utils/stageInference';
+import { inferProductStage, extractGoLiveDates, extractCompletenessPerLocale, extractValidationPerLocale, isProductAtRisk, getLiveLocales } from '../utils/stageInference';
 import { validateMasterLocale, validateAllLocales, triggerGoLive } from '../utils/validationActions';
 import { ReleaseStage } from '../types';
 
@@ -161,8 +161,29 @@ const CompletenessProgress = styled.div<{ $percentage: number }>`
   transition: width 0.3s;
 `;
 
+const ValidationIndicator = styled.span<{ $validated: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: ${({ $validated }) => ($validated ? '#67B373' : '#E0E0E0')};
+  color: white;
+  font-size: 10px;
+  margin-left: 8px;
+`;
+
+const LocaleWithValidation = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 100px;
+`;
+
 export function PanelMode({ config }: PanelModeProps) {
   const [product, setProduct] = useState<ProductWithRelease | null>(null);
+  const [validationStatus, setValidationStatus] = useState<{ [locale: string]: boolean }>({});
   const [loading, setLoading] = useState(true);
   const [isValidating, setIsValidating] = useState(false);
 
@@ -188,19 +209,15 @@ export function PanelMode({ config }: PanelModeProps) {
         }
 
         // Fetch the product data
-        const productData: any = await globalThis.PIM.api.product_uuid_v1.get({ uuid: productUuid });
-
-        // Ensure UUID exists (identifier can be empty)
-        if (!productData.uuid) {
-          console.error('Invalid product data received - no UUID');
-          setLoading(false);
-          return;
-        }
+        const productData: any = await globalThis.PIM.api.product_uuid_v1.get({ uuid: productUuid, withCompletenesses: true });
+        console.log(productData);
 
         // Enrich product with release tracking data
         const currentStage = inferProductStage(productData as any, config);
+        console.log(currentStage);
         const goLiveDates = extractGoLiveDates(productData as any, config);
         const completenessPerLocale = extractCompletenessPerLocale(productData as any, config);
+        const validationPerLocale = extractValidationPerLocale(productData as any, config);
         const riskInfo = isProductAtRisk(productData as any, currentStage, config);
         const liveLocales = getLiveLocales(productData as any, config);
 
@@ -223,6 +240,7 @@ export function PanelMode({ config }: PanelModeProps) {
 
         console.log("enrichedProduct", enrichedProduct)
         setProduct(enrichedProduct);
+        setValidationStatus(validationPerLocale);
       } catch (error) {
         console.error('Failed to fetch product:', error);
       } finally {
@@ -335,11 +353,18 @@ export function PanelMode({ config }: PanelModeProps) {
 
       {/* Completeness per Locale */}
       <Section>
-        <SectionTitle>Completeness</SectionTitle>
+        <SectionTitle>Completeness {config.validationAttribute && '& Validation'}</SectionTitle>
         <LocaleCompleteness>
           {Object.entries(product.completenessPerLocale).map(([locale, percentage]) => (
             <CompletenessItem key={locale}>
-              <span>{locale}</span>
+              <LocaleWithValidation>
+                <span>{locale}</span>
+                {config.validationAttribute && (
+                  <ValidationIndicator $validated={validationStatus[locale] || false} title={validationStatus[locale] ? 'Validated' : 'Not validated'}>
+                    {validationStatus[locale] && <CheckCircle size={12} />}
+                  </ValidationIndicator>
+                )}
+              </LocaleWithValidation>
               <CompletenessBar>
                 <CompletenessProgress $percentage={percentage} />
               </CompletenessBar>

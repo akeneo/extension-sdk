@@ -57,8 +57,15 @@ export function inferProductStage(
   const localizationComplete = checkLocalizationComplete(product, config);
   const hasFutureGoLiveDate = checkHasFutureGoLiveDate(product, config);
   //const hasPassedGoLiveDate = checkHasPassedGoLiveDate(product, config);
-  const isMasterValidated = checkIsValidated(product, config, config.masterLocale);
-  const areAllLocalesValidated = checkAreAllLocalesValidated(product, config);
+
+  // Check if validation workflow is enabled
+  const hasValidationWorkflow = !!config.validationAttribute;
+  const isMasterValidated = hasValidationWorkflow ? checkIsValidated(product, config, config.masterLocale) : true;
+  const areAllLocalesValidated = hasValidationWorkflow ? checkAreAllLocalesValidated(product, config) : true;
+
+if (product.uuid === "1ddef23e-c254-4084-9dd0-776750c9871e") {
+  console.log(product);
+}
 
   // Stage 7: Live - product has passed go-live date
   // This status should be linked to a mock control variable or an API.
@@ -66,13 +73,14 @@ export function inferProductStage(
     return ReleaseStage.LIVE;
   } */
 
-  // Stage 6: Ready to Go Live - all locales validated, waiting for go-live date
-  if (areAllLocalesValidated && hasFutureGoLiveDate) {
+  // Stage 6: Ready to Go Live - all locales complete and validated, waiting for go-live date
+  if (localizationComplete && areAllLocalesValidated && hasFutureGoLiveDate) {
     return ReleaseStage.GO_LIVE;
   }
 
   // Stage 5: Global Validation - master validated, all locales complete, but not all validated
-  if (isMasterValidated && localizationComplete && !areAllLocalesValidated) {
+  // Only if validation workflow is enabled
+  if (hasValidationWorkflow && isMasterValidated && localizationComplete && !areAllLocalesValidated) {
     return ReleaseStage.GLOBAL_VALIDATION;
   }
 
@@ -82,12 +90,13 @@ export function inferProductStage(
   }
 
   // Stage 3: Master Validation - master enrichment complete, awaiting validation
-  if (masterCompleteness >= config.thresholds.masterEnrichment && !isMasterValidated) {
+  // Only if validation workflow is enabled
+  if (hasValidationWorkflow && masterCompleteness >= config.thresholds.masterEnrichment && !isMasterValidated) {
     return ReleaseStage.MASTER_VALIDATION;
   }
 
   // Stage 2: Master Enrichment - adding information and visuals in master locale
-  if (masterCompleteness > 0) {
+  if (masterCompleteness > 0 && masterCompleteness < config.thresholds.masterEnrichment) {
     return ReleaseStage.MASTER_ENRICHMENT;
   }
 
@@ -176,11 +185,27 @@ function checkIsValidated(product: Product, config: ReleaseCalendarConfig, local
       v.locale === locale &&
       (!config.channel || !v.scope || v.scope === config.channel)
     );
-    return localeValue && localeValue.data !== null && localeValue.data !== '';
+    if (!localeValue || localeValue.data === null || localeValue.data === '') {
+      return false;
+    }
+    // Handle boolean values explicitly
+    if (typeof localeValue.data === 'boolean') {
+      return localeValue.data === true;
+    }
+    // For other values (strings, dates, etc.), check if truthy
+    return !!localeValue.data;
   }
 
   // Handle single value
-  return validationAttr.data !== null && validationAttr.data !== '';
+  if (validationAttr.data === null || validationAttr.data === '') {
+    return false;
+  }
+  // Handle boolean values explicitly
+  if (typeof validationAttr.data === 'boolean') {
+    return validationAttr.data === true;
+  }
+  // For other values (strings, dates, etc.), check if truthy
+  return !!validationAttr.data;
 }
 
 /**
@@ -332,6 +357,28 @@ export function extractCompletenessPerLocale(
   });
 
   return completenessMap;
+}
+
+/**
+ * Extract validation status per locale
+ * Returns true if the locale has been validated (validation attribute is set)
+ */
+export function extractValidationPerLocale(
+  product: Product,
+  config: ReleaseCalendarConfig
+): { [locale: string]: boolean } {
+  const validationMap: { [locale: string]: boolean } = {};
+
+  // If validation workflow is not enabled, return empty map
+  if (!config.validationAttribute) return validationMap;
+
+  const locales = [config.masterLocale, ...config.targetLocales];
+
+  locales.forEach((locale) => {
+    validationMap[locale] = checkIsValidated(product, config, locale);
+  });
+
+  return validationMap;
 }
 
 /**
