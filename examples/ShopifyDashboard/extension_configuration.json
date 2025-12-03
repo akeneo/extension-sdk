@@ -1,0 +1,35 @@
+{
+  "position": "pim.product.panel",
+  "name": "sdk_script_extension_stock_data",
+  "type": "sdk_script",
+  "file": "dist/stock_data.js",
+  "configuration": {
+    "default_label": "Stock data on panel",
+    "labels": {
+      "en_US": "Stock data on panel"
+    }
+  },
+  "credentials": [
+      {
+            "code": "credential_example_1",
+            "type": "Bearer Token",
+            "value": "your_auth_token"
+        },
+        {
+            "code": "credential_example_2",
+            "type": "Basic Auth",
+            "value": {
+             "username": "your_username",
+             "password": "your_password"   
+            }
+        },
+        {
+            "code": "credential_example_3",
+            "type": "Custom Header",
+            "value": {
+             "header_key": "your_header_key",
+             "header_value": "your_header_value"   
+            }
+        }
+  ]
+}
