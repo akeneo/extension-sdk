@@ -70,7 +70,7 @@ canvas {
   letter-spacing: 2px;
 }
 
-img, #sprite, #ziggy {
+#sprite, #ziggy {
   display: none !important;
   visibility: hidden !important;
   position: absolute !important;
@@ -112,13 +112,43 @@ h1 {
 }
 
 #mainMenu h1 {
-  transform: rotate(-3deg);
-  animation: bounce 2s ease-in-out infinite;
+  font-size: clamp(48px, 10vh, 72px);
+  color: #5E4ABA;
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+  font-weight: 800;
+  margin: 8vh 0 2vh 0;
+  letter-spacing: 3px;
+  animation: titleFloat 3s ease-in-out infinite;
 }
 
-@keyframes bounce {
-  0%, 100% { transform: rotate(-3deg) translateY(0); }
-  50% { transform: rotate(-3deg) translateY(-10px); }
+@keyframes titleFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+
+.ziggy-mascot {
+  width: clamp(120px, 20vw, 180px);
+  height: clamp(120px, 20vw, 180px);
+  margin: 0 auto 3vh;
+  animation: ziggyBounce 2s ease-in-out infinite;
+  filter: drop-shadow(0 10px 30px rgba(94, 74, 186, 0.4));
+}
+
+.ziggy-mascot img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block !important;
+  visibility: visible !important;
+  position: relative !important;
+  opacity: 1 !important;
+}
+
+@keyframes ziggyBounce {
+  0%, 100% { transform: translateY(0px) rotate(-5deg); }
+  25% { transform: translateY(-20px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+  75% { transform: translateY(-20px) rotate(0deg); }
 }
 
 h3 {
@@ -233,6 +263,10 @@ root.innerHTML = `
     </canvas>
     <div><h1>Ziggy Jump!</h1></div>
     <div id="mainMenu">
+        <h1>Ziggy Jump!</h1>
+        <div class="ziggy-mascot">
+            <img src="${ziggyImageUrl}" alt="Ziggy Mascot" />
+        </div>
         <p class="info">
             use
             <span class="key left">←</span>
