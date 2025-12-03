@@ -246,6 +246,7 @@ function App() {
         <TimelineView
           products={products}
           onNavigateToProduct={handleNavigateToProduct}
+          selectedLocale={filters.locale}
         />
       )}
 

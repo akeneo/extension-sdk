@@ -6,6 +6,7 @@ import { useState, useMemo } from 'react';
 interface TimelineViewProps {
   products: ProductWithRelease[];
   onNavigateToProduct: (productUuid: string) => void;
+  selectedLocale?: string;
 }
 
 /**
@@ -237,7 +238,7 @@ interface CalendarDay {
   products: ProductWithRelease[];
 }
 
-export function TimelineView({ products, onNavigateToProduct }: TimelineViewProps) {
+export function TimelineView({ products, onNavigateToProduct, selectedLocale }: TimelineViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   // Generate calendar days for the current month
@@ -268,6 +269,15 @@ export function TimelineView({ products, onNavigateToProduct }: TimelineViewProp
 
       // Find products with go-live dates on this day
       const dayProducts = products.filter((product) => {
+        // If a locale is selected, only show products with go-live dates for that locale
+        if (selectedLocale) {
+          const goLiveDate = product.goLiveDates[selectedLocale];
+          if (!goLiveDate) return false;
+          const productDateStr = formatLocalDate(new Date(goLiveDate));
+          return productDateStr === dateStr;
+        }
+
+        // If no locale selected, show products with go-live dates for any locale
         return Object.values(product.goLiveDates).some((goLiveDate) => {
           if (!goLiveDate) return false;
           const productDateStr = formatLocalDate(new Date(goLiveDate));
@@ -285,7 +295,7 @@ export function TimelineView({ products, onNavigateToProduct }: TimelineViewProp
     }
 
     return days;
-  }, [currentDate, products]);
+  }, [currentDate, products, selectedLocale]);
 
   // Group days into weeks
   const weeks: CalendarDay[][] = [];

@@ -144,10 +144,7 @@ export function useReleaseProducts(
         filtered = filtered.filter((p) => p.currentStage === filters.stage);
       }
 
-      // Filter by locale (products with go-live dates for this locale)
-      if (filters.locale) {
-        filtered = filtered.filter((p) => p.goLiveDates[filters.locale!] !== null);
-      }
+      // Note: Locale filter is handled in TimelineView to filter dots per date, not products
 
       // Filter by search query
       if (filters.searchQuery) {
@@ -170,7 +167,7 @@ export function useReleaseProducts(
 
   useEffect(() => {
     fetchProducts();
-  }, [config, filters.family, filters.category, filters.stage, filters.locale, filters.searchQuery]);
+  }, [config, filters.family, filters.category, filters.stage, filters.searchQuery]);
 
   return {
     products,
