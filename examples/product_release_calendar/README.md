@@ -45,15 +45,20 @@ The Product Release Calendar helps merchandising and product teams track product
 
 - **Interactive Validation Workflow**:
   - **Master Validation**: Click "Validate Master" button to approve master locale content
+    - Verifies the validation attribute exists in the product family
     - Sets the validation attribute to `true` for the master locale
+    - Shows success message in bottom-right notification
     - Page reloads to reflect the new validation status
   - **Global Validation**: Click "Validate All Locales" button to approve all locale content
+    - Verifies the validation attribute exists in the product family
     - Sets the validation attribute to `true` for all target locales
+    - Shows success message in bottom-right notification
     - Page reloads to reflect the new validation status
   - **Go Live**: Click "Go Live" button when ready to publish
-    - Displays a success message confirming the product is ready
-    - Can be customized to integrate with publishing workflows or external APIs
+    - Displays a warning message that the go-live mechanism is not yet implemented
+    - Can be customized in `src/utils/validationActions.ts` to integrate with publishing workflows or external APIs
   - Validation status is stored in a configurable yes/no attribute (localizable & scopable)
+  - All notifications appear as message bars in the bottom-right corner using Akeneo Design System
 
 ### User Interface
 
@@ -299,13 +304,13 @@ Release dates are are configured in `custom_variables` and applied to products b
 
 The extension provides several filtering options to help you navigate your product catalog:
 
-1. **Family (Required)**: Products are only loaded when a family is selected. The first family is automatically selected when the extension loads. Use this to focus on specific product types.
+1. **Family (Required)**: Products are only loaded when a family is selected. The first family is automatically selected when the extension loads. This filter cannot be cleared as a family selection is required for the calendar to function.
 
 2. **Category (Optional)**: Filter products by category within the selected family. Shows all categories available in your PIM.
 
 3. **Stage (Timeline View Only)**: In timeline view, filter products by their current stage in the release pipeline. This filter is hidden in pipeline view where stages are already visually separated.
 
-4. **Locale (Optional)**: Filter products by checking completeness for a specific locale. Useful for tracking localization progress.
+4. **Locale (Timeline View Only)**: Filter product dots on the calendar by locale. When a specific locale is selected, only products with go-live dates for that locale are displayed on their respective calendar dates. When "All Locales" is selected, products appear on dates corresponding to any of their configured locale go-live dates. This filter is hidden in pipeline view.
 
 5. **Search**: Search products by their identifier. This filter appears last in the filter bar for quick access.
 
@@ -466,16 +471,43 @@ The extension integrates with Akeneo's navigation system:
 
 ### User Notifications
 
-The extension uses the Akeneo Design System `Helper` component to display success and error messages instead of browser alerts. This provides a consistent user experience within the PIM interface:
+The extension uses the Akeneo Design System `MessageBar` component to display success, error, and warning messages. All notifications appear in a fixed position at the bottom-right corner of the screen:
 
 ```typescript
-// Success message displayed with green Helper component
-<Helper level="success" inline={false}>
-  Product "SKU123" is ready to go live!
-</Helper>
+// Success message displayed with green MessageBar
+<MessageBar
+  level="success"
+  title="Success"
+  dismissTitle="Close"
+  onClose={() => setMessage(null)}
+>
+  Master locale validated successfully!
+</MessageBar>
 ```
 
-Messages automatically disappear after 5 seconds. This approach ensures the extension works properly in all PIM contexts.
+**Message Types:**
+- **Success** (green): Validation completed successfully
+- **Error** (red): Validation attribute not found or validation failed
+- **Warning** (yellow): Go-live mechanism not implemented
+
+Messages automatically disappear after 5 seconds and can be manually dismissed. The fixed positioning ensures notifications don't interfere with the product cards or calendar view.
+
+### Validation Attribute Checking
+
+Before validating a product, the extension verifies that the validation attribute exists in the product's family definition:
+
+```typescript
+// Fetch the product and its family
+const product = await PIM.api.product_uuid_v1.get({ uuid: productUuid });
+const family = await PIM.api.family_v1.get({ code: product.family });
+
+// Check if validation attribute exists in family
+if (!family.attributes || !family.attributes.includes(config.validationAttribute)) {
+  throw new Error(`Validation attribute "${config.validationAttribute}" not found in family`);
+}
+```
+
+This provides accurate validation of PIM configuration and displays helpful error messages when the attribute is not properly configured.
 
 ### Product Identifier Handling
 
@@ -523,7 +555,10 @@ Ensure your `channel` configuration in custom_variables matches the `scope` valu
 
 ## Customization Ideas
 
-- **Implement actual publishing workflow**: Modify the `triggerGoLive` function in `src/utils/validationActions.ts` to integrate with your publishing system or external API
+- **Implement actual publishing workflow**: The "Go Live" button currently displays a warning message. Modify the `triggerGoLive` function in `src/utils/validationActions.ts` to:
+  - Integrate with your publishing system or external API
+  - Update product status or push to channels
+  - Trigger external workflows or notifications
 - **Add automatic "Live" stage**: Implement the commented-out logic in `src/utils/stageInference.ts` to automatically move products to "Live" stage based on go-live dates or API status
 - Add workflow task integration for approval steps
 - Implement bulk actions (set go-live dates, change stages)
@@ -531,6 +566,7 @@ Ensure your `channel` configuration in custom_variables matches the `scope` valu
 - Integrate with external calendars (Google Calendar, Outlook)
 - Add export functionality (CSV, iCal)
 - Create custom stage definitions for your workflow
+- Customize notification messages and durations in the MessageBar implementation
 
 ## Troubleshooting
 
