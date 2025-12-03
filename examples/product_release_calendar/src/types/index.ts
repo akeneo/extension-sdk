@@ -36,12 +36,6 @@ export interface ReleaseCalendarConfig {
   // This attribute will be filled when validation buttons are clicked
   validationAttribute: string;
 
-  // Image/asset attributes for visuals
-  imageAttributes: string[];
-
-  // Asset family for images (if using Asset Manager)
-  imageAssetFamily?: string;
-
   // Completeness thresholds per stage
   thresholds: {
     masterEnrichment: number; // e.g., 50

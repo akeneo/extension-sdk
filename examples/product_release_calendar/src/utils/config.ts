@@ -12,10 +12,8 @@ export const DEFAULT_CONFIG: ReleaseCalendarConfig = {
     { date: '2025-12-15', locale: 'de_DE' },
   ],
   masterLocale: 'en_US',
-  targetLocales: ['fr_FR', 'de_DE', 'es_ES', 'it_IT'],
+  targetLocales: ['fr_FR', 'de_DE'],
   validationAttribute: 'validation_status',
-  imageAttributes: ['image', 'main_image', 'images'],
-  imageAssetFamily: 'product_images',
   thresholds: {
     masterEnrichment: 40,
     localization: 80,
@@ -67,10 +65,6 @@ export function loadConfig(): ReleaseCalendarConfig {
       ? (customVars.targetLocales as string[])
       : DEFAULT_CONFIG.targetLocales,
     validationAttribute: (customVars.validationAttribute as string) || DEFAULT_CONFIG.validationAttribute,
-    imageAttributes: Array.isArray(customVars.imageAttributes)
-      ? (customVars.imageAttributes as string[])
-      : DEFAULT_CONFIG.imageAttributes,
-    imageAssetFamily: (customVars.imageAssetFamily as string) || DEFAULT_CONFIG.imageAssetFamily,
     thresholds: {
       masterEnrichment: (customVars.thresholdMasterEnrichment as number) || DEFAULT_CONFIG.thresholds.masterEnrichment,
       localization: (customVars.thresholdLocalization as number) || DEFAULT_CONFIG.thresholds.localization,

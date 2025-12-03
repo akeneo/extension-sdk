@@ -115,34 +115,6 @@ function getMasterCompleteness(product: Product, config: ReleaseCalendarConfig):
   return masterCompleteness?.data || 0;
 }
 
-/**
- * Check if product has images
- */
-function checkHasImages(product: Product, config: ReleaseCalendarConfig): boolean {
-  if (!product.values || config.imageAttributes.length === 0) {
-    return false;
-  }
-
-  return config.imageAttributes.some((attrCode) => {
-    const attrValue = product.values![attrCode];
-    if (!attrValue) return false;
-
-    // For simple media attributes
-    if (Array.isArray(attrValue)) {
-      const masterImage = attrValue.find((v: any) =>
-        !v.locale || v.locale === config.masterLocale
-      );
-      return masterImage && masterImage.data && masterImage.data.length > 0;
-    }
-
-    // For asset collection attributes
-    if (attrValue.data && Array.isArray(attrValue.data)) {
-      return attrValue.data.length > 0;
-    }
-
-    return false;
-  });
-}
 
 /**
  * Check if localization is complete for all target locales
@@ -404,15 +376,10 @@ export function isProductAtRisk(
   // Check what's missing based on current stage
   if (isNearGoLive) {
     const masterCompleteness = getMasterCompleteness(product, config);
-    const hasImages = checkHasImages(product, config);
     const localizationComplete = checkLocalizationComplete(product, config);
 
     if (masterCompleteness < config.thresholds.masterEnrichment) {
       missingItems.push(`Master completeness (${masterCompleteness}% / ${config.thresholds.masterEnrichment}%)`);
-    }
-
-    if (!hasImages) {
-      missingItems.push('Master visuals');
     }
 
     if (!localizationComplete) {
