@@ -1,0 +1,12 @@
+{
+  "position": "pim.dashboard",
+  "name": "doodle_jump_game",
+  "type": "sdk_script",
+  "file": "dist/doodle_jump.js",
+  "configuration": {
+    "default_label": "Doodle Jump Game",
+    "labels": {
+      "en_US": "Doodle Jump Game"
+    }
+  }
+}
