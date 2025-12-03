@@ -1,10 +1,11 @@
-@import url(https://fonts.googleapis.com/css?family=Gloria+Hallelujah);
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
 *{box-sizing: border-box;}
 
 body {
     margin: 0; padding: 0;
-    font-family: 'Gloria Hallelujah', cursive;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .container {
@@ -13,6 +14,8 @@ body {
     position: relative;
     margin: 20px auto 0;
     overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 canvas {
@@ -28,20 +31,26 @@ canvas {
 
 #scoreBoard {
     width: 420px;
-    height: 50px;
-    background: rgba(182, 200, 220, 0.7);
+    height: 60px;
+    background: linear-gradient(135deg, #5E4ABA 0%, #7C5FB8 100%);
     position: absolute;
-    top: -3px;
+    top: 0;
     left: 0;
     z-index: 1;
-    border-image: url(https://i.imgur.com/5BBsR.png) 100 5 round;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 4px 12px rgba(94, 74, 186, 0.3);
 }
 
 #scoreBoard p {
-    font-size: 20px;
+    font-size: 28px;
+    font-weight: 700;
     padding: 0;
-    line-height: 47px;
-    margin: 0px 0 0 5px;
+    line-height: 60px;
+    margin: 0;
+    text-align: center;
+    color: #FFFFFF;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: 2px;
 }
 
 img, #sprite {
@@ -72,45 +81,109 @@ img, #sprite {
     z-index: -1;
 }
 
-h2, h3, h1 {font-weight: normal}
+h2, h3, h1 {font-weight: 700;}
+
 h1 {
-    font-size: 60px;
-    color: #5a5816;
-    transform: rotate(-10deg);
-    margin: 0px;
+    font-size: 56px;
+    color: #5E4ABA;
+    margin: 80px 0 20px 0;
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+    letter-spacing: 2px;
 }
 
-h3 {text-align: right; margin: -10px 20px 0 0; color: #5e96be}
-h3 a {color: #5a5816}
+#mainMenu h1 {
+    transform: rotate(-3deg);
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: rotate(-3deg) translateY(0); }
+    50% { transform: rotate(-3deg) translateY(-10px); }
+}
+
+h3 {
+    text-align: center;
+    margin: 20px 20px 30px 20px;
+    color: #5E4ABA;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+#gameOverMenu h1 {
+    color: #E74C3C;
+    transform: none;
+    animation: none;
+}
+
+#gameOverMenu h3 {
+    color: #333;
+}
 
 .button {
-    width: 105px;
-    height: 31px;
-    background: url(https://i.imgur.com/2WEhF.png) 0 0 no-repeat;
+    width: 160px;
+    height: 50px;
+    background: linear-gradient(135deg, #5E4ABA 0%, #7C5FB8 100%);
     display: block;
-    color:  #000;
-    font-size: 12px;
-    line-height: 31px;
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 50px;
     text-decoration: none;
     position: absolute;
     left: 50%;
     top: 50%;
-    margin-left: -53px;
+    margin-left: -80px;
     margin-top: 20px;
+    border-radius: 25px;
+    box-shadow: 0 6px 20px rgba(94, 74, 186, 0.4);
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(94, 74, 186, 0.5);
+    background: linear-gradient(135deg, #6E5AC0 0%, #8C6FC8 100%);
 }
 
 .button.tweet {bottom: 100px; background-position: 0 -90px}
 .button.fb {bottom: 150px; background-position: 0 -60px}
 
-.info {position: absolute; right: 20px; bottom: 00px; margin: 0; color: green}
-
-.info .key {
-    width: 16px;
-    height: 16px;
-    background: url(https://i.imgur.com/2WEhF.png) no-repeat;
-    text-indent: -9999px;
-    display: inline-block;
+.info {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 60px;
+    margin: 0;
+    color: #5E4ABA;
+    font-size: 14px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.info .key.left {background-position: -92px -621px;}
-.info .key.right {background-position: -92px -641px;}
+.info .key {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background: #5E4ABA;
+    color: white;
+    border-radius: 6px;
+    line-height: 30px;
+    text-align: center;
+    font-weight: 700;
+    margin: 0 4px;
+    box-shadow: 0 2px 6px rgba(94, 74, 186, 0.3);
+    text-indent: 0;
+}
+
+.info .key.left::before {
+    content: '←';
+}
+
+.info .key.right::before {
+    content: '→';
+}

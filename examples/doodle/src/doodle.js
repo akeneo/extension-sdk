@@ -448,13 +448,6 @@ function init() {
             showGoMenu();
             hideScore();
             player.isDead = "lol";
-
-            var tweet = document.getElementById("tweetBtn");
-            tweet.href='https://twitter.com/share?url=http://is.gd/PnFFzu&text=I just scored ' +score+ ' points in the HTML5 Doodle Jump game!&count=horiztonal&via=cssdeck&related=solitarydesigns';
-
-            var facebook = document.getElementById("fbBtn");
-            facebook.href='https://facebook.com/sharer.php?s=100&p[url]=http://cssdeck.com/labs/html5-doodle-jump/8&p[title]=I just scored ' +score+ ' points in the HTML5 Doodle Jump game!&p[summary]=Can you beat me in this awesome recreation of Doodle Jump created in HTML5?';
-
         }
     }
 

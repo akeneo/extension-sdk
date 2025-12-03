@@ -1,5 +1,222 @@
-// Import CSS
-import './doodle.css';
+// Import Ziggy image
+import ziggyImageUrl from './ziggy.png';
+
+// Inject CSS styles directly into the page
+const style = document.createElement('style');
+style.textContent = `
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  height: 90vh;
+  width: calc(90vh * 422 / 552);
+  max-width: 95vw;
+  position: relative;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: url(https://i.imgur.com/Y0BMP.png) top left;
+  background-size: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+#scoreBoard {
+  width: 100%;
+  height: 10%;
+  min-height: 50px;
+  background: linear-gradient(135deg, #5E4ABA 0%, #7C5FB8 100%);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 4px 12px rgba(94, 74, 186, 0.3);
+}
+
+#scoreBoard p {
+  font-size: clamp(24px, 5vh, 36px);
+  font-weight: 700;
+  padding: 0;
+  line-height: 10vh;
+  min-height: 50px;
+  margin: 0;
+  text-align: center;
+  color: #FFFFFF;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 2px;
+}
+
+img, #sprite, #ziggy {
+  display: none !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#mainMenu, #gameOverMenu {
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+#gameOverMenu {
+  visibility: hidden;
+  z-index: -1;
+}
+
+h2, h3, h1 {
+  font-weight: 700;
+}
+
+h1 {
+  font-size: clamp(40px, 8vh, 56px);
+  color: #5E4ABA;
+  margin: 15vh 0 3vh 0;
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+  letter-spacing: 2px;
+}
+
+#mainMenu h1 {
+  transform: rotate(-3deg);
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: rotate(-3deg) translateY(0); }
+  50% { transform: rotate(-3deg) translateY(-10px); }
+}
+
+h3 {
+  text-align: center;
+  margin: 2vh 20px 4vh 20px;
+  color: #5E4ABA;
+  font-size: clamp(16px, 3vh, 20px);
+  font-weight: 600;
+}
+
+#gameOverMenu h1 {
+  color: #E74C3C;
+  transform: none;
+  animation: none;
+}
+
+#gameOverMenu h3 {
+  color: #333;
+}
+
+.button {
+  width: clamp(140px, 30vw, 180px);
+  height: clamp(45px, 8vh, 60px);
+  background: linear-gradient(135deg, #5E4ABA 0%, #7C5FB8 100%);
+  display: block;
+  color: #FFFFFF;
+  font-size: clamp(16px, 3vh, 20px);
+  font-weight: 600;
+  line-height: clamp(45px, 8vh, 60px);
+  text-decoration: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, 0);
+  margin-top: 2vh;
+  border-radius: 30px;
+  box-shadow: 0 6px 20px rgba(94, 74, 186, 0.4);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.button:hover {
+  transform: translate(-50%, 0);
+  background: linear-gradient(135deg, #6E5AC0 0%, #8C6FC8 100%);
+}
+
+.info {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 8vh;
+  margin: 0;
+  color: #5E4ABA;
+  font-size: clamp(12px, 2vh, 14px);
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.9);
+  padding: clamp(8px, 1.5vh, 12px) clamp(15px, 3vw, 20px);
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.info .key {
+  display: inline-block;
+  width: clamp(25px, 4vh, 32px);
+  height: clamp(25px, 4vh, 32px);
+  background: #5E4ABA;
+  color: white;
+  border-radius: 6px;
+  line-height: clamp(25px, 4vh, 32px);
+  text-align: center;
+  font-weight: 700;
+  margin: 0 4px;
+  box-shadow: 0 2px 6px rgba(94, 74, 186, 0.3);
+}
+
+.info .key.left::before {
+  content: '←';
+}
+
+.info .key.right::before {
+  content: '→';
+}
+
+.credits {
+  position: absolute;
+  bottom: 2vh;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #333;
+  font-size: clamp(11px, 2vh, 14px);
+  font-weight: 400;
+  text-align: center;
+  z-index: 20;
+}
+`;
+document.head.appendChild(style);
 
 // Create root if it doesn't exist
 if (!document.getElementById('root')) {
@@ -14,7 +231,7 @@ root.innerHTML = `
     <canvas id="canvas">
         Aww, your browser doesn't support HTML5!
     </canvas>
-    <div><h1>doodle jump</h1></div>
+    <div><h1>Ziggy Jump!</h1></div>
     <div id="mainMenu">
         <p class="info">
             use
@@ -23,13 +240,15 @@ root.innerHTML = `
             to move and space to (re) start...
         </p>
         <a class="button" href="#" id="playBtn">Play</a>
+        <p class="credits">Made with ❤️ by Clovis Peridy</p>
     </div>
 
-    <div id="gameOverMenu">
-        <h1>game over!</h1>
-        <h3 id="go_score">you scored 0 points</h3>
+    <div id="gameOverMenu" style="visibility: hidden; z-index: -1;">
+        <h1>Game Over!</h1>
+        <h3 id="go_score">You scored 0 points!</h3>
 
-        <a class="button" href="#" id="restartBtn">Restart</a>
+        <a class="button" href="#" id="restartBtn">Play Again</a>
+        <p class="credits">Made with ❤️ by Clovis Peridy</p>
     </div>
 
     <div id="scoreBoard">
@@ -38,7 +257,7 @@ root.innerHTML = `
 </div>
 `;
 
-// Create sprite image but keep it hidden outside the container
+// Create sprite image for platforms/environment (original sprite sheet)
 const spriteImg = document.createElement('img');
 spriteImg.id = 'sprite';
 spriteImg.src = 'https://i.imgur.com/2WEhF.png';
@@ -50,6 +269,20 @@ spriteImg.style.height = '0';
 spriteImg.style.opacity = '0';
 spriteImg.style.visibility = 'hidden';
 document.body.appendChild(spriteImg);
+
+// Create Ziggy image for the player - using local Ziggy character image
+const ziggyImg = document.createElement('img');
+ziggyImg.id = 'ziggy';
+// Use the local Ziggy image (no CORS issues!)
+ziggyImg.src = ziggyImageUrl;
+ziggyImg.style.position = 'absolute';
+ziggyImg.style.left = '-9999px';
+ziggyImg.style.top = '-9999px';
+ziggyImg.style.width = '0';
+ziggyImg.style.height = '0';
+ziggyImg.style.opacity = '0';
+ziggyImg.style.visibility = 'hidden';
+document.body.appendChild(ziggyImg);
 
 // Wait for the image to load before initializing the game
 spriteImg.onload = function() {
@@ -84,6 +317,7 @@ function initializeGame() {
   //Variables for game
   var platforms = [],
     image = document.getElementById("sprite"),
+    ziggy = document.getElementById("ziggy"),
     player, platformCount = 10,
     position = 0,
     gravity = 0.2,
@@ -117,7 +351,7 @@ function initializeGame() {
 
   var base = new Base();
 
-  //Player object
+  //Player object - Now featuring Ziggy the Hydra!
   var Player = function() {
     this.vy = 11;
     this.vx = 0;
@@ -126,30 +360,49 @@ function initializeGame() {
     this.isMovingRight = false;
     this.isDead = false;
 
-    this.width = 55;
-    this.height = 40;
-
-    //Sprite clipping
-    this.cx = 0;
-    this.cy = 0;
-    this.cwidth = 110;
-    this.cheight = 80;
+    this.width = 60;
+    this.height = 60;
 
     this.dir = "left";
 
     this.x = width / 2 - this.width / 2;
     this.y = height / 2;
 
-    //Function to draw it
+    //Function to draw Ziggy
     this.draw = function() {
       try {
-        if (this.dir == "right") this.cy = 121;
-        else if (this.dir == "left") this.cy = 201;
-        else if (this.dir == "right_land") this.cy = 289;
-        else if (this.dir == "left_land") this.cy = 371;
+        if (ziggy && ziggy.complete && ziggy.naturalWidth > 0) {
+          ctx.save();
 
-        ctx.drawImage(image, this.cx, this.cy, this.cwidth, this.cheight, this.x, this.y, this.width, this.height);
-      } catch (e) {}
+          // Flip Ziggy horizontally when moving left
+          if (this.dir == "left" || this.dir == "left_land") {
+            ctx.translate(this.x + this.width, this.y);
+            ctx.scale(-1, 1);
+            ctx.drawImage(ziggy, 0, 0, this.width, this.height);
+          } else {
+            ctx.drawImage(ziggy, this.x, this.y, this.width, this.height);
+          }
+
+          ctx.restore();
+
+          // Add a subtle bounce effect when landing
+          if (this.dir == "right_land" || this.dir == "left_land") {
+            ctx.save();
+            ctx.globalAlpha = 0.3;
+            ctx.fillStyle = '#5E4ABA'; // Akeneo purple
+            ctx.beginPath();
+            ctx.ellipse(this.x + this.width/2, this.y + this.height + 5, this.width/2, 8, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.restore();
+          }
+        } else {
+          // Fallback: draw a purple rectangle if Ziggy isn't loaded
+          ctx.fillStyle = '#5E4ABA';
+          ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+      } catch (e) {
+        console.error('Error drawing Ziggy:', e);
+      }
     };
 
     this.jump = function() {
