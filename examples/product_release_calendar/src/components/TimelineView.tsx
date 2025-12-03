@@ -414,13 +414,13 @@ export function TimelineView({ products, onNavigateToProduct, selectedLocale }: 
                           <ProductDot
                             key={product.uuid}
                             $color={color}
-                            title={`${product.identifier} - ${stageConfig.label}`}
+                            title={`${product.displayLabel} (ID: ${product.identifier}) - ${stageConfig.label}`}
                             onClick={(e) => {
                               e.stopPropagation();
                               onNavigateToProduct(product.uuid);
                             }}
                           >
-                            {product.identifier}
+                            {product.displayLabel}
                           </ProductDot>
                         );
                       })}

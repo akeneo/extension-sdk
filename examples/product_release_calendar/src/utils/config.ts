@@ -65,6 +65,7 @@ export function loadConfig(): ReleaseCalendarConfig {
       ? (customVars.targetLocales as string[])
       : DEFAULT_CONFIG.targetLocales,
     validationAttribute: (customVars.validationAttribute as string) || DEFAULT_CONFIG.validationAttribute,
+    displayLabelAttribute: customVars.displayLabelAttribute as string | undefined,
     thresholds: {
       masterEnrichment: (customVars.thresholdMasterEnrichment as number) || DEFAULT_CONFIG.thresholds.masterEnrichment,
       localization: (customVars.thresholdLocalization as number) || DEFAULT_CONFIG.thresholds.localization,

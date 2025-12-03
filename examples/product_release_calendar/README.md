@@ -73,6 +73,18 @@ The Product Release Calendar helps merchandising and product teams track product
   - At-risk products
   - Completeness per locale
 
+### Display Labels
+
+By default, products are displayed using their identifier (SKU). You can configure a custom attribute to use as the display label on product cards and calendar dots:
+
+- Configure `displayLabelAttribute` in custom_variables (e.g., `"name"`, `"title"`, `"label"`)
+- The extension will extract the value from the specified attribute
+- For localizable attributes, the master locale value is prioritized
+- If the attribute is not found or empty, the product identifier is used as fallback
+- The product identifier is still accessible in tooltips for reference
+
+This allows for more user-friendly labels while maintaining technical identifiers for tracking.
+
 ## Configuration
 
 ### Custom Variables
@@ -92,6 +104,7 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "masterLocale": "en_US",
   "targetLocales": ["fr_FR", "de_DE", "es_ES"],
   "validationAttribute": "validation_status",
+  "displayLabelAttribute": "name",
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 40,
   "thresholdLocalization": 80,
@@ -207,6 +220,7 @@ For product.panel position (simplified view showing current product):
 | `masterLocale` | string | Yes | Master locale code for initial content creation |
 | `targetLocales` | string[] | Yes | Array of target locale codes for translations |
 | `validationAttribute` | string | Yes | Attribute code for validation status (yes/no type, localizable, scopable) |
+| `displayLabelAttribute` | string | No | Attribute code to use as display label on product cards and dots. Falls back to product identifier if not specified or value is empty. Prioritizes master locale for localizable attributes. |
 | `channel` | string | No | Channel code to use for completeness calculations |
 | `thresholdMasterEnrichment` | number | No | Completeness % threshold to reach master validation stage (default: 40) |
 | `thresholdLocalization` | number | No | Completeness % threshold for localization per locale (default: 80) |

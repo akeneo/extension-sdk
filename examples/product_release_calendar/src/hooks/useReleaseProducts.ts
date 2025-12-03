@@ -51,6 +51,50 @@ function getProductIdentifier(product: any): string {
 }
 
 /**
+ * Extract display label from product values based on configured attribute
+ * Falls back to identifier if attribute not found or empty
+ */
+function getProductDisplayLabel(product: any, config: ReleaseCalendarConfig, identifier: string): string {
+  // If no display label attribute configured, use identifier
+  if (!config.displayLabelAttribute) {
+    return identifier;
+  }
+
+  // Try to get the attribute value
+  const attributeValue = product.values?.[config.displayLabelAttribute];
+
+  if (!attributeValue) {
+    return identifier;
+  }
+
+  // Handle array of values (localizable/scopable attributes)
+  if (Array.isArray(attributeValue) && attributeValue.length > 0) {
+    // Try to find value for master locale first
+    const masterValue = attributeValue.find((v: any) =>
+      v.locale === config.masterLocale || !v.locale
+    );
+
+    if (masterValue && masterValue.data && typeof masterValue.data === 'string' && masterValue.data.trim().length > 0) {
+      return masterValue.data.trim();
+    }
+
+    // Fallback to first available value
+    const firstValue = attributeValue[0];
+    if (firstValue && firstValue.data && typeof firstValue.data === 'string' && firstValue.data.trim().length > 0) {
+      return firstValue.data.trim();
+    }
+  }
+
+  // Handle single value (non-localizable)
+  if (attributeValue.data && typeof attributeValue.data === 'string' && attributeValue.data.trim().length > 0) {
+    return attributeValue.data.trim();
+  }
+
+  // Fallback to identifier
+  return identifier;
+}
+
+/**
  * Hook to fetch products with release tracking information
  */
 export function useReleaseProducts(
@@ -119,9 +163,13 @@ export function useReleaseProducts(
         // Get identifier with fallback for empty identifier field
         const identifier = getProductIdentifier(product);
 
+        // Get display label from configured attribute or fallback to identifier
+        const displayLabel = getProductDisplayLabel(product, config, identifier);
+
         return {
           ...product,
           identifier,
+          displayLabel,
           currentStage,
           completenessPerLocale,
           goLiveDates,

@@ -19,8 +19,9 @@ const Container = styled.div`
 `;
 
 const Column = styled.div`
-  min-width: 280px;
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 200px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
 `;

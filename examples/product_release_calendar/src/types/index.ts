@@ -36,6 +36,10 @@ export interface ReleaseCalendarConfig {
   // This attribute will be filled when validation buttons are clicked
   validationAttribute: string;
 
+  // Optional: Attribute code to use as display label on product cards and dots
+  // If not specified, product identifier will be used
+  displayLabelAttribute?: string;
+
   // Completeness thresholds per stage
   thresholds: {
     masterEnrichment: number; // e.g., 50
@@ -128,6 +132,9 @@ interface BaseProduct {
  * Product with release tracking information
  */
 export interface ProductWithRelease extends BaseProduct {
+  // Display label (from configured attribute or fallback to identifier)
+  displayLabel: string;
+
   // Current stage in the release pipeline
   currentStage: ReleaseStage;
 

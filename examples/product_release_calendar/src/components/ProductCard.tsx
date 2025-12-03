@@ -22,6 +22,8 @@ const Card = styled.div<{ $isAtRisk?: boolean }>`
   margin-bottom: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  width: 100%;
+  box-sizing: border-box;
 
   &:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -34,6 +36,8 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 8px;
+  min-width: 0;
+  gap: 8px;
 `;
 
 const Identifier = styled.div`
@@ -44,6 +48,7 @@ const Identifier = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
 `;
 
 const RiskIndicator = styled.div`
@@ -59,6 +64,9 @@ const MissingItem = styled.div`
   font-size: 11px;
   color: #67768E;
   padding-left: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const LocaleInfo = styled.div`
@@ -167,7 +175,7 @@ export function ProductCard({ product, onNavigate, config, onRefresh, onShowMess
   return (
     <Card $isAtRisk={product.isAtRisk} onClick={() => onNavigate(product.uuid)}>
       <Header>
-        <Identifier title={product.identifier}>{product.identifier}</Identifier>
+        <Identifier title={`ID: ${product.identifier}`}>{product.displayLabel}</Identifier>
         <span title={product.enabled ? "Product is enabled" : "Product is disabled"}>
           {product.enabled ? (
             <CheckCircle size={16} color="#67B373" />
