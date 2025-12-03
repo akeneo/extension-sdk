@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { ReleaseCalendarConfig, ProductWithRelease, STAGE_CONFIG } from '../types';
 import styled from 'styled-components';
 import { AlertCircle, Calendar, CheckCircle } from 'lucide-react';
-import { Placeholder, UsersIllustration, Helper } from 'akeneo-design-system';
+import { Placeholder, UsersIllustration, MessageBar } from 'akeneo-design-system';
 import { inferProductStage, extractGoLiveDates, extractCompletenessPerLocale, extractValidationPerLocale, isProductAtRisk, getLiveLocales } from '../utils/stageInference';
-import { validateMasterLocale, validateAllLocales, triggerGoLive } from '../utils/validationActions';
+import { validateMasterLocale, validateAllLocales } from '../utils/validationActions';
 import { ReleaseStage } from '../types';
 
 interface PanelModeProps {
@@ -181,12 +181,20 @@ const LocaleWithValidation = styled.div`
   min-width: 100px;
 `;
 
+const MessageBarContainer = styled.div`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+`;
+
 export function PanelMode({ config }: PanelModeProps) {
   const [product, setProduct] = useState<ProductWithRelease | null>(null);
   const [validationStatus, setValidationStatus] = useState<{ [locale: string]: boolean }>({});
   const [loading, setLoading] = useState(true);
   const [isValidating, setIsValidating] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ text: string; level: 'success' | 'error' | 'warning' | 'info' } | null>(null);
 
   useEffect(() => {
     const fetchCurrentProduct = async () => {
@@ -252,14 +260,21 @@ export function PanelMode({ config }: PanelModeProps) {
   const handleValidateMaster = async () => {
     if (!product) return;
     setIsValidating(true);
+    setMessage(null);
     try {
       await validateMasterLocale(product.uuid, config);
-      // Refresh product data
-      window.location.reload();
+      setMessage({ text: 'Master locale validated successfully!', level: 'success' });
+      setTimeout(() => {
+        // Refresh product data
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error('Failed to validate master locale:', error);
-      alert('Failed to validate. Please try again.');
-    } finally {
+      const errorMsg = error instanceof Error && error.message.includes('validation')
+        ? 'Validation attribute not found. Please check your configuration.'
+        : 'Failed to validate. Please try again.';
+      setMessage({ text: errorMsg, level: 'error' });
+      setTimeout(() => setMessage(null), 5000);
       setIsValidating(false);
     }
   };
@@ -267,24 +282,32 @@ export function PanelMode({ config }: PanelModeProps) {
   const handleValidateAll = async () => {
     if (!product) return;
     setIsValidating(true);
+    setMessage(null);
     try {
       await validateAllLocales(product.uuid, config);
-      // Refresh product data
-      window.location.reload();
+      setMessage({ text: 'All locales validated successfully!', level: 'success' });
+      setTimeout(() => {
+        // Refresh product data
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error('Failed to validate all locales:', error);
-      alert('Failed to validate. Please try again.');
-    } finally {
+      const errorMsg = error instanceof Error && error.message.includes('validation')
+        ? 'Validation attribute not found. Please check your configuration.'
+        : 'Failed to validate. Please try again.';
+      setMessage({ text: errorMsg, level: 'error' });
+      setTimeout(() => setMessage(null), 5000);
       setIsValidating(false);
     }
   };
 
   const handleGoLive = () => {
     if (!product) return;
-    const message = triggerGoLive(product.identifier);
-    setSuccessMessage(message);
-    // Clear message after 5 seconds
-    setTimeout(() => setSuccessMessage(null), 5000);
+    setMessage({
+      text: 'Go live mechanism is not yet implemented. Please configure your publishing workflow in the triggerGoLive function.',
+      level: 'warning'
+    });
+    setTimeout(() => setMessage(null), 5000);
   };
 
   if (loading) {
@@ -314,18 +337,10 @@ export function PanelMode({ config }: PanelModeProps) {
   const stageConfig = STAGE_CONFIG[product.currentStage];
 
   return (
-    <Container>
-      {/* Success Message */}
-      {successMessage && (
+    <>
+      <Container>
+        {/* Current Stage */}
         <Section>
-          <Helper level="success" inline={false}>
-            {successMessage}
-          </Helper>
-        </Section>
-      )}
-
-      {/* Current Stage */}
-      <Section>
         <StageCard $color={stageConfig.color}>
           <StageLabel>{stageConfig.label}</StageLabel>
           <StageDescription>{stageConfig.description}</StageDescription>
@@ -429,6 +444,21 @@ export function PanelMode({ config }: PanelModeProps) {
           </ValidationButton>
         </Section>
       )}
-    </Container>
+      </Container>
+
+      {/* Global Message Bar - Bottom Right */}
+      {message && (
+        <MessageBarContainer>
+          <MessageBar
+            level={message.level}
+            title={message.level === 'success' ? 'Success' : message.level === 'error' ? 'Error' : 'Warning'}
+            dismissTitle="Close"
+            onClose={() => setMessage(null)}
+          >
+            {message.text}
+          </MessageBar>
+        </MessageBarContainer>
+      )}
+    </>
   );
 }

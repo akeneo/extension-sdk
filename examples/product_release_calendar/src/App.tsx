@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { SectionTitle, Helper, Placeholder, UsersIllustration } from 'akeneo-design-system';
+import { SectionTitle, Helper, Placeholder, UsersIllustration, MessageBar } from 'akeneo-design-system';
 import styled from 'styled-components';
 import { ViewMode, FilterState, DisplayMode } from './types';
 import { loadConfig } from './utils/config';
@@ -94,9 +94,18 @@ const AtRiskCount = styled(StatValue)`
   color: #EE5D50;
 `;
 
+const MessageBarContainer = styled.div`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+`;
+
 function App() {
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.PIPELINE);
   const [filters, setFilters] = useState<FilterState>({ family: '' });
+  const [message, setMessage] = useState<{ text: string; level: 'success' | 'error' | 'warning' | 'info' } | null>(null);
 
   // Load configuration from custom_variables
   const config = useMemo(() => loadConfig(), []);
@@ -137,6 +146,10 @@ function App() {
     navigateToProduct(productUuid);
   };
 
+  const showMessage = (text: string, level: 'success' | 'error' | 'warning' | 'info') => {
+    setMessage({ text, level });
+    setTimeout(() => setMessage(null), 5000);
+  };
 
   return (
     <Container>
@@ -227,12 +240,27 @@ function App() {
           config={config}
           onNavigateToProduct={handleNavigateToProduct}
           onRefresh={refetch}
+          onShowMessage={showMessage}
         />
       ) : (
         <TimelineView
           products={products}
           onNavigateToProduct={handleNavigateToProduct}
         />
+      )}
+
+      {/* Global Message Bar - Bottom Right */}
+      {message && (
+        <MessageBarContainer>
+          <MessageBar
+            level={message.level}
+            title={message.level === 'success' ? 'Success' : message.level === 'error' ? 'Error' : 'Warning'}
+            dismissTitle="Close"
+            onClose={() => setMessage(null)}
+          >
+            {message.text}
+          </MessageBar>
+        </MessageBarContainer>
       )}
     </Container>
   );

@@ -7,6 +7,7 @@ interface PipelineViewProps {
   config: ReleaseCalendarConfig;
   onNavigateToProduct: (productUuid: string) => void;
   onRefresh: () => void;
+  onShowMessage: (text: string, level: 'success' | 'error' | 'warning' | 'info') => void;
 }
 
 const Container = styled.div`
@@ -66,7 +67,7 @@ const EmptyState = styled.div`
   font-style: italic;
 `;
 
-export function PipelineView({ products, config, onNavigateToProduct, onRefresh }: PipelineViewProps) {
+export function PipelineView({ products, config, onNavigateToProduct, onRefresh, onShowMessage }: PipelineViewProps) {
   // Group products by stage
   const productsByStage: { [key in ReleaseStage]: ProductWithRelease[] } = {
     [ReleaseStage.CREATION]: [],
@@ -127,6 +128,7 @@ export function PipelineView({ products, config, onNavigateToProduct, onRefresh 
                     config={config}
                     onNavigate={onNavigateToProduct}
                     onRefresh={onRefresh}
+                    onShowMessage={onShowMessage}
                     showLocales={false}
                   />
                 ))

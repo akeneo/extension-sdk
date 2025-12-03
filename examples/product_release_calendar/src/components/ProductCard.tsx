@@ -2,7 +2,7 @@ import { ProductWithRelease, ReleaseStage, ReleaseCalendarConfig } from '../type
 import styled from 'styled-components';
 import { AlertCircle, Calendar, CheckCircle } from 'lucide-react';
 import { findNearestGoLiveDate } from '../utils/stageInference';
-import { validateMasterLocale, validateAllLocales, triggerGoLive } from '../utils/validationActions';
+import { validateMasterLocale, validateAllLocales } from '../utils/validationActions';
 import { useState } from 'react';
 
 interface ProductCardProps {
@@ -10,6 +10,7 @@ interface ProductCardProps {
   onNavigate: (productUuid: string) => void;
   config: ReleaseCalendarConfig;
   onRefresh: () => void;
+  onShowMessage: (text: string, level: 'success' | 'error' | 'warning' | 'info') => void;
   showLocales?: boolean;
 }
 
@@ -113,7 +114,7 @@ const ValidationButton = styled.button`
   }
 `;
 
-export function ProductCard({ product, onNavigate, config, onRefresh, showLocales = true }: ProductCardProps) {
+export function ProductCard({ product, onNavigate, config, onRefresh, onShowMessage, showLocales = true }: ProductCardProps) {
   const [isValidating, setIsValidating] = useState(false);
 
   // Find nearest go-live date (any date, past or future)
@@ -124,10 +125,14 @@ export function ProductCard({ product, onNavigate, config, onRefresh, showLocale
     setIsValidating(true);
     try {
       await validateMasterLocale(product.uuid, config);
+      onShowMessage('Master locale validated successfully!', 'success');
       onRefresh(); // Refresh to update the product stage
     } catch (error) {
       console.error('Failed to validate master locale:', error);
-      alert('Failed to validate. Please try again.');
+      const errorMsg = error instanceof Error && error.message.includes('validation')
+        ? 'Validation attribute not found. Please check your configuration.'
+        : 'Failed to validate. Please try again.';
+      onShowMessage(errorMsg, 'error');
     } finally {
       setIsValidating(false);
     }
@@ -138,10 +143,14 @@ export function ProductCard({ product, onNavigate, config, onRefresh, showLocale
     setIsValidating(true);
     try {
       await validateAllLocales(product.uuid, config);
+      onShowMessage('All locales validated successfully!', 'success');
       onRefresh(); // Refresh to update the product stage
     } catch (error) {
       console.error('Failed to validate all locales:', error);
-      alert('Failed to validate. Please try again.');
+      const errorMsg = error instanceof Error && error.message.includes('validation')
+        ? 'Validation attribute not found. Please check your configuration.'
+        : 'Failed to validate. Please try again.';
+      onShowMessage(errorMsg, 'error');
     } finally {
       setIsValidating(false);
     }
@@ -149,7 +158,10 @@ export function ProductCard({ product, onNavigate, config, onRefresh, showLocale
 
   const handleGoLive = (e: React.MouseEvent) => {
     e.stopPropagation();
-    triggerGoLive(product.identifier);
+    onShowMessage(
+      'Go live mechanism is not yet implemented. Please configure your publishing workflow in the triggerGoLive function.',
+      'warning'
+    );
   };
 
   return (
@@ -168,7 +180,7 @@ export function ProductCard({ product, onNavigate, config, onRefresh, showLocale
       {nearestDate && (
         <DateBadge>
           <Calendar size={12} />
-          {nearestDate.date.toLocaleDateString()} ({nearestDate.locale})
+          {nearestDate.date.toLocaleDateString()}
         </DateBadge>
       )}
 

@@ -91,6 +91,7 @@ export function Filters({ filters, onFiltersChange, families, categories, config
           }}
           emptyResultLabel="No families found"
           openLabel="Open"
+          clearable={false}
         >
           {familyOptions.map((option) => (
             <SelectInput.Option key={option.value} value={option.value} title={option.label}>
@@ -118,40 +119,42 @@ export function Filters({ filters, onFiltersChange, families, categories, config
       </FilterGroup>
 
       {viewMode === ViewMode.TIMELINE && (
-        <FilterGroup>
-          <SelectInput
-            value={filters.stage || ''}
-            onChange={(value: string) => {
-              onFiltersChange({ ...filters, stage: (value as ReleaseStage) || undefined });
-            }}
-            emptyResultLabel="No stages found"
-            openLabel="Open"
-          >
-            {stageOptions.map((option) => (
-              <SelectInput.Option key={option.value} value={option.value} title={option.label}>
-                {option.label}
-              </SelectInput.Option>
-            ))}
-          </SelectInput>
-        </FilterGroup>
-      )}
+        <>
+          <FilterGroup>
+            <SelectInput
+              value={filters.stage || ''}
+              onChange={(value: string) => {
+                onFiltersChange({ ...filters, stage: (value as ReleaseStage) || undefined });
+              }}
+              emptyResultLabel="No stages found"
+              openLabel="Open"
+            >
+              {stageOptions.map((option) => (
+                <SelectInput.Option key={option.value} value={option.value} title={option.label}>
+                  {option.label}
+                </SelectInput.Option>
+              ))}
+            </SelectInput>
+          </FilterGroup>
 
-      <FilterGroup>
-        <SelectInput
-          value={filters.locale || ''}
-          onChange={(value: string) => {
-            onFiltersChange({ ...filters, locale: value || undefined });
-          }}
-          emptyResultLabel="No locales found"
-          openLabel="Open"
-        >
-          {localeOptions.map((option) => (
-            <SelectInput.Option key={option.value} value={option.value} title={option.label}>
-              {option.label}
-            </SelectInput.Option>
-          ))}
-        </SelectInput>
-      </FilterGroup>
+          <FilterGroup>
+            <SelectInput
+              value={filters.locale || ''}
+              onChange={(value: string) => {
+                onFiltersChange({ ...filters, locale: value || undefined });
+              }}
+              emptyResultLabel="No locales found"
+              openLabel="Open"
+            >
+              {localeOptions.map((option) => (
+                <SelectInput.Option key={option.value} value={option.value} title={option.label}>
+                  {option.label}
+                </SelectInput.Option>
+              ))}
+            </SelectInput>
+          </FilterGroup>
+        </>
+      )}
 
       <SearchContainer>
         <SearchIcon>

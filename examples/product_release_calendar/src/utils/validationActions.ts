@@ -8,8 +8,23 @@ export async function validateMasterLocale(
   productUuid: string,
   config: ReleaseCalendarConfig
 ): Promise<void> {
-  if (!globalThis.PIM?.api?.product_uuid_v1) {
+  if (!globalThis.PIM?.api?.product_uuid_v1 || !globalThis.PIM?.api?.family_v1) {
     throw new Error('PIM API not available');
+  }
+
+  // Fetch the product to get its family code
+  const product: any = await globalThis.PIM.api.product_uuid_v1.get({ uuid: productUuid });
+
+  if (!product.family) {
+    throw new Error('Product has no family assigned');
+  }
+
+  // Fetch the family to check if validation attribute exists
+  const family: any = await globalThis.PIM.api.family_v1.get({ code: product.family });
+
+  // Check if the validation attribute exists in the family's attributes
+  if (!family.attributes || !family.attributes.includes(config.validationAttribute)) {
+    throw new Error(`Validation attribute "${config.validationAttribute}" not found in family "${product.family}". Please ensure the attribute exists in the product family and is configured as localizable and scopable.`);
   }
 
   const updatePayload: any = {
@@ -38,8 +53,23 @@ export async function validateAllLocales(
   productUuid: string,
   config: ReleaseCalendarConfig
 ): Promise<void> {
-  if (!globalThis.PIM?.api?.product_uuid_v1) {
+  if (!globalThis.PIM?.api?.product_uuid_v1 || !globalThis.PIM?.api?.family_v1) {
     throw new Error('PIM API not available');
+  }
+
+  // Fetch the product to get its family code
+  const product: any = await globalThis.PIM.api.product_uuid_v1.get({ uuid: productUuid });
+
+  if (!product.family) {
+    throw new Error('Product has no family assigned');
+  }
+
+  // Fetch the family to check if validation attribute exists
+  const family: any = await globalThis.PIM.api.family_v1.get({ code: product.family });
+
+  // Check if the validation attribute exists in the family's attributes
+  if (!family.attributes || !family.attributes.includes(config.validationAttribute)) {
+    throw new Error(`Validation attribute "${config.validationAttribute}" not found in family "${product.family}". Please ensure the attribute exists in the product family and is configured as localizable and scopable.`);
   }
 
   // Create validation entries for all target locales with true value
