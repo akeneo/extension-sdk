@@ -62,8 +62,9 @@ export async function validateAllLocales(
 }
 
 /**
- * Trigger go-live action (currently just shows a message)
+ * Trigger go-live action
+ * Returns a success message to be displayed by the caller
  */
-export function triggerGoLive(productIdentifier: string): void {
-  alert(`Product "${productIdentifier}" is ready to go live!`);
+export function triggerGoLive(productIdentifier: string): string {
+  return `Product "${productIdentifier}" is ready to go live!`;
 }

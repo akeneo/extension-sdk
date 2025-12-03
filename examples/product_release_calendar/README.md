@@ -10,14 +10,15 @@ The Product Release Calendar helps merchandising and product teams track product
 
 ### Core Functionality
 
-- **Multi-Stage Pipeline**: Tracks products through 7 distinct stages with validation workflows:
+- **Multi-Stage Pipeline**: Tracks products through 6 active stages with validation workflows:
   1. **Creation** - Product page created (empty)
   2. **Master Enrichment** - Adding information and visuals in master locale
   3. **Master Validation** - Master content ready for validation (shows validation button)
   4. **Localization** - Working on translations and visuals for other locales
   5. **Global Validation** - All locales ready for validation (shows validate all button)
   6. **Ready to Go Live** - Fully validated and awaiting publication (shows go-live button)
-  7. **Live** - Published on channels (future: automatic based on go-live date)
+
+  **Note**: A 7th stage "Live" is reserved for future implementation (automatic status based on go-live date or external API integration)
 
 - **Dual Display Modes**:
   - **Board Mode** (`displayMode: "board"`): Full-featured view for activity.navigation.tab position
@@ -44,8 +45,14 @@ The Product Release Calendar helps merchandising and product teams track product
 
 - **Interactive Validation Workflow**:
   - **Master Validation**: Click "Validate Master" button to approve master locale content
+    - Sets the validation attribute to `true` for the master locale
+    - Page reloads to reflect the new validation status
   - **Global Validation**: Click "Validate All Locales" button to approve all locale content
-  - **Go Live**: Click "Go Live" button when ready to publish (displays confirmation message)
+    - Sets the validation attribute to `true` for all target locales
+    - Page reloads to reflect the new validation status
+  - **Go Live**: Click "Go Live" button when ready to publish
+    - Displays a success message confirming the product is ready
+    - Can be customized to integrate with publishing workflows or external APIs
   - Validation status is stored in a configurable yes/no attribute (localizable & scopable)
 
 ### User Interface
@@ -185,11 +192,12 @@ For product.panel position (simplified view showing current product):
 ```
 
 **Panel mode features:**
-- Shows current product's stage and status
+- Shows current product's stage and status with color-coded indicators
 - Displays all release dates per locale
-- Shows completeness progress bars per locale
+- Shows completeness progress bars per locale with validation indicators (checkmark icons)
 - Lists missing items to complete stages
-- Displays validation buttons when product is ready
+- Displays validation buttons when product is ready for validation
+- Shows success messages using Akeneo Design System message bars
 - Automatically updates when viewing different products
 
 ### Configuration Parameters
@@ -321,34 +329,37 @@ The extension automatically determines which stage a product is in by analyzing:
 
 ### Stage Determination Logic
 
+The extension automatically determines a product's stage based on completeness, validation status, and go-live dates:
+
 ```
-LIVE (7)
-└─ Reserved for future use (e.g., automatic based on go-live date or API status)
+LIVE (7) - Reserved for Future Implementation
+└─ Not currently active
+└─ Planned: Automatic status based on go-live date or external publishing API
 
 READY TO GO LIVE (6)
 ├─ All locales validated (validation attribute = true)
-└─ Has future go-live date
-└─ Shows "Go Live" button
+├─ Has future go-live date
+└─ Shows "Go Live" button (displays success message)
 
 GLOBAL VALIDATION (5)
 ├─ Master locale validated
 ├─ All target locales completeness >= localization threshold
-└─ Not all target locales validated yet
+├─ Not all target locales validated yet
 └─ Shows "Validate All Locales" button
 
 LOCALIZATION (4)
 ├─ Master locale validated (validation attribute = true for master)
-└─ Target locales completeness < localization threshold
+├─ Target locales completeness < localization threshold
 └─ Working on translations
 
 MASTER VALIDATION (3)
 ├─ Master completeness >= master enrichment threshold
-└─ Master locale not validated yet
+├─ Master locale not validated yet
 └─ Shows "Validate Master" button
 
 MASTER ENRICHMENT (2)
 ├─ Master completeness > 0
-└─ Master completeness < master enrichment threshold
+├─ Master completeness < master enrichment threshold
 └─ Adding content and visuals
 
 CREATION (1)
@@ -410,6 +421,8 @@ npm run build
 
 Outputs optimized bundle to `dist/` directory.
 
+**Note**: Before deploying to production, consider removing debug console.log statements from `src/utils/stageInference.ts`
+
 ### TypeScript
 
 The project includes comprehensive TypeScript types for:
@@ -450,6 +463,19 @@ The extension integrates with Akeneo's navigation system:
 - Maintains context when returning to the calendar
 
 ## Technical Implementation Notes
+
+### User Notifications
+
+The extension uses the Akeneo Design System `Helper` component to display success and error messages instead of browser alerts. This provides a consistent user experience within the PIM interface:
+
+```typescript
+// Success message displayed with green Helper component
+<Helper level="success" inline={false}>
+  Product "SKU123" is ready to go live!
+</Helper>
+```
+
+Messages automatically disappear after 5 seconds. This approach ensures the extension works properly in all PIM contexts.
 
 ### Product Identifier Handling
 
@@ -497,6 +523,8 @@ Ensure your `channel` configuration in custom_variables matches the `scope` valu
 
 ## Customization Ideas
 
+- **Implement actual publishing workflow**: Modify the `triggerGoLive` function in `src/utils/validationActions.ts` to integrate with your publishing system or external API
+- **Add automatic "Live" stage**: Implement the commented-out logic in `src/utils/stageInference.ts` to automatically move products to "Live" stage based on go-live dates or API status
 - Add workflow task integration for approval steps
 - Implement bulk actions (set go-live dates, change stages)
 - Add email notifications for at-risk products

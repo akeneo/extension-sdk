@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ReleaseCalendarConfig, ProductWithRelease, STAGE_CONFIG } from '../types';
 import styled from 'styled-components';
 import { AlertCircle, Calendar, CheckCircle } from 'lucide-react';
-import { Placeholder, UsersIllustration } from 'akeneo-design-system';
+import { Placeholder, UsersIllustration, Helper } from 'akeneo-design-system';
 import { inferProductStage, extractGoLiveDates, extractCompletenessPerLocale, extractValidationPerLocale, isProductAtRisk, getLiveLocales } from '../utils/stageInference';
 import { validateMasterLocale, validateAllLocales, triggerGoLive } from '../utils/validationActions';
 import { ReleaseStage } from '../types';
@@ -186,6 +186,7 @@ export function PanelMode({ config }: PanelModeProps) {
   const [validationStatus, setValidationStatus] = useState<{ [locale: string]: boolean }>({});
   const [loading, setLoading] = useState(true);
   const [isValidating, setIsValidating] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCurrentProduct = async () => {
@@ -210,11 +211,9 @@ export function PanelMode({ config }: PanelModeProps) {
 
         // Fetch the product data
         const productData: any = await globalThis.PIM.api.product_uuid_v1.get({ uuid: productUuid, withCompletenesses: true });
-        console.log(productData);
 
         // Enrich product with release tracking data
         const currentStage = inferProductStage(productData as any, config);
-        console.log(currentStage);
         const goLiveDates = extractGoLiveDates(productData as any, config);
         const completenessPerLocale = extractCompletenessPerLocale(productData as any, config);
         const validationPerLocale = extractValidationPerLocale(productData as any, config);
@@ -238,7 +237,6 @@ export function PanelMode({ config }: PanelModeProps) {
           missingItems: riskInfo.missingItems,
         };
 
-        console.log("enrichedProduct", enrichedProduct)
         setProduct(enrichedProduct);
         setValidationStatus(validationPerLocale);
       } catch (error) {
@@ -283,7 +281,10 @@ export function PanelMode({ config }: PanelModeProps) {
 
   const handleGoLive = () => {
     if (!product) return;
-    triggerGoLive(product.identifier);
+    const message = triggerGoLive(product.identifier);
+    setSuccessMessage(message);
+    // Clear message after 5 seconds
+    setTimeout(() => setSuccessMessage(null), 5000);
   };
 
   if (loading) {
@@ -314,6 +315,15 @@ export function PanelMode({ config }: PanelModeProps) {
 
   return (
     <Container>
+      {/* Success Message */}
+      {successMessage && (
+        <Section>
+          <Helper level="success" inline={false}>
+            {successMessage}
+          </Helper>
+        </Section>
+      )}
+
       {/* Current Stage */}
       <Section>
         <StageCard $color={stageConfig.color}>

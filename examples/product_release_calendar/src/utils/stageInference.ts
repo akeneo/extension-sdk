@@ -63,10 +63,6 @@ export function inferProductStage(
   const isMasterValidated = hasValidationWorkflow ? checkIsValidated(product, config, config.masterLocale) : true;
   const areAllLocalesValidated = hasValidationWorkflow ? checkAreAllLocalesValidated(product, config) : true;
 
-if (product.uuid === "1ddef23e-c254-4084-9dd0-776750c9871e") {
-  console.log(product);
-}
-
   // Stage 7: Live - product has passed go-live date
   // This status should be linked to a mock control variable or an API.
 /*   if (hasPassedGoLiveDate) {
