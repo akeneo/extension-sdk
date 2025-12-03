@@ -138,10 +138,22 @@ const LocaleCompleteness = styled.div`
 `;
 
 const CompletenessItem = styled.div`
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 80px 1fr 80px;
   align-items: center;
+  gap: 12px;
   font-size: 13px;
+`;
+
+const LocaleName = styled.div`
+  font-weight: 500;
+  color: #11324D;
+`;
+
+const CompletenessColumn = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;
 
 const CompletenessBar = styled.div`
@@ -149,8 +161,13 @@ const CompletenessBar = styled.div`
   height: 6px;
   background: #F5F5F5;
   border-radius: 3px;
-  margin: 0 12px;
   overflow: hidden;
+`;
+
+const PercentageText = styled.span`
+  min-width: 35px;
+  text-align: right;
+  color: #67768E;
 `;
 
 const CompletenessProgress = styled.div<{ $percentage: number }>`
@@ -161,24 +178,16 @@ const CompletenessProgress = styled.div<{ $percentage: number }>`
   transition: width 0.3s;
 `;
 
-const ValidationIndicator = styled.span<{ $validated: boolean }>`
-  display: inline-flex;
+const ValidationIndicator = styled.div<{ $validated: boolean }>`
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: ${({ $validated }) => ($validated ? '#67B373' : '#E0E0E0')};
   color: white;
-  font-size: 10px;
-  margin-left: 8px;
-`;
-
-const LocaleWithValidation = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 100px;
+  margin: 0 auto;
 `;
 
 const MessageBarContainer = styled.div`
@@ -345,12 +354,6 @@ export function PanelMode({ config }: PanelModeProps) {
           <StageLabel>{stageConfig.label}</StageLabel>
           <StageDescription>{stageConfig.description}</StageDescription>
         </StageCard>
-        {product.enabled && (
-          <InfoBadge>
-            <CheckCircle size={14} />
-            Product Enabled
-          </InfoBadge>
-        )}
       </Section>
 
       {/* Release Dates */}
@@ -361,11 +364,10 @@ export function PanelMode({ config }: PanelModeProps) {
         </SectionTitle>
         <DateList>
           {Object.entries(product.goLiveDates).map(([locale, dateStr]) => {
-            const isLive = product.liveLocales.includes(locale);
             return (
               <DateItem key={locale}>
                 <LocaleLabel>
-                  {locale} {isLive && '✓'}
+                  {locale}
                 </LocaleLabel>
                 <DateValue>
                   {dateStr ? new Date(dateStr).toLocaleDateString() : 'Not set'}
@@ -382,18 +384,18 @@ export function PanelMode({ config }: PanelModeProps) {
         <LocaleCompleteness>
           {Object.entries(product.completenessPerLocale).map(([locale, percentage]) => (
             <CompletenessItem key={locale}>
-              <LocaleWithValidation>
-                <span>{locale}</span>
-                {config.validationAttribute && (
-                  <ValidationIndicator $validated={validationStatus[locale] || false} title={validationStatus[locale] ? 'Validated' : 'Not validated'}>
-                    {validationStatus[locale] && <CheckCircle size={12} />}
-                  </ValidationIndicator>
-                )}
-              </LocaleWithValidation>
-              <CompletenessBar>
-                <CompletenessProgress $percentage={percentage} />
-              </CompletenessBar>
-              <span>{percentage}%</span>
+              <LocaleName>{locale}</LocaleName>
+              <CompletenessColumn>
+                <CompletenessBar>
+                  <CompletenessProgress $percentage={percentage} />
+                </CompletenessBar>
+                <PercentageText>{percentage}%</PercentageText>
+              </CompletenessColumn>
+              {config.validationAttribute && (
+                <ValidationIndicator $validated={validationStatus[locale] || false} title={validationStatus[locale] ? 'Validated' : 'Not validated'}>
+                  {validationStatus[locale] && <CheckCircle size={14} />}
+                </ValidationIndicator>
+              )}
             </CompletenessItem>
           ))}
         </LocaleCompleteness>
@@ -421,7 +423,6 @@ export function PanelMode({ config }: PanelModeProps) {
       {product.currentStage === ReleaseStage.MASTER_VALIDATION && (
         <Section>
           <ValidationButton onClick={handleValidateMaster} disabled={isValidating}>
-            <CheckCircle size={16} />
             {isValidating ? 'Validating...' : 'Validate Master'}
           </ValidationButton>
         </Section>
@@ -430,7 +431,6 @@ export function PanelMode({ config }: PanelModeProps) {
       {product.currentStage === ReleaseStage.GLOBAL_VALIDATION && (
         <Section>
           <ValidationButton onClick={handleValidateAll} disabled={isValidating}>
-            <CheckCircle size={16} />
             {isValidating ? 'Validating...' : 'Validate All Locales'}
           </ValidationButton>
         </Section>

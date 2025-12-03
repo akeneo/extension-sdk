@@ -24,21 +24,16 @@ const Header = styled.div`
   margin-bottom: 24px;
 `;
 
-const HeaderTop = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+const HelperSection = styled.div`
+  width: 100%;
+  margin-top: 12px;
 `;
 
-const HeaderActions = styled.div`
+const Actions = styled.div`
   display: flex;
   gap: 12px;
   align-items: center;
-`;
-
-const HelperSection = styled.div`
-  width: 100%;
+  margin-left: auto;
 `;
 
 const RefreshButton = styled.button`
@@ -154,18 +149,17 @@ function App() {
   return (
     <Container>
       <Header>
-        <HeaderTop>
-          <SectionTitle>
-            <SectionTitle.Title>Product Release Calendar</SectionTitle.Title>
-          </SectionTitle>
-          <HeaderActions>
+        <SectionTitle>
+          <SectionTitle.Title>Product Release Calendar</SectionTitle.Title>
+          <SectionTitle.Separator />
+          <Actions>
             <ViewSwitcher currentView={viewMode} onViewChange={setViewMode} />
             <RefreshButton onClick={refetch} disabled={loading}>
               <RefreshCw size={16} />
               Refresh
             </RefreshButton>
-          </HeaderActions>
-        </HeaderTop>
+          </Actions>
+        </SectionTitle>
         <HelperSection>
           <Helper level="info" inline={false}>
             Track products through the release pipeline from creation to go-live. Configure
