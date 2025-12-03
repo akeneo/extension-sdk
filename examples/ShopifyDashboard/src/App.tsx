@@ -4,10 +4,9 @@ import {
   ApiIllustration,
   Helper,
   Badge,
-  Button,
-  TextInput
+  Button
 } from "akeneo-design-system";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ShopifyOrder {
   id: number;
@@ -61,9 +60,9 @@ function App() {
   const [isLoadingShopify, setIsLoadingShopify] = useState<boolean>(false);
   const [isLoadingAkeneo, setIsLoadingAkeneo] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [shopifyUrl, setShopifyUrl] = useState<string>('');
-  const [shopifyUrlInput, setShopifyUrlInput] = useState<string>('');
-  const [isUrlSet, setIsUrlSet] = useState<boolean>(false);
+
+  // Get Shopify URL from custom variables
+  const shopifyUrl = (globalThis.PIM.custom_variables.shopify_url as string) || '';
 
   const fetchOrdersAndCalculateTopProducts = async (storeUrl: string) => {
       try {
@@ -279,29 +278,12 @@ function App() {
     return `${currency} ${amount.toFixed(2)}`;
   };
 
-  const handleUrlSubmit = () => {
-    const trimmedUrl = shopifyUrlInput.trim();
-
-    // Basic validation
-    if (!trimmedUrl) {
-      setError('Please enter a Shopify store URL');
-      return;
+  // Auto-load data on mount if shopifyUrl is configured
+  useEffect(() => {
+    if (shopifyUrl) {
+      fetchOrdersAndCalculateTopProducts(shopifyUrl);
     }
-
-    // Remove trailing slash if present
-    const cleanedUrl = trimmedUrl.replace(/\/$/, '');
-
-    // Validate URL format
-    if (!cleanedUrl.match(/^https:\/\/[^\/]+\.myshopify\.com$/)) {
-      setError('Please enter a valid Shopify store URL (e.g., https://your-store.myshopify.com)');
-      return;
-    }
-
-    setShopifyUrl(cleanedUrl);
-    setIsUrlSet(true);
-    setError(null);
-    fetchOrdersAndCalculateTopProducts(cleanedUrl);
-  };
+  }, []);
 
   return (
     <div style={{
@@ -323,64 +305,29 @@ function App() {
         </SectionTitle>
       </div>
 
-      {/* Shopify URL Input */}
-      <div style={{
-        marginBottom: '20px',
-        border: '2px solid #5E4ABA',
-        borderRadius: '4px',
-        padding: '16px',
-        backgroundColor: '#F0EDFC'
-      }}>
-        <div style={{ marginBottom: '12px' }}>
-          <label style={{
-            display: 'block',
-            fontWeight: 600,
-            fontSize: '14px',
-            marginBottom: '8px',
-            color: '#333'
-          }}>
-            Shopify Store URL
-          </label>
-          <div style={{ marginBottom: '12px' }}>
-            <Helper level="info" inline={false}>
-              Enter your Shopify store URL (e.g., https://your-store.myshopify.com)
-            </Helper>
+      {/* Connected Store Info */}
+      {shopifyUrl && (
+        <div style={{
+          marginBottom: '20px',
+          border: '2px solid #5E4ABA',
+          borderRadius: '4px',
+          padding: '16px',
+          backgroundColor: '#F0EDFC'
+        }}>
+          <div style={{ fontSize: '12px', color: '#67768A', marginBottom: '4px' }}>
+            Connected to:
+          </div>
+          <div style={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '14px' }}>
+            {shopifyUrl}
           </div>
         </div>
+      )}
 
-        {!isUrlSet ? (
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-            <div style={{ flex: 1 }}>
-              <TextInput
-                value={shopifyUrlInput}
-                onChange={(value: string) => setShopifyUrlInput(value)}
-                placeholder="https://your-store.myshopify.com"
-              />
-            </div>
-            <Button
-              onClick={handleUrlSubmit}
-              level="primary"
-              disabled={!shopifyUrlInput.trim()}
-            >
-              Load Dashboard
-            </Button>
-          </div>
-        ) : (
-          <div style={{
-            padding: '8px 12px',
-            backgroundColor: '#FFFFFF',
-            borderRadius: '4px',
-            border: '1px solid #E8EBEE'
-          }}>
-            <div style={{ fontSize: '12px', color: '#67768A', marginBottom: '4px' }}>
-              Connected to:
-            </div>
-            <div style={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '14px' }}>
-              {shopifyUrl}
-            </div>
-          </div>
-        )}
-      </div>
+      {!shopifyUrl && (
+        <Helper level="warning" inline={false}>
+          No Shopify store URL configured. Please configure the 'shopify_url' custom variable in your extension configuration.
+        </Helper>
+      )}
 
       {/* Loading, Error, and Data Display States */}
       {isLoadingShopify && topProducts.length === 0 && (
@@ -445,32 +392,14 @@ function App() {
                   <div style={{ display: 'flex', gap: '8px' }}>
                     {/* Shopify link */}
                     {product.shopifyProductId ? (
-                      <a
-                        href={`${shopifyUrl}/admin/products/${product.shopifyProductId}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'inline-block',
-                          padding: '4px 12px',
-                          fontSize: '13px',
-                          fontWeight: 500,
-                          color: '#5E4ABA',
-                          textDecoration: 'none',
-                          border: '1px solid #5E4ABA',
-                          borderRadius: '4px',
-                          backgroundColor: 'transparent',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#F0EDFC';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                        }}
+                      <Button
+                        ghost
+                        level="secondary"
+                        size="small"
+                        onClick={() => globalThis.PIM.navigate.external(`${shopifyUrl}/admin/products/${product.shopifyProductId}`)}
                       >
                         View in Shopify
-                      </a>
+                      </Button>
                     ) : null}
 
                     {/* Akeneo PIM button */}
