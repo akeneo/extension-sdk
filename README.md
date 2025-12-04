@@ -37,20 +37,6 @@ try {
 }
 ```
 
-## Available SDK Positions
-
-When configuring your UI extension, you must specify where it will appear in the PIM interface. The SDK supports the following positions:
-
-- `pim.product.tab`: Adds a new tab in the product edit form
-- `pim.category.tab`: Adds a new tab in the category edit form
-- `pim.product.panel`: Displays in a side panel in the product edit form
-- `pim.sub-product-model.panel`: Displays a side panel in the sub-product model edit form
-- `pim.product-model.panel`: Displays a side panel in the product model edit form
-- `pim.activity.navigation.tab`: Adds a new tab in the activity navigation
-
-The position you choose will determine where and how your extension is presented to users in the PIM interface.
-
-
 ## Further Documentation
 
 For more detailed information about the Akeneo PIM API, please refer to the official [Akeneo API documentation](https://api.akeneo.com/).

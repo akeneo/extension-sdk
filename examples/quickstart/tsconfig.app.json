@@ -18,11 +18,10 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "types": ["./src/global"]
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src",
-    "examples/quickstart/src/global.d.ts"
+    "../common/global.d.ts"
   ]
 }

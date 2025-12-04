@@ -166,3 +166,17 @@ make update
 make update-with-credentials
 ```
 This builds the extension for production and updates it in the PIM, including any credentials defined in your `extension_configuration.json`.
+
+## Understanding SES (Secure ECMAScript)
+
+**Important**: Akeneo PIM uses SES (Secure ECMAScript) to run UI extensions in a secure sandbox environment. SES provides isolation and security by restricting access to potentially dangerous JavaScript features. See [here](https://www.npmjs.com/package/ses/v/1.14.0) and [here](https://github.com/endojs/endo/tree/master/packages/ses#ses) for more information.
+
+### What this means for your extension:
+
+- **Security First**: Your extension script runs in a controlled environment that prevents access to sensitive browser APIs and global objects.
+- **Error Messages**: If you encounter errors mentioning "SES" in the browser console, these are typically related to:
+  - Module loading or import statements that SES cannot resolve
+  - Use of restricted JavaScript features or APIs
+  - Dynamic code evaluation or unsafe patterns
+
+If you encounter SES-related errors, review your build configuration and ensure your code doesn't rely on restricted features or dynamic code execution patterns.
