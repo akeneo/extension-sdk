@@ -119,18 +119,6 @@ const ValidationButton = styled.button`
   }
 `;
 
-const InfoBadge = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  background: #E9F7EB;
-  color: #236334;
-  border-radius: 3px;
-  font-size: 12px;
-  font-weight: 600;
-`;
-
 const LocaleCompleteness = styled.div`
   display: flex;
   flex-direction: column;

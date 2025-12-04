@@ -19,10 +19,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["./src/global"]
   },
-  "include": [
-    "src",
-    "examples/product_release_calendar/src/global.d.ts"
-  ]
+  "include": ["src", "../common/global.d.ts"]
 }
