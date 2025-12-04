@@ -1,0 +1,25 @@
+{
+  "position": "pim.dashboard",
+  "name": "shopify_dashboard",
+  "type": "sdk_script",
+  "file": "dist/shopify_dashboard.js",
+  "configuration": {
+    "default_label": "Shopify Dashboard",
+    "labels": {
+      "en_US": "Shopify Dashboard"
+    }
+  },
+  "custom_variables": {
+    "shopify_url": "https://your-store.myshopify.com"
+  },
+  "credentials": [
+    {
+      "code": "shopify_access_token",
+      "type": "Custom Header",
+      "value": {
+        "header_key": "X-Shopify-Access-Token",
+        "header_value": "your_shopify_access_token_here"
+      }
+    }
+  ]
+}
