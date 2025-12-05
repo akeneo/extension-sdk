@@ -391,8 +391,14 @@ export function isProductAtRisk(
       });
     }
 
-    if (currentStage !== ReleaseStage.GO_LIVE && currentStage !== ReleaseStage.LIVE) {
-      missingItems.push('Validation incomplete');
+    // Add validation status based on current stage
+    if (currentStage === ReleaseStage.CREATION ||
+        currentStage === ReleaseStage.MASTER_ENRICHMENT ||
+        currentStage === ReleaseStage.MASTER_VALIDATION) {
+      missingItems.push('Master validation pending');
+    } else if (currentStage === ReleaseStage.LOCALIZATION ||
+               currentStage === ReleaseStage.GLOBAL_VALIDATION) {
+      missingItems.push('Global validation pending');
     }
   }
 

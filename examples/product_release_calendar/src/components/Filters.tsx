@@ -8,6 +8,7 @@ interface FiltersProps {
   onFiltersChange: (filters: FilterState) => void;
   families: { code: string; label: string }[];
   categories: { code: string; label: string }[];
+  locales: { code: string; enabled: boolean }[];
   config: ReleaseCalendarConfig;
   viewMode: ViewMode;
 }
@@ -48,7 +49,7 @@ const StyledTextInput = styled(TextInput).withConfig({
   }
 `;
 
-export function Filters({ filters, onFiltersChange, families, categories, config, viewMode }: FiltersProps) {
+export function Filters({ filters, onFiltersChange, families, categories, locales, viewMode }: FiltersProps) {
   const stageOptions = [
     { value: '', label: 'All Stages' },
     ...Object.values(ReleaseStage).map((stage) => ({
@@ -72,10 +73,9 @@ export function Filters({ filters, onFiltersChange, families, categories, config
 
   const localeOptions = [
     { value: '', label: 'All Locales' },
-    { value: config.masterLocale, label: config.masterLocale },
-    ...config.targetLocales.map((locale) => ({
-      value: locale,
-      label: locale,
+    ...locales.map((locale) => ({
+      value: locale.code,
+      label: locale.code,
     })),
   ];
 
