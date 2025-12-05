@@ -2,6 +2,7 @@ import {Information, Link, SectionTitle, UsersIllustration} from "akeneo-design-
 import {useGetProduct} from "./useGetProduct.ts";
 
 function App() {
+  const variables = globalThis.PIM.custom_variables;
   const PIMContext = globalThis.PIM.context;
   const PIMUser = globalThis.PIM.user
   const productList = useGetProduct();
@@ -23,6 +24,10 @@ function App() {
       <SectionTitle.Title level="secondary">Available PIM User information within the custom component context</SectionTitle.Title>
     </SectionTitle>
     <pre>{JSON.stringify(PIMUser)}</pre>
+    <SectionTitle>
+      <SectionTitle.Title level="secondary">Available variables within the custom component context</SectionTitle.Title>
+    </SectionTitle>
+    <pre>{JSON.stringify(variables)}</pre>
     <SectionTitle>
       <SectionTitle.Title level="secondary">Example response of products list endpoint</SectionTitle.Title>
     </SectionTitle>
