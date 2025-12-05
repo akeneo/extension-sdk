@@ -1,0 +1,33 @@
+{
+  "name": "SDK Script Example",
+  "description": "Example to demonstrate how to use the Akeneo PIM Extension SDK to fetch and display stock data on a product panel.",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "akeneo-design-system": "^4.0.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "styled-components": "^6.1.13",
+    "axios": "^1.12.2"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.27.1",
+    "@types/node": "^22.7.4",
+    "@types/react": "^17.0.2",
+    "@swc/cli": "^0.7.8",
+    "@swc/core": "^1.13.5",
+    "@types/react-dom": "^17.0.2",
+    "@vitejs/plugin-react": "^4.3.1",
+    "rollup": "4.24.0",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.0.1",
+    "unplugin-swc": "^1.5.7",
+    "vite": "^7.1.5"
+  }
+}

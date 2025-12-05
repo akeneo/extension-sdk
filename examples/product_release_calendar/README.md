@@ -289,8 +289,6 @@ CREATION (1)
 └─ Product exists but is empty (0% completeness)
 ```
 
-
-
 ## Installation
 
 1. **Build the Extension**:
