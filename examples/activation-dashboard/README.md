@@ -1,5 +1,18 @@
-# SDK script example: Quickstart
-This is a quickstart example for building a UI extension.
+# SDK script example: Activation Dashboard
+This is an Activation Dashboard UI extension that displays orders from Akeneo Activation across all your channels.
+
+## Available Features
+
+- **Display all your channels** in Akeneo Activation with a clean, collapsible interface
+- **View orders for each channel** with comprehensive details including:
+  - Order number and status
+  - Purchase date and total amount
+  - Products ordered with SKU, quantities (ordered and shipped), and prices
+  - Buyer information (name and email)
+  - Fulfillment details
+- **Collapsible sections** for easy navigation when dealing with multiple channels and orders
+- **Real-time status indicators** with color-coded badges for order statuses (Shipped, Waiting for Shipment, Canceled, etc.)
+- **Scrollable order lists** to handle large volumes of orders efficiently
 
 ## Prerequisites
 Before you begin, you need an active connection to an Akeneo PIM sandbox.
