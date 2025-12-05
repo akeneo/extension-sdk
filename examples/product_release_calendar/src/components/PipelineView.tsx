@@ -130,7 +130,6 @@ export function PipelineView({ products, config, onNavigateToProduct, onRefresh,
                     onNavigate={onNavigateToProduct}
                     onRefresh={onRefresh}
                     onShowMessage={onShowMessage}
-                    showLocales={false}
                   />
                 ))
               )}

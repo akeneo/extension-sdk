@@ -34,8 +34,9 @@ The Product Release Calendar helps merchandising and product teams track product
     - Automatically syncs with the current product being viewed
 
 - **Multi-Locale Support**: Track completeness and go-live dates per locale
-
-- **Risk Detection**: Automatically identifies products at risk (near go-live date with missing content)
+  - Locales are dynamically fetched from your PIM instance
+  - Shows all enabled locales in filter dropdowns
+  - No need to hardcode locale lists in configuration
 
 - **Smart Stage Inference**: Determines product stage based on:
   - Completeness percentage per locale (master and target locales)
@@ -63,15 +64,17 @@ The Product Release Calendar helps merchandising and product teams track product
 ### User Interface
 
 - **Required family selection**: Products are loaded based on the selected family
-- Filter by category, locale, and search by product identifier
+- Filter by category, locale (dynamically loaded from PIM), and search by product identifier
 - **Stage filter** (timeline view only): Filter products by their current stage
 - Click products to navigate to edit forms
 - Visual indicators for:
   - Current stage (color-coded)
-  - Validation status
+  - Validation status with specific labels:
+    - **Master validation pending**: For products in Creation, Master Enrichment, or Master Validation stages
+    - **Global validation pending**: For products in Localization or Global Validation stages
   - Live locales
-  - At-risk products
   - Completeness per locale
+  - Missing items for validation (displayed as bullet points on product cards)
 
 ### Display Labels
 
@@ -311,7 +314,7 @@ The extension provides several filtering options to help you navigate your produ
 
 3. **Stage (Timeline View Only)**: In timeline view, filter products by their current stage in the release pipeline. This filter is hidden in pipeline view where stages are already visually separated.
 
-4. **Locale (Timeline View Only)**: Filter product dots on the calendar by locale. When a specific locale is selected, only products with go-live dates for that locale are displayed on their respective calendar dates. When "All Locales" is selected, products appear on dates corresponding to any of their configured locale go-live dates. This filter is hidden in pipeline view.
+4. **Locale (Timeline View Only)**: Filter product dots on the calendar by locale. The locale list is dynamically fetched from your PIM instance, showing all enabled locales. When a specific locale is selected, only products with go-live dates for that locale are displayed on their respective calendar dates. When "All Locales" is selected, products appear on dates corresponding to any of their configured locale go-live dates. This filter is hidden in pipeline view.
 
 5. **Search**: Search products by their identifier. This filter appears last in the filter bar for quick access.
 
@@ -319,6 +322,8 @@ The extension provides several filtering options to help you navigate your produ
 
 - Products are fetched from the PIM API based on the selected family (required) and category (optional)
 - The extension fetches up to 100 products per request
+- **Locales are dynamically loaded** from the PIM API (`locale_v1.list`) showing all enabled locales
+- Families and categories are also fetched dynamically from the PIM
 - Completeness data is retrieved for all configured locales and channels
 - Release dates are applied from `custom_variables` configuration based on product family, locale, and channel
 - Use the Refresh button to reload data and see the latest changes from your PIM
@@ -371,12 +376,15 @@ CREATION (1)
 └─ Product exists but is empty (0% completeness)
 ```
 
-## Risk Detection
+## Missing Items Tracking
 
-Products are flagged as "at risk" when they are within 7 days of their go-live date and:
-- Master completeness is below validation threshold
-- Translations incomplete for target locales
-- Not yet validated
+Products display a list of missing items needed for full validation when they are within 7 days of their go-live date:
+- **Master validation pending**: Shown for products that haven't completed master locale validation
+- **Global validation pending**: Shown for products that haven't completed global locale validation
+- **Master completeness (X% / Y%)**: When master locale completeness is below the configured threshold
+- **[locale] translation (X%)**: For each target locale with completeness below the localization threshold
+
+These indicators help teams prioritize work and identify what's blocking product releases, without creating visual "at risk" warnings.
 
 ## Installation
 
@@ -540,6 +548,24 @@ completenesses: [
 
 Ensure your `channel` configuration in custom_variables matches the `scope` values in your PIM.
 
+### Dynamic Locale Loading
+
+The extension automatically fetches available locales from your PIM instance using the Locale API:
+
+```typescript
+// Fetching enabled locales from PIM
+const response = await PIM.api.locale_v1.list({ limit: 100 });
+const locales = response.items.filter(locale => locale.enabled);
+```
+
+**Benefits:**
+- No need to maintain locale lists in configuration
+- Automatically reflects changes when locales are added/removed in PIM
+- Shows only enabled locales in filter dropdowns
+- Eliminates configuration drift between PIM and extension
+
+The locale filter in timeline view displays all enabled locales from your PIM, providing a dynamic and accurate reflection of your catalog's localization setup.
+
 ## Limitations and Considerations
 
 1. **Performance**: Fetches up to 100 products at a time. For larger catalogs, use family and category filters to narrow results.
@@ -561,11 +587,12 @@ Ensure your `channel` configuration in custom_variables matches the `scope` valu
 - **Add automatic "Live" stage**: Implement the commented-out logic in `src/utils/stageInference.ts` to automatically move products to "Live" stage based on go-live dates or API status
 - Add workflow task integration for approval steps
 - Implement bulk actions (set go-live dates, change stages)
-- Add email notifications for at-risk products
+- Add email notifications for products with missing validation items
 - Integrate with external calendars (Google Calendar, Outlook)
 - Add export functionality (CSV, iCal)
 - Create custom stage definitions for your workflow
 - Customize notification messages and durations in the MessageBar implementation
+- Add custom locale-specific workflows or validations
 
 ## Troubleshooting
 

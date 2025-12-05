@@ -11,7 +11,6 @@ interface ProductCardProps {
   config: ReleaseCalendarConfig;
   onRefresh: () => void;
   onShowMessage: (text: string, level: 'success' | 'error' | 'warning' | 'info') => void;
-  showLocales?: boolean;
 }
 
 const Card = styled.div`
@@ -113,7 +112,7 @@ const ValidationButton = styled.button`
   }
 `;
 
-export function ProductCard({ product, onNavigate, config, onRefresh, onShowMessage, showLocales = true }: ProductCardProps) {
+export function ProductCard({ product, onNavigate, config, onRefresh, onShowMessage }: ProductCardProps) {
   const [isValidating, setIsValidating] = useState(false);
 
   // Find nearest go-live date (any date, past or future)
@@ -191,19 +190,17 @@ export function ProductCard({ product, onNavigate, config, onRefresh, onShowMess
         </>
       )}
 
-      {showLocales && (
-        <LocaleInfo>
-          {Object.entries(product.completenessPerLocale).map(([locale, completeness]) => {
-            const isLive = product.liveLocales.includes(locale);
-            return (
-              <LocaleBadge key={locale} $isLive={isLive} title={`${completeness}% complete`}>
-                {locale}
-                {isLive && ' ✓'}
-              </LocaleBadge>
-            );
-          })}
-        </LocaleInfo>
-      )}
+      <LocaleInfo>
+        {Object.entries(product.completenessPerLocale).map(([locale, completeness]) => {
+          const isLive = product.liveLocales.includes(locale);
+          return (
+            <LocaleBadge key={locale} $isLive={isLive} title={`${completeness}% complete`}>
+              {locale}
+              {isLive && ' ✓'}
+            </LocaleBadge>
+          );
+        })}
+      </LocaleInfo>
 
       {/* Validation buttons based on current stage */}
       {product.currentStage === ReleaseStage.MASTER_VALIDATION && (
