@@ -49,8 +49,8 @@ const useGetChannels = () => {
     const [productSku, setProductSku] = useState<string | null>(null);
 
     const fetchOrders = useCallback(async (channelId: string, currentProductSku: string | null) => {
-        const pimConnectionId = '694fe2268d91816f1012a1f97bef3988f86a6808fbfc0c06b93a58aae1d52cf8';
-        const accessToken = '0841ec7a87d04ab4b21d26f52718a14572ee4b8f6db221751db7cb0bc44a40d953661afc1541ecf43d7222ede4952a7690cd4510ff75037d5d99cebb292eadb0';
+        // Get pim_connection_id from custom variables
+        const pimConnectionId = globalThis.PIM.custom_variables.pim_connection_id as string;
 
         // Update channel state to show loading
         setChannels(prevChannels =>
@@ -63,9 +63,9 @@ const useGetChannels = () => {
             const response = await globalThis.PIM.api.external.call({
                 method: 'GET',
                 url: `https://api.retail.app.akeneo.cloud/v1/channel-connections/${channelId}/orders`,
+                credentials_code: 'activation_access_token',
                 headers: {
                     'pim_connection_id': pimConnectionId,
-                    'access_token': accessToken,
                     'Content-Type': 'application/json',
                 },
             });
@@ -221,15 +221,15 @@ const useGetChannels = () => {
     const fetchChannels = useCallback(async () => {
         try {
             setLoading(true);
-            const pimConnectionId = '694fe2268d91816f1012a1f97bef3988f86a6808fbfc0c06b93a58aae1d52cf8';
-            const accessToken = '0841ec7a87d04ab4b21d26f52718a14572ee4b8f6db221751db7cb0bc44a40d953661afc1541ecf43d7222ede4952a7690cd4510ff75037d5d99cebb292eadb0';
+            // Get pim_connection_id from custom variables
+            const pimConnectionId = globalThis.PIM.custom_variables.pim_connection_id as string;
 
             const response = await globalThis.PIM.api.external.call({
                 method: 'GET',
                 url: 'https://api.retail.app.akeneo.cloud/v1/channel-connections',
+                credentials_code: 'activation_access_token',
                 headers: {
                     'pim_connection_id': pimConnectionId,
-                    'access_token': accessToken,
                     'Content-Type': 'application/json',
                 },
             });
