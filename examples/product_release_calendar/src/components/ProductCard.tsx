@@ -11,12 +11,11 @@ interface ProductCardProps {
   config: ReleaseCalendarConfig;
   onRefresh: () => void;
   onShowMessage: (text: string, level: 'success' | 'error' | 'warning' | 'info') => void;
-  showLocales?: boolean;
 }
 
-const Card = styled.div<{ $isAtRisk?: boolean }>`
+const Card = styled.div`
   background: white;
-  border: 1px solid ${({ $isAtRisk }) => ($isAtRisk ? '#EE5D50' : '#DDDDDD')};
+  border: 1px solid #DDDDDD;
   border-radius: 4px;
   padding: 12px;
   margin-bottom: 8px;
@@ -51,19 +50,10 @@ const Identifier = styled.div`
   min-width: 0;
 `;
 
-const RiskIndicator = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #EE5D50;
-  font-size: 12px;
-  margin-top: 4px;
-`;
-
 const MissingItem = styled.div`
   font-size: 11px;
   color: #67768E;
-  padding-left: 20px;
+  margin-top: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -122,7 +112,7 @@ const ValidationButton = styled.button`
   }
 `;
 
-export function ProductCard({ product, onNavigate, config, onRefresh, onShowMessage, showLocales = true }: ProductCardProps) {
+export function ProductCard({ product, onNavigate, config, onRefresh, onShowMessage }: ProductCardProps) {
   const [isValidating, setIsValidating] = useState(false);
 
   // Find nearest go-live date (any date, past or future)
@@ -173,7 +163,7 @@ export function ProductCard({ product, onNavigate, config, onRefresh, onShowMess
   };
 
   return (
-    <Card $isAtRisk={product.isAtRisk} onClick={() => onNavigate(product.uuid)}>
+    <Card onClick={() => onNavigate(product.uuid)}>
       <Header>
         <Identifier title={`ID: ${product.identifier}`}>{product.displayLabel}</Identifier>
         <span title={product.enabled ? "Product is enabled" : "Product is disabled"}>
@@ -192,31 +182,25 @@ export function ProductCard({ product, onNavigate, config, onRefresh, onShowMess
         </DateBadge>
       )}
 
-      {product.isAtRisk && (
+      {product.missingItems.length > 0 && (
         <>
-          <RiskIndicator>
-            <AlertCircle size={14} />
-            At Risk
-          </RiskIndicator>
           {product.missingItems.map((item, idx) => (
             <MissingItem key={idx}>• {item}</MissingItem>
           ))}
         </>
       )}
 
-      {showLocales && (
-        <LocaleInfo>
-          {Object.entries(product.completenessPerLocale).map(([locale, completeness]) => {
-            const isLive = product.liveLocales.includes(locale);
-            return (
-              <LocaleBadge key={locale} $isLive={isLive} title={`${completeness}% complete`}>
-                {locale}
-                {isLive && ' ✓'}
-              </LocaleBadge>
-            );
-          })}
-        </LocaleInfo>
-      )}
+      <LocaleInfo>
+        {Object.entries(product.completenessPerLocale).map(([locale, completeness]) => {
+          const isLive = product.liveLocales.includes(locale);
+          return (
+            <LocaleBadge key={locale} $isLive={isLive} title={`${completeness}% complete`}>
+              {locale}
+              {isLive && ' ✓'}
+            </LocaleBadge>
+          );
+        })}
+      </LocaleInfo>
 
       {/* Validation buttons based on current stage */}
       {product.currentStage === ReleaseStage.MASTER_VALIDATION && (

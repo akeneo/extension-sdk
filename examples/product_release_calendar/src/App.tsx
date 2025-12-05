@@ -7,6 +7,7 @@ import { navigateToProduct } from './utils/navigation';
 import { useReleaseProducts } from './hooks/useReleaseProducts';
 import { useFamilies } from './hooks/useFamilies';
 import { useCategories } from './hooks/useCategories';
+import { useLocales } from './hooks/useLocales';
 import { ViewSwitcher } from './components/ViewSwitcher';
 import { Filters } from './components/Filters';
 import { PipelineView } from './components/PipelineView';
@@ -85,10 +86,6 @@ const StatLabel = styled.div`
   margin-top: 4px;
 `;
 
-const AtRiskCount = styled(StatValue)`
-  color: #EE5D50;
-`;
-
 const MessageBarContainer = styled.div`
   position: fixed;
   bottom: 20px;
@@ -110,9 +107,10 @@ function App() {
     return <PanelMode config={config} />;
   }
 
-  // Fetch families and categories for filtering
+  // Fetch families, categories and locales for filtering
   const { families } = useFamilies();
   const { categories } = useCategories();
+  const { locales } = useLocales();
 
   // Set initial family when families are loaded
   useEffect(() => {
@@ -192,10 +190,6 @@ function App() {
           <StatValue>{stats.live}</StatValue>
           <StatLabel>Live</StatLabel>
         </StatItem>
-        <StatItem>
-          <AtRiskCount>{stats.atRisk}</AtRiskCount>
-          <StatLabel>At Risk</StatLabel>
-        </StatItem>
       </Stats>
 
       <Filters
@@ -203,6 +197,7 @@ function App() {
         onFiltersChange={setFilters}
         families={families}
         categories={categories}
+        locales={locales}
         config={config}
         viewMode={viewMode}
       />

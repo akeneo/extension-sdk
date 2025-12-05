@@ -354,7 +354,6 @@ export function TimelineView({ products, onNavigateToProduct, selectedLocale }: 
               {stageConfig.label}
             </LegendItem>
           ))}
-          <LegendItem $color="#EE5D50">At Risk</LegendItem>
         </Legend>
       </Controls>
 
@@ -406,14 +405,11 @@ export function TimelineView({ products, onNavigateToProduct, selectedLocale }: 
                       </DayNumber>
                       {day.products.slice(0, 3).map((product) => {
                         const stageConfig = STAGE_CONFIG[product.currentStage];
-                        const color = product.isAtRisk
-                          ? '#EE5D50'
-                          : stageConfig.color;
 
                         return (
                           <ProductDot
                             key={product.uuid}
-                            $color={color}
+                            $color={stageConfig.color}
                             title={`${product.displayLabel} (ID: ${product.identifier}) - ${stageConfig.label}`}
                             onClick={(e) => {
                               e.stopPropagation();

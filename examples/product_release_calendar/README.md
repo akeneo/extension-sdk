@@ -34,56 +34,9 @@ The Product Release Calendar helps merchandising and product teams track product
     - Automatically syncs with the current product being viewed
 
 - **Multi-Locale Support**: Track completeness and go-live dates per locale
-
-- **Risk Detection**: Automatically identifies products at risk (near go-live date with missing content)
-
-- **Smart Stage Inference**: Determines product stage based on:
-  - Completeness percentage per locale (master and target locales)
-  - Validation status (tracked via a yes/no attribute)
-  - Localization completeness across all target locales
-  - Go-live dates configuration
-
-- **Interactive Validation Workflow**:
-  - **Master Validation**: Click "Validate Master" button to approve master locale content
-    - Verifies the validation attribute exists in the product family
-    - Sets the validation attribute to `true` for the master locale
-    - Shows success message in bottom-right notification
-    - Page reloads to reflect the new validation status
-  - **Global Validation**: Click "Validate All Locales" button to approve all locale content
-    - Verifies the validation attribute exists in the product family
-    - Sets the validation attribute to `true` for all target locales
-    - Shows success message in bottom-right notification
-    - Page reloads to reflect the new validation status
-  - **Go Live**: Click "Go Live" button when ready to publish
-    - Displays a warning message that the go-live mechanism is not yet implemented
-    - Can be customized in `src/utils/validationActions.ts` to integrate with publishing workflows or external APIs
-  - Validation status is stored in a configurable yes/no attribute (localizable & scopable)
-  - All notifications appear as message bars in the bottom-right corner using Akeneo Design System
-
-### User Interface
-
-- **Required family selection**: Products are loaded based on the selected family
-- Filter by category, locale, and search by product identifier
-- **Stage filter** (timeline view only): Filter products by their current stage
-- Click products to navigate to edit forms
-- Visual indicators for:
-  - Current stage (color-coded)
-  - Validation status
-  - Live locales
-  - At-risk products
-  - Completeness per locale
-
-### Display Labels
-
-By default, products are displayed using their identifier (SKU). You can configure a custom attribute to use as the display label on product cards and calendar dots:
-
-- Configure `displayLabelAttribute` in custom_variables (e.g., `"name"`, `"title"`, `"label"`)
-- The extension will extract the value from the specified attribute
-- For localizable attributes, the master locale value is prioritized
-- If the attribute is not found or empty, the product identifier is used as fallback
-- The product identifier is still accessible in tooltips for reference
-
-This allows for more user-friendly labels while maintaining technical identifiers for tracking.
+  - Locales are dynamically fetched from your PIM instance
+  - Shows all enabled locales in filter dropdowns
+  - No need to hardcode locale lists in configuration
 
 ## Configuration
 
@@ -268,17 +221,6 @@ For a product in the "cameras" family, "digital" category, for locale "en_US":
 
 ## PIM Setup Requirements
 
-### Product Families
-
-The extension requires at least one product family to be configured in your PIM. Products must be assigned to families for the extension to display them.
-
-### Categories (Optional)
-
-If you want to use category filtering:
-- Set up product categories in your PIM
-- Assign products to categories
-- The extension will automatically fetch and display available categories in the filter dropdown
-
 ### Required Attributes
 
 1. **Validation Attribute** (Required for workflow)
@@ -289,36 +231,12 @@ If you want to use category filtering:
    - Purpose: Tracks validation approval for each locale/channel
    - Configure in `validationAttribute` in custom_variables
 
-### Release Dates
-
-Release dates are are configured in `custom_variables` and applied to products based on their family, locale, and channel. This allows you to:
-
-- Define release schedules centrally without modifying products
-- Update release dates globally by changing configuration
-- Apply different release dates to different product families
-- Coordinate multi-locale releases from a single configuration
-- Avoid creating and maintaining date attributes per product
-
-## Filtering and Data Loading
-
-### Filter Behavior
-
-The extension provides several filtering options to help you navigate your product catalog:
-
-1. **Family (Required)**: Products are only loaded when a family is selected. The first family is automatically selected when the extension loads. This filter cannot be cleared as a family selection is required for the calendar to function.
-
-2. **Category (Optional)**: Filter products by category within the selected family. Shows all categories available in your PIM.
-
-3. **Stage (Timeline View Only)**: In timeline view, filter products by their current stage in the release pipeline. This filter is hidden in pipeline view where stages are already visually separated.
-
-4. **Locale (Timeline View Only)**: Filter product dots on the calendar by locale. When a specific locale is selected, only products with go-live dates for that locale are displayed on their respective calendar dates. When "All Locales" is selected, products appear on dates corresponding to any of their configured locale go-live dates. This filter is hidden in pipeline view.
-
-5. **Search**: Search products by their identifier. This filter appears last in the filter bar for quick access.
-
-### Data Loading
+## Data Loading
 
 - Products are fetched from the PIM API based on the selected family (required) and category (optional)
 - The extension fetches up to 100 products per request
+- **Locales are dynamically loaded** from the PIM API (`locale_v1.list`) showing all enabled locales
+- Families and categories are also fetched dynamically from the PIM
 - Completeness data is retrieved for all configured locales and channels
 - Release dates are applied from `custom_variables` configuration based on product family, locale, and channel
 - Use the Refresh button to reload data and see the latest changes from your PIM
@@ -370,13 +288,6 @@ MASTER ENRICHMENT (2)
 CREATION (1)
 └─ Product exists but is empty (0% completeness)
 ```
-
-## Risk Detection
-
-Products are flagged as "at risk" when they are within 7 days of their go-live date and:
-- Master completeness is below validation threshold
-- Translations incomplete for target locales
-- Not yet validated
 
 ## Installation
 
@@ -435,138 +346,6 @@ The project includes comprehensive TypeScript types for:
 - Stage definitions
 - Filter states
 
-## Use Cases
-
-### E-commerce Product Launch
-
-Track new product introductions across multiple markets:
-- Ensure all content is enriched before launch
-- Coordinate translations across regions
-- Manage staged rollouts per locale
-- Monitor products approaching launch dates
-
-### Seasonal Collections
-
-Manage seasonal product releases:
-- Plan launches around key dates (holidays, seasons)
-- Track progress for entire collections
-- Identify bottlenecks in the pipeline
-
-### Multi-Brand Catalog Management
-
-For organizations managing multiple brands:
-- Configure different locales per brand
-- Track validation workflows
-- Coordinate global launches
-
-## Navigation Integration
-
-The extension integrates with Akeneo's navigation system:
-- Click any product card to navigate to its edit form
-- Uses `PIM.navigate` API for seamless navigation
-- Maintains context when returning to the calendar
-
-## Technical Implementation Notes
-
-### User Notifications
-
-The extension uses the Akeneo Design System `MessageBar` component to display success, error, and warning messages. All notifications appear in a fixed position at the bottom-right corner of the screen:
-
-```typescript
-// Success message displayed with green MessageBar
-<MessageBar
-  level="success"
-  title="Success"
-  dismissTitle="Close"
-  onClose={() => setMessage(null)}
->
-  Master locale validated successfully!
-</MessageBar>
-```
-
-**Message Types:**
-- **Success** (green): Validation completed successfully
-- **Error** (red): Validation attribute not found or validation failed
-- **Warning** (yellow): Go-live mechanism not implemented
-
-Messages automatically disappear after 5 seconds and can be manually dismissed. The fixed positioning ensures notifications don't interfere with the product cards or calendar view.
-
-### Validation Attribute Checking
-
-Before validating a product, the extension verifies that the validation attribute exists in the product's family definition:
-
-```typescript
-// Fetch the product and its family
-const product = await PIM.api.product_uuid_v1.get({ uuid: productUuid });
-const family = await PIM.api.family_v1.get({ code: product.family });
-
-// Check if validation attribute exists in family
-if (!family.attributes || !family.attributes.includes(config.validationAttribute)) {
-  throw new Error(`Validation attribute "${config.validationAttribute}" not found in family`);
-}
-```
-
-This provides accurate validation of PIM configuration and displays helpful error messages when the attribute is not properly configured.
-
-### Product Identifier Handling
-
-The extension includes a workaround for cases where the `identifier` field may be empty. It automatically searches the product's `values` object for attributes with type `pim_catalog_identifier` to retrieve the correct identifier:
-
-```typescript
-// Fallback mechanism for empty identifier field
-if (!product.identifier || product.identifier.trim().length === 0) {
-  // Search product.values for pim_catalog_identifier attribute type
-  for (const attributeValue of Object.values(product.values)) {
-    if (attributeValue.attribute_type === 'pim_catalog_identifier') {
-      return attributeValue.data;
-    }
-  }
-}
-```
-
-### Completeness API Structure
-
-The extension works with Akeneo's completeness API which returns data in the following structure:
-
-```typescript
-completenesses: [
-  {
-    locale: "en_US",
-    scope: "ecommerce",  // Channel/scope
-    data: 85              // Completeness percentage (0-100)
-  }
-]
-```
-
-Ensure your `channel` configuration in custom_variables matches the `scope` values in your PIM.
-
-## Limitations and Considerations
-
-1. **Performance**: Fetches up to 100 products at a time. For larger catalogs, use family and category filters to narrow results.
-
-2. **Family Selection Required**: Products are only loaded when a family is selected. The extension automatically selects the first available family on load.
-
-3. **Release Date Configuration**: Release dates are configured in `custom_variables`, not stored as product attributes. This allows centralized schedule management but requires configuration updates to change dates.
-
-4. **Completeness Calculation**: Relies on Akeneo's completeness API. Ensure completeness is correctly configured in your PIM for the specified channel/scope.
-
-5. **Real-time Updates**: Data is fetched on load and when filters change. Use the refresh button for latest data.
-
-## Customization Ideas
-
-- **Implement actual publishing workflow**: The "Go Live" button currently displays a warning message. Modify the `triggerGoLive` function in `src/utils/validationActions.ts` to:
-  - Integrate with your publishing system or external API
-  - Update product status or push to channels
-  - Trigger external workflows or notifications
-- **Add automatic "Live" stage**: Implement the commented-out logic in `src/utils/stageInference.ts` to automatically move products to "Live" stage based on go-live dates or API status
-- Add workflow task integration for approval steps
-- Implement bulk actions (set go-live dates, change stages)
-- Add email notifications for at-risk products
-- Integrate with external calendars (Google Calendar, Outlook)
-- Add export functionality (CSV, iCal)
-- Create custom stage definitions for your workflow
-- Customize notification messages and durations in the MessageBar implementation
-
 ## Troubleshooting
 
 ### No Products Showing
@@ -591,16 +370,3 @@ The extension includes a fallback mechanism for empty identifiers. If you see pr
 - Check that the `pim_catalog_identifier` attribute type exists in product values
 - Verify products have identifier values set in the PIM
 - Check browser console for warnings about identifier extraction
-
-### Stage Filter Not Visible
-
-The stage filter only appears in **Timeline View**. If you don't see it:
-- Switch to Timeline View using the view switcher in the header
-- In Pipeline View, products are already organized by stage in columns
-
-### Navigation Not Working
-
-- Verify `PIM.navigate` API is available in your PIM version
-- Check that product UUIDs are valid
-- Ensure user has permission to edit products
-- Check browser console for navigation errors
