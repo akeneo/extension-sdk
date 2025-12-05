@@ -1,0 +1,13 @@
+{
+  "position": "pim.activity.navigation.tab",
+  "name": "sdk_script_extension_activation_panel",
+  "type": "sdk_script",
+  "file": "dist/activation-panel.js",
+  "configuration": {
+    "default_label": "Activation Panel",
+    "labels": {
+      "en_US": "Activation Panel"
+    }
+  },
+  "credentials": []
+}

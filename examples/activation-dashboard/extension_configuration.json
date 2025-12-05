@@ -1,0 +1,13 @@
+{
+  "position": "pim.activity.navigation.tab",
+  "name": "sdk_script_extension_activation_dashboard",
+  "type": "sdk_script",
+  "file": "dist/activation-dashboard.js",
+  "configuration": {
+    "default_label": "Activation Dashboard",
+    "labels": {
+      "en_US": "Activation Dashboard"
+    }
+  },
+  "credentials": []
+}
