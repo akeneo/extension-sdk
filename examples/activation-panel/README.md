@@ -1,5 +1,18 @@
-# SDK script example: Quickstart
-This is a quickstart example for building a UI extension.
+# SDK script example: Activation Panel
+This is an Activation Panel UI extension that displays order details for a specific product across all your Akeneo Activation channels.
+
+## Available Features
+
+- **Product-specific order tracking** - Automatically filters orders containing the current product being viewed
+- **Display orders across all channels** with details including:
+  - Order number and status
+  - Purchase date and total amount
+  - All items in the order (not just the current product)
+  - Buyer information (name and email)
+  - Fulfillment details
+- **Collapsible interface** for easy navigation when viewing multiple channels and orders
+- **Real-time status indicators** with color-coded badges for order statuses
+- **Context-aware filtering** - Shows only orders that include the product you're currently viewing in the PIM
 
 ## Prerequisites
 Before you begin, you need an active connection to an Akeneo PIM sandbox.

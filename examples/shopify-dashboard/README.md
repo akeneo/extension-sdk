@@ -1,5 +1,18 @@
-# SDK script example: Stock data on panel
-This is an example of a UI extension that displays stock data on a product panel in Akeneo PIM.
+# SDK script example: Shopify Dashboard
+This is a Shopify Dashboard UI extension that displays product performance analytics from your Shopify store directly in Akeneo PIM.
+
+## Available Features
+
+- **Product performance analytics** - View comprehensive sales data for all products in your Shopify store
+- **Display sales metrics** for each product including:
+  - SKU and product name
+  - Total quantity sold across all orders
+  - Total number of orders containing the product
+  - Total revenue generated
+  - Average quantity per order
+- **Real-time data sync** - Fetches live order data from your Shopify store via API
+- **Clean tabular view** - Organized display of product metrics in an easy-to-read table
+- **Secure credential management** - Uses Akeneo's credential system to safely store your Shopify access token
 
 ## Prerequisites
 Before you begin, you need an active connection to an Akeneo PIM sandbox.

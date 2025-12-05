@@ -1,5 +1,23 @@
-# SDK script example: Quickstart
-This is a quickstart example for building a UI extension.
+# SDK script example: Shopify Panel
+This is a Shopify Panel UI extension that displays Shopify product information and related orders for the product you're currently viewing in Akeneo PIM.
+
+## Available Features
+
+- **Product synchronization status** - See if the current PIM product exists in your Shopify store
+- **Shopify product details** - View product information from Shopify including:
+  - Product title and status
+  - Shopify product ID
+  - Creation and update timestamps
+  - Product variants with SKUs
+- **Related orders display** - See all Shopify orders containing the current product with:
+  - Order number and creation date
+  - Total price and currency
+  - Financial and fulfillment status
+  - Customer information
+  - Line items with quantities and prices
+- **Context-aware filtering** - Automatically shows orders for the product being viewed in the PIM
+- **Status indicators** - Color-coded badges for financial and fulfillment statuses
+- **Real-time data sync** - Fetches live data from your Shopify store via API
 
 ## Prerequisites
 Before you begin, you need an active connection to an Akeneo PIM sandbox.
