@@ -1219,6 +1219,7 @@ export declare type EXTENSION_VARIABLES = Record<string | number, string | numbe
 
 declare type externalGateway = {
     call: (requestParameters?: externalGatewayRequest) => Promise<any>;
+    longCall: (requestParameters?: externalGatewayRequest) => Promise<any>;
 };
 
 declare interface externalGatewayRequest {
@@ -1646,14 +1647,26 @@ export declare type PIM_CONTEXT = {
         uuid: string;
         identifier: string | null;
     };
+    user?: {
+        catalog_locale: string;
+        catalog_scope: string;
+    };
 } | {
     category: {
         code: string;
+    };
+    user?: {
+        catalog_locale: string;
+        catalog_scope: string;
     };
 } | {
     productGrid: {
         productUuids: string[];
         productModelCodes: string[];
+    };
+    user?: {
+        catalog_locale: string;
+        catalog_scope: string;
     };
 };
 
