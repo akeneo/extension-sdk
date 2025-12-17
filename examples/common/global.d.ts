@@ -489,9 +489,19 @@ declare interface Attribute {
      */
     scopable?: boolean;
     /**
+     * To make the attribute locale specific, specify here for which locales it is specific
+     */
+    availableLocales?: string[];
+    /**
      * Sort order of the attribute
      */
     sortOrder?: number;
+    /**
+     * Attribute group labels
+     */
+    groupLabels?: {
+        [locale: string]: string;
+    };
     /**
      * Default value for this attribute
      */
@@ -517,9 +527,17 @@ declare interface Attribute {
      */
     validationRegexp?: string | null;
     /**
+     * Whether the WYSIWYG interface is shown when the attribute type is `textarea`
+     */
+    wysiwygEnabled?: boolean | null;
+    /**
      * Whether decimal values are allowed for this attribute when type is `number`
      */
     decimalsAllowed?: boolean;
+    /**
+     * Whether negative values are allowed when the attribute type is `number` or `metric`
+     */
+    negativeAllowed?: boolean | null;
     /**
      * Minimum value allowed for the attribute when type is `number`
      */
@@ -553,9 +571,39 @@ declare interface Attribute {
      */
     dateMax?: string | null;
     /**
-     * Whether the attribute is read-only
+     * Reference entity code when the attribute type is `akeneo_reference_entity` or `akeneo_reference_entity_collection`
+     * OR Asset family code when the attribute type is `pim_catalog_asset_collection`
      */
-    isReadOnly?: boolean;
+    referenceDataName?: string | null;
+    /**
+     * Configuration of the Table attribute (columns)
+     */
+    tableConfiguration?: any[];
+    /**
+     * Is this attribute main identifier when attribute type is `pim_catalog_identifier`
+     */
+    isMainIdentifier?: boolean;
+    /**
+     * This attribute must be enriched from the moment a product is created. It will be mandatory across all families.
+     */
+    isMandatory?: boolean;
+    /**
+     * Defines the decimal places strategy. Available options are `round`, `forbid` and `trim`.
+     */
+    decimalPlacesStrategy?: string | null;
+    /**
+     * Defines the number of decimal places when decimal places strategy is `round` or `forbid`.
+     */
+    decimalPlaces?: number | null;
+    /**
+     * Whether new attribute options can be created automatically during product or product model import (CSV, XLSX),
+     * when the attribute type is `pim_catalog_simpleselect` or `pim_catalog_multiselect`
+     */
+    enableOptionCreationDuringImport?: boolean | null;
+    /**
+     * Maximum number of items allowed in an asset collection when the attribute type is `pim_catalog_asset_collection`
+     */
+    maxItemsCount?: number | null;
     /**
      * API links for the attribute
      */
@@ -935,6 +983,14 @@ declare interface AttributePatchParams {
      */
     data: AttributePatchData;
 }
+
+declare type BaseContext = {
+    position: string;
+    user: {
+        catalog_locale: string;
+        catalog_scope: string;
+    };
+};
 
 /**
  * Simplified category for the SDK
@@ -1642,33 +1698,25 @@ declare interface PendingAttributeValue {
     comment?: string;
 }
 
-export declare type PIM_CONTEXT = {
-    product: {
+export declare type PIM_CONTEXT = BaseContext & ({
+    product?: {
         uuid: string;
         identifier: string | null;
     };
-    user?: {
-        catalog_locale: string;
-        catalog_scope: string;
-    };
 } | {
-    category: {
+    productModel?: {
         code: string;
     };
-    user?: {
-        catalog_locale: string;
-        catalog_scope: string;
+} | {
+    category?: {
+        code: string;
     };
 } | {
-    productGrid: {
+    productGrid?: {
         productUuids: string[];
         productModelCodes: string[];
     };
-    user?: {
-        catalog_locale: string;
-        catalog_scope: string;
-    };
-};
+});
 
 export declare type PIM_SDK = {
     user: PIM_USER;
