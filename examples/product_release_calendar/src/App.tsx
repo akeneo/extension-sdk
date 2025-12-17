@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { SectionTitle, Helper, Placeholder, UsersIllustration, MessageBar } from 'akeneo-design-system';
 import styled from 'styled-components';
 import { ViewMode, FilterState, DisplayMode } from './types';
-import { loadConfig } from './utils/config';
+import { loadConfig, getDisplayMode } from './utils/config';
 import { navigateToProduct } from './utils/navigation';
 import { useReleaseProducts } from './hooks/useReleaseProducts';
 import { useFamilies } from './hooks/useFamilies';
@@ -102,8 +102,11 @@ function App() {
   // Load configuration from custom_variables
   const config = useMemo(() => loadConfig(), []);
 
+  // Determine display mode based on extension position
+  const displayMode = useMemo(() => getDisplayMode(), []);
+
   // If in panel mode, render simplified view for single product
-  if (config.displayMode === DisplayMode.PANEL) {
+  if (displayMode === DisplayMode.PANEL) {
     return <PanelMode config={config} />;
   }
 

@@ -196,26 +196,34 @@ export function PanelMode({ config }: PanelModeProps) {
   useEffect(() => {
     const fetchCurrentProduct = async () => {
       try {
-        // Get current product from PIM context
+        // Get current product/product model from PIM context
         const context = globalThis.PIM?.context;
 
-        // Type guard to check if context has product
-        if (!context || !('product' in context)) {
-          console.error('No product context found - extension may not be in product panel position');
+        // Check if context has product or productModel
+        let productData: any;
+        if (context && 'product' in context && context.product) {
+          // Regular product
+          const productUuid = context.product.uuid;
+          if (!productUuid) {
+            console.error('No product UUID found in context');
+            setLoading(false);
+            return;
+          }
+          productData = await globalThis.PIM.api.product_uuid_v1.get({ uuid: productUuid, withCompletenesses: true });
+        } else if (context && 'productModel' in context && context.productModel) {
+          // Product model or sub-product model
+          const productModelCode = context.productModel.code;
+          if (!productModelCode) {
+            console.error('No product model code found in context');
+            setLoading(false);
+            return;
+          }
+          productData = await globalThis.PIM.api.product_model_v1.get({ code: productModelCode });
+        } else {
+          console.error('No product or product model context found - extension may not be in a panel position');
           setLoading(false);
           return;
         }
-
-        const productUuid = context.product.uuid;
-
-        if (!productUuid) {
-          console.error('No product UUID found in context');
-          setLoading(false);
-          return;
-        }
-
-        // Fetch the product data
-        const productData: any = await globalThis.PIM.api.product_uuid_v1.get({ uuid: productUuid, withCompletenesses: true });
 
         // Enrich product with release tracking data
         const currentStage = inferProductStage(productData as any, config);
@@ -227,8 +235,8 @@ export function PanelMode({ config }: PanelModeProps) {
 
         const enrichedProduct: ProductWithRelease = {
           ...productData,
-          uuid: productData.uuid,
-          identifier: productData.identifier || '',
+          uuid: productData.uuid || productData.code, // Use code for product models
+          identifier: productData.identifier || productData.code || '',
           enabled: productData.enabled ?? true,
           currentStage,
           goLiveDates,

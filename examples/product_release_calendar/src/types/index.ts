@@ -14,8 +14,8 @@ export interface ReleaseDate {
  * Display mode for the extension
  */
 export enum DisplayMode {
-  BOARD = 'board', // Full board view for activity.navigation.tab
-  PANEL = 'panel'  // Simplified panel view for product.panel
+  BOARD = 'board', // Full board view for pim.activity.navigation.tab
+  PANEL = 'panel'  // Simplified panel view for pim.product.tab, pim.product.panel, pim.product-model.tab, pim.product-model.panel, pim.sub-product-model.tab, pim.sub-product-model.panel
 }
 
 /**
@@ -48,9 +48,6 @@ export interface ReleaseCalendarConfig {
 
   // Optional: Channel to consider for completeness
   channel?: string;
-
-  // Display mode: 'board' for full view, 'panel' for simplified product view
-  displayMode?: DisplayMode;
 }
 
 /**

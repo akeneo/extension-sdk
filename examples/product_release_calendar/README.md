@@ -20,18 +20,19 @@ The Product Release Calendar helps merchandising and product teams track product
 
   **Note**: A 7th stage "Live" is reserved for future implementation (automatic status based on go-live date or external API integration)
 
-- **Dual Display Modes**:
-  - **Board Mode** (`displayMode: "board"`): Full-featured view for activity.navigation.tab position
+- **Dual Display Modes** (automatically detected based on extension position):
+  - **Board Mode**: Full-featured view for pim.activity.navigation.tab position
     - **Pipeline View**: Kanban-style board showing products grouped by current stage
     - **Timeline View**: Calendar view showing products by their go-live dates
     - Complete statistics, filters, and bulk product management
-  - **Panel Mode** (`displayMode: "panel"`): Simplified view for product.panel position
-    - Shows current product's release status and stage
+  - **Panel Mode**: Simplified view for product/product model tabs and panels
+    - Positions: pim.product.tab, pim.product.panel, pim.product-model.tab, pim.product-model.panel, pim.sub-product-model.tab, pim.sub-product-model.panel
+    - Shows current product/product model's release status and stage
     - Displays all release dates per locale
     - Shows completeness per locale with progress bars
     - Lists missing items needed to complete stages
     - Displays validation buttons when applicable
-    - Automatically syncs with the current product being viewed
+    - Automatically syncs with the current product/product model being viewed
 
 - **Multi-Locale Support**: Track completeness and go-live dates per locale
   - Locales are dynamically fetched from your PIM instance
@@ -60,8 +61,7 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "displayLabelAttribute": "name",
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 40,
-  "thresholdLocalization": 80,
-  "displayMode": "board"
+  "thresholdLocalization": 80
 }
 ```
 
@@ -80,8 +80,7 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "validationAttribute": "validation_status",
   "channel": "website",
   "thresholdMasterEnrichment": 50,
-  "thresholdLocalization": 85,
-  "displayMode": "board"
+  "thresholdLocalization": 85
 }
 ```
 
@@ -101,8 +100,7 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "validationAttribute": "validation_status",
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 40,
-  "thresholdLocalization": 75,
-  "displayMode": "board"
+  "thresholdLocalization": 75
 }
 ```
 
@@ -122,8 +120,7 @@ The extension uses `custom_variables` to map to your PIM structure. Release date
   "validationAttribute": "validation_status",
   "channel": "ecommerce",
   "thresholdMasterEnrichment": 50,
-  "thresholdLocalization": 85,
-  "displayMode": "board"
+  "thresholdLocalization": 85
 }
 ```
 
@@ -134,36 +131,6 @@ In this example (priority order):
 4. All other "cameras" products → **Jan 10**
 5. All other "de_DE" locale products → **Feb 15**
 6. Products that don't match any rule → **Not shown on calendar**
-
-#### Example 5: Panel Mode Configuration
-
-For product.panel position (simplified view showing current product):
-
-```json
-{
-  "releaseDates": [
-    { "date": "2025-12-01", "locale": "en_US" },
-    { "date": "2025-12-15", "locale": "fr_FR" },
-    { "date": "2025-12-20", "locale": "de_DE" }
-  ],
-  "masterLocale": "en_US",
-  "targetLocales": ["fr_FR", "de_DE", "es_ES"],
-  "validationAttribute": "validation_status",
-  "channel": "ecommerce",
-  "thresholdMasterEnrichment": 40,
-  "thresholdLocalization": 80,
-  "displayMode": "panel"
-}
-```
-
-**Panel mode features:**
-- Shows current product's stage and status with color-coded indicators
-- Displays all release dates per locale
-- Shows completeness progress bars per locale with validation indicators (checkmark icons)
-- Lists missing items to complete stages
-- Displays validation buttons when product is ready for validation
-- Shows success messages using Akeneo Design System message bars
-- Automatically updates when viewing different products
 
 ### Configuration Parameters
 
@@ -177,7 +144,6 @@ For product.panel position (simplified view showing current product):
 | `channel` | string | No | Channel code to use for completeness calculations |
 | `thresholdMasterEnrichment` | number | No | Completeness % threshold to reach master validation stage (default: 40) |
 | `thresholdLocalization` | number | No | Completeness % threshold for localization per locale (default: 80) |
-| `displayMode` | string | No | Display mode: "board" for full view (activity.navigation.tab) or "panel" for simplified product view (product.panel) (default: "board") |
 
 #### ReleaseDate Object
 
@@ -304,19 +270,19 @@ CREATION (1)
    - Configure the custom_variables in the extension settings
 
 3. **Add to PIM**:
-   The extension can be added to two different positions:
+   The extension can be added to multiple positions:
 
    **Board Mode** (Full view):
-   - Position: `activity.navigation.tab`
-   - Configuration: Set `displayMode: "board"`
+   - Position: `pim.activity.navigation.tab`
+   - Display mode is automatically detected based on position
    - Use case: Team dashboard for managing all products across the release pipeline
    - Features: Full statistics, filters, pipeline/timeline views, bulk management
 
-   **Panel Mode** (Product view):
-   - Position: `product.panel`
-   - Configuration: Set `displayMode: "panel"`
-   - Use case: Individual product release tracking within product edit form
-   - Features: Simplified view showing current product's status, dates, and validation buttons
+   **Panel Mode** (Product/Product Model view):
+   - Positions: `pim.product.tab`, `pim.product.panel`, `pim.product-model.tab`, `pim.product-model.panel`, `pim.sub-product-model.tab`, `pim.sub-product-model.panel`
+   - Display mode is automatically detected based on position
+   - Use case: Individual product/product model release tracking within the edit form (as tab or panel)
+   - Features: Simplified view showing current entity's status, dates, and validation buttons
 
 ## Development
 
