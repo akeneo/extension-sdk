@@ -1,0 +1,14 @@
+{
+  "position": "pim.product.panel",
+  "name": "sdk_script_extension_digital_product_passport",
+  "type": "sdk_script",
+  "file": "src/dpp.js",
+  "configuration": {
+    "default_label": "Digital Product Passport",
+    "labels": {
+      "en_US": "Digital Product Passport",
+      "en_CA": "Digital Product Passport",
+      "fr_FR": "Passeport Produit Numérique"
+    }
+  }
+}
