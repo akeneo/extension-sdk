@@ -19,7 +19,6 @@ export const DEFAULT_CONFIG: ReleaseCalendarConfig = {
     localization: 80,
   },
   channel: 'ecommerce',
-  displayMode: DisplayMode.BOARD,
 };
 
 /**
@@ -71,6 +70,36 @@ export function loadConfig(): ReleaseCalendarConfig {
       localization: (customVars.thresholdLocalization as number) || DEFAULT_CONFIG.thresholds.localization,
     },
     channel: (customVars.channel as string) || DEFAULT_CONFIG.channel,
-    displayMode: (customVars.displayMode as DisplayMode) || DEFAULT_CONFIG.displayMode,
   };
+}
+
+/**
+ * Determine display mode based on the extension position
+ * - Panel positions (product/product-model tabs and panels) -> PANEL mode
+ * - All other positions (pim.activity.navigation.tab, etc.) -> BOARD mode
+ */
+export function getDisplayMode(): DisplayMode {
+  const position = globalThis.PIM?.context?.position;
+
+  if (!position) {
+    console.warn('PIM context position not found, defaulting to BOARD mode');
+    return DisplayMode.BOARD;
+  }
+
+  // Panel mode for all product-related panel and tab positions
+  const panelPositions = [
+    'pim.product.panel',
+    'pim.product-model.panel',
+    'pim.sub-product-model.panel',
+    'pim.product.tab',
+    'pim.product-model.tab',
+    'pim.sub-product-model.tab'
+  ];
+
+  if (panelPositions.includes(position)) {
+    return DisplayMode.PANEL;
+  }
+
+  // Board mode for all other positions (pim.activity.navigation.tab, etc.)
+  return DisplayMode.BOARD;
 }
