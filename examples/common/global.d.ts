@@ -1765,6 +1765,7 @@ export declare type PIM_USER = {
 declare type pimNavigate = {
     internal: (path: string) => void;
     external: (rawUrl: string) => void;
+    refresh: () => void;
 };
 
 /**
