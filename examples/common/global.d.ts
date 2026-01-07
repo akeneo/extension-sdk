@@ -1704,10 +1704,6 @@ export declare type PIM_CONTEXT = BaseContext & ({
         identifier: string | null;
     };
 } | {
-    productModel?: {
-        code: string;
-    };
-} | {
     category?: {
         code: string;
     };
