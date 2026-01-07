@@ -28,11 +28,8 @@ function App() {
     <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
       <Button onClick={handleInternalNavigation}>Internal Navigation</Button>
       <Button onClick={handleExternalNavigation}>External Navigation</Button>
-            <Button onClick={refresh}>refresh</Button>
-
+      <Button onClick={refresh}>refresh</Button>
     </div>
-
-
 
     <SectionTitle>
       <SectionTitle.Title level="secondary">Available PIM Context information within the custom component context (depend of the displayed page)</SectionTitle.Title>
