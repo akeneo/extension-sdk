@@ -1,0 +1,14 @@
+{
+  "position": "pim.activity.navigation.tab",
+  "name": "sdk_script_extension_pdf_viewer",
+  "type": "sdk_script",
+  "file": "dist/pdf-viewer.js",
+  "configuration": {
+    "default_label": "PDF Viewer",
+    "labels": {
+      "en_US": "PDF Viewer",
+      "fr_FR": "Visionneuse PDF"
+    }
+  },
+  "credentials": []
+}

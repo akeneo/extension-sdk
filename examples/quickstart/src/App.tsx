@@ -1,4 +1,4 @@
-import {Information, Link, SectionTitle, UsersIllustration} from "akeneo-design-system";
+import {Button, Information, Link, SectionTitle, UsersIllustration} from "akeneo-design-system";
 import {useGetProduct} from "./useGetProduct.ts";
 
 function App() {
@@ -6,6 +6,15 @@ function App() {
   const PIMContext = globalThis.PIM.context;
   const PIMUser = globalThis.PIM.user
   const productList = useGetProduct();
+  const refresh = globalThis.PIM.navigate.refresh;
+
+  const handleInternalNavigation = () => {
+    globalThis.PIM.navigate.internal('#/');
+  };
+
+  const handleExternalNavigation = () => {
+    globalThis.PIM.navigate.external('https://help.akeneo.com');
+  };
 
   return <>
     <Information
@@ -15,6 +24,12 @@ function App() {
       See the <Link href="https://github.com/akeneo/extension-sdk/blob/init/README.md" target="_blank">Readme</Link> of the SDK to explore capabilities and see implementation examples.<br/>
       Link to the UI Extension component  <Link href="https://api.akeneo.com/extensions/overview.html" target="_blank">documentation</Link>.<br/>
     </Information>
+
+    <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+      <Button onClick={handleInternalNavigation}>Internal Navigation</Button>
+      <Button onClick={handleExternalNavigation}>External Navigation</Button>
+      <Button onClick={refresh}>refresh</Button>
+    </div>
 
     <SectionTitle>
       <SectionTitle.Title level="secondary">Available PIM Context information within the custom component context (depend of the displayed page)</SectionTitle.Title>
