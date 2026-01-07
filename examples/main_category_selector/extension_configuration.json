@@ -1,0 +1,14 @@
+{
+  "position": "pim.product.panel",
+  "name": "main_category_selector",
+  "type": "sdk_script",
+  "file": "dist/main_category_selector.js",
+  "configuration": {
+    "default_label": "Main Category",
+    "labels": {
+      "en_US": "Main Category",
+      "fr_FR": "Catégorie principale"
+    }
+  },
+  "credentials": []
+}
