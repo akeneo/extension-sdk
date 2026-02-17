@@ -1,0 +1,14 @@
+{
+  "position": "pim.product.header",
+  "name": "sdk_script_extension_preload_hook",
+  "type": "sdk_script",
+  "file": "dist/preload_hook.js",
+  "configuration": {
+    "default_label": "Pre-load Hook",
+    "labels": {
+      "en_US": "Pre-load Hook",
+      "fr_FR": "Pre-load Hook"
+    }
+  },
+  "credentials": []
+}

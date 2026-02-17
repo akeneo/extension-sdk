@@ -1,0 +1,16 @@
+html, body {
+  margin: 0;
+  background: transparent;
+}
+body,
+input,
+button,
+select,
+textarea {
+  font-family: 'Lato';
+  font-size: 13px;
+  color: #67768a;
+}
+* {
+  box-sizing: border-box;
+}
