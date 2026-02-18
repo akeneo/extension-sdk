@@ -31,6 +31,29 @@ const useProductInfo = () => {
                 const identifier = extractIdentifier(product);
                 const label = extractLabel(product.values, catalogLocale);
 
+                // ---------------------------------------------------------------
+                // EXAMPLE: Fetch data from an external API
+                // ---------------------------------------------------------------
+                // Use PIM.api.external.call() to call your own external service
+                // (ERP, pricing engine, compliance tool, etc.).
+                // The credentials_code must match a credential defined in
+                // extension_configuration.json.
+                //
+                // const externalResponse = await globalThis.PIM.api.external.call({
+                //     method: 'GET',
+                //     url: `https://your-erp-api.example.com/products/${identifier}/stock`,
+                //     credentials_code: 'your_erp_api_token',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                // });
+                // const externalData = await externalResponse.json();
+                //
+                // You can then use externalData to display real information
+                // (stock levels, pricing, compliance status, etc.) instead of
+                // the simulated data used in this example.
+                // ---------------------------------------------------------------
+
                 setProductInfo({label, identifier});
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An unknown error occurred');

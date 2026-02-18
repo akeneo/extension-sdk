@@ -2,7 +2,7 @@
 
 This is an example of a UI extension that demonstrates a "preload hook" pattern using a custom component (`sdk_script`) positioned on the **`pim.product.header`** placement.
 
-When a product page loads, the extension automatically fetches the product's label and identifier from the PIM API and displays a stock availability message — no user interaction required.
+When a product page loads, the extension automatically fetches the product's label and identifier from the PIM API and displays simulated external data (stock availability, pricing, compliance) — no user interaction required.
 
 ## How it works
 
@@ -10,9 +10,32 @@ When a product page loads, the extension automatically fetches the product's lab
 2. On mount, it reads the product UUID and user's catalog locale from `PIM.context`
 3. It calls `PIM.api.product_uuid_v1.get()` to retrieve the product data
 4. It extracts the product label (from `name`, `label`, or `nom` attributes) and identifier
-5. It displays: **"Le produit [label] ([identifier]) est disponible en stock."**
+5. It displays simulated external data: stock availability, pricing and compliance status
 
 This illustrates how a custom component can act as a "preload hook" — executing logic automatically at page load without requiring user interaction.
+
+## Calling an external API
+
+This example uses simulated data for demonstration purposes. In a real-world scenario, you would replace it with a call to your own external service (ERP, pricing engine, compliance tool, etc.) using `PIM.api.external.call()`.
+
+A commented example is provided in `src/useProductInfo.ts`. Here is a quick overview:
+
+```typescript
+const response = await globalThis.PIM.api.external.call({
+    method: 'GET',
+    url: `https://your-erp-api.example.com/products/${identifier}/stock`,
+    credentials_code: 'your_erp_api_token',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+const data = await response.json();
+```
+
+To use this, you need to:
+1. Define a credential in `extension_configuration.json` (see [Credentials object](#credentials-object) below)
+2. Reference its `code` in the `credentials_code` parameter
+3. Deploy the extension with credentials: `make create-with-credentials` or `make update-with-credentials`
 
 ## Prerequisites
 
@@ -118,7 +141,7 @@ This is highly recommended for an efficient development workflow.
 
 The application is organized into the following files:
 - **`src/App.tsx`**: Main component that displays the product information or error/loading states
-- **`src/useProductInfo.ts`**: Custom hook that fetches the product label and identifier from the PIM API
+- **`src/useProductInfo.ts`**: Custom hook that fetches the product label and identifier from the PIM API. Contains a commented example of how to call an external API using `PIM.api.external.call()`
 
 ### Extension configuration
 
