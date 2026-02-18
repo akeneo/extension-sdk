@@ -14,16 +14,29 @@ When a product page loads, the extension automatically fetches the product's lab
 
 This illustrates how a custom component can act as a "preload hook" — executing logic automatically at page load without requiring user interaction.
 
-## Calling an external API
+## Connecting to your own tools
 
-This example uses simulated data for demonstration purposes. In a real-world scenario, you would replace it with a call to your own external service (ERP, pricing engine, compliance tool, etc.) using `PIM.api.external.call()`.
+This example uses simulated data for demonstration purposes. In a real-world scenario, you would replace it with data from your own external services. Commented examples are provided in `src/useProductInfo.ts` showing two approaches:
 
-A commented example is provided in `src/useProductInfo.ts`. Here is a quick overview:
+### Configuration via custom_variables
+
+Use `PIM.custom_variables` to read extension-level configuration set by the PIM administrator (API URLs, thresholds, feature flags, etc.):
+
+```typescript
+const erpApiUrl = globalThis.PIM.custom_variables.erp_api_url as string;
+const stockThreshold = globalThis.PIM.custom_variables.stock_threshold as number;
+```
+
+Custom variables are defined in the PIM administration interface and are available to the extension at runtime.
+
+### Fetching data from an external API
+
+Use `PIM.api.external.call()` to call your own external service (ERP, pricing engine, compliance tool, etc.):
 
 ```typescript
 const response = await globalThis.PIM.api.external.call({
     method: 'GET',
-    url: `https://your-erp-api.example.com/products/${identifier}/stock`,
+    url: `${erpApiUrl}/products/${identifier}/stock`,
     credentials_code: 'your_erp_api_token',
     headers: {
         'Content-Type': 'application/json',
@@ -36,6 +49,10 @@ To use this, you need to:
 1. Define a credential in `extension_configuration.json` (see [Credentials object](#credentials-object) below)
 2. Reference its `code` in the `credentials_code` parameter
 3. Deploy the extension with credentials: `make create-with-credentials` or `make update-with-credentials`
+
+### Combining both
+
+A typical pattern is to use `custom_variables` for configuration (API URL, attribute codes) and `api.external.call()` to fetch data — as shown in the commented examples in `src/useProductInfo.ts`.
 
 ## Prerequisites
 

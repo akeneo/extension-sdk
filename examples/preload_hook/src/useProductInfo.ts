@@ -32,7 +32,21 @@ const useProductInfo = () => {
                 const label = extractLabel(product.values, catalogLocale);
 
                 // ---------------------------------------------------------------
-                // EXAMPLE: Fetch data from an external API
+                // EXAMPLE 1: Read configuration from custom_variables
+                // ---------------------------------------------------------------
+                // Use PIM.custom_variables to read extension-level configuration
+                // set by the PIM administrator. This is useful for storing API
+                // URLs, thresholds, feature flags, attribute codes, etc.
+                //
+                // const erpApiUrl = globalThis.PIM.custom_variables.erp_api_url as string;
+                // const stockThreshold = globalThis.PIM.custom_variables.stock_threshold as number;
+                //
+                // You can then use these values to configure your external API
+                // calls or customize the extension behavior.
+                // ---------------------------------------------------------------
+
+                // ---------------------------------------------------------------
+                // EXAMPLE 2: Fetch data from an external API
                 // ---------------------------------------------------------------
                 // Use PIM.api.external.call() to call your own external service
                 // (ERP, pricing engine, compliance tool, etc.).
@@ -41,7 +55,7 @@ const useProductInfo = () => {
                 //
                 // const externalResponse = await globalThis.PIM.api.external.call({
                 //     method: 'GET',
-                //     url: `https://your-erp-api.example.com/products/${identifier}/stock`,
+                //     url: `${erpApiUrl}/products/${identifier}/stock`,
                 //     credentials_code: 'your_erp_api_token',
                 //     headers: {
                 //         'Content-Type': 'application/json',
