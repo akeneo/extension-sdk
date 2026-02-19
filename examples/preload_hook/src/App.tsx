@@ -1,5 +1,5 @@
 import {Helper, Placeholder, UsersIllustration} from "akeneo-design-system";
-import {useProductInfo} from "./useProductInfo.ts";
+import {usePreLoadData} from "./usePreLoadData.ts";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -33,7 +33,7 @@ const Badge = styled.span<{$color: string}>`
 `;
 
 function App() {
-    const {productInfo, loading, error} = useProductInfo();
+    const {preLoadData, loading, error} = usePreLoadData();
 
     if (loading) {
         return (
@@ -52,31 +52,23 @@ function App() {
         );
     }
 
-    if (!productInfo) {
+    if (!preLoadData) {
         return null;
     }
-
-    const label = productInfo.label ?? 'N/A';
-    const identifier = productInfo.identifier ?? 'N/A';
 
     return (
         <Container>
             <Row>
                 <Label>Product</Label>
-                <span>{label} ({identifier})</span>
+                <span>{preLoadData.label}</span>
             </Row>
             <Row>
-                <Label>Stock</Label>
-                <Badge $color="#67b373">Available</Badge>
+                <Label>Certification</Label>
+                <Badge $color="#67b373">CE Certificate valid until 15/09/2027</Badge>
             </Row>
             <Row>
-                <Label>Price</Label>
-                <span>149.99 EUR</span>
-            </Row>
-            <Row>
-                <Label>Compliance</Label>
-                <Badge $color="#67b373">CE</Badge>
-                <Badge $color="#67b373">RoHS</Badge>
+                <Label>Expiration</Label>
+                <Badge $color="#67b373">Product expiration date: 01/03/2028</Badge>
             </Row>
         </Container>
     );

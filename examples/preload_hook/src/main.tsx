@@ -8,6 +8,9 @@ import {ThemeProvider} from "styled-components";
 if (!document.getElementById('root')) {
     document.body.innerHTML = '<div id="root"></div>';
 }
+document.documentElement.style.background = 'transparent';
+document.body.style.background = 'transparent';
+document.body.style.margin = '0';
 
 ReactDOM.render(
   <StrictMode>

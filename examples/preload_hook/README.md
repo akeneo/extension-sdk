@@ -2,32 +2,33 @@
 
 This is an example of a UI extension that demonstrates a "preload hook" pattern using a custom component (`sdk_script`) positioned on the **`pim.product.header`** placement.
 
-When a product page loads, the extension automatically fetches the product's label and identifier from the PIM API and displays simulated external data (stock availability, pricing, compliance) — no user interaction required.
+When a product or product model page loads, the extension automatically fetches the product label and displays simulated external data (certification, expiration) — no user interaction required.
 
 ## How it works
 
 1. The extension mounts on the product page header (`pim.product.header`)
-2. On mount, it reads the product UUID and user's catalog locale from `PIM.context`
-3. It calls `PIM.api.product_uuid_v1.get()` to retrieve the product data
-4. It extracts the product label (from `name`, `label`, or `nom` attributes) and identifier
-5. It displays simulated external data: stock availability, pricing and compliance status
+2. On mount, it reads the product context and user's catalog locale from `PIM.context`
+3. For products (`context.product.uuid` exists), it calls `PIM.api.product_uuid_v1.get()` and extracts the label from product values
+4. For product models (`context.product.identifier` exists), the label is provided directly by the context
+5. It displays the product label and simulated external data: certification and expiration status
 
 This illustrates how a custom component can act as a "preload hook" — executing logic automatically at page load without requiring user interaction.
 
+## Supported positions
+
+This example uses `pim.product.header` by default. You can change the `position` in `extension_configuration.json` to target other header placements:
+
+| Position | Description |
+| --- | --- |
+| `pim.product.header` | Product edit page header |
+| `pim.product-model.header` | Product model edit page header |
+| `pim.sub-product-model.header` | Sub product model edit page header |
+
+The hook automatically detects whether it is running on a product or a product model based on the context and calls the appropriate API.
+
 ## Connecting to your own tools
 
-This example uses simulated data for demonstration purposes. In a real-world scenario, you would replace it with data from your own external services. Commented examples are provided in `src/useProductInfo.ts` showing two approaches:
-
-### Configuration via custom_variables
-
-Use `PIM.custom_variables` to read extension-level configuration set by the PIM administrator (API URLs, thresholds, feature flags, etc.):
-
-```typescript
-const erpApiUrl = globalThis.PIM.custom_variables.erp_api_url as string;
-const stockThreshold = globalThis.PIM.custom_variables.stock_threshold as number;
-```
-
-Custom variables are defined in the PIM administration interface and are available to the extension at runtime.
+This example uses simulated data for demonstration purposes. In a real-world scenario, you would replace it with data from your own external services. Commented examples are provided in `src/usePreLoadData.ts` showing two approaches:
 
 ### Fetching data from an external API
 
@@ -50,9 +51,20 @@ To use this, you need to:
 2. Reference its `code` in the `credentials_code` parameter
 3. Deploy the extension with credentials: `make create-with-credentials` or `make update-with-credentials`
 
+### Configuration via custom_variables
+
+Use `PIM.custom_variables` to read extension-level configuration set by the PIM administrator (API URLs, thresholds, feature flags, etc.):
+
+```typescript
+const erpApiUrl = globalThis.PIM.custom_variables.erp_api_url as string;
+const stockThreshold = globalThis.PIM.custom_variables.stock_threshold as number;
+```
+
+Custom variables are defined in the PIM administration interface and are available to the extension at runtime.
+
 ### Combining both
 
-A typical pattern is to use `custom_variables` for configuration (API URL, attribute codes) and `api.external.call()` to fetch data — as shown in the commented examples in `src/useProductInfo.ts`.
+A typical pattern is to use `custom_variables` for configuration (API URL, attribute codes) and `api.external.call()` to fetch data — as shown in the commented examples in `src/usePreLoadData.ts`.
 
 ## Prerequisites
 
@@ -158,7 +170,7 @@ This is highly recommended for an efficient development workflow.
 
 The application is organized into the following files:
 - **`src/App.tsx`**: Main component that displays the product information or error/loading states
-- **`src/useProductInfo.ts`**: Custom hook that fetches the product label and identifier from the PIM API. Contains a commented example of how to call an external API using `PIM.api.external.call()`
+- **`src/usePreLoadData.ts`**: Custom hook that fetches the product or product model label from the PIM API. Contains commented examples of how to call an external API using `PIM.api.external.call()` and how to read configuration from `PIM.custom_variables`
 
 ### Extension configuration
 
