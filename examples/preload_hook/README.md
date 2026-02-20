@@ -17,7 +17,7 @@ This illustrates how a custom component can act as a "preload hook" — executin
 
 ### Custom Variables
 
-The extension uses `custom_variables` to configure the certification expiration date.
+The extension uses `custom_variables` to configure the certification expiration date. Configure the `custom_variables` in the extension settings after uploading to the PIM.
 
 #### Example
 
@@ -33,6 +33,8 @@ The extension uses `custom_variables` to configure the certification expiration 
 |-----------|------|----------|-------------|
 | `certification_expiration_date` | string | No | The certification expiration date displayed in the notification. Defaults to `2027-09-15` if not set |
 
+If `custom_variables` are not configured, the extension falls back to default values defined in `src/usePreLoadData.ts`.
+
 ## Supported positions
 
 This example uses `pim.product.header` by default. You can change the `position` in `extension_configuration.json` to target other header placements:
@@ -47,17 +49,13 @@ The hook automatically detects whether it is running on a product or a product m
 
 ## Connecting to your own tools
 
-This example uses simulated data for demonstration purposes. In a real-world scenario, you would replace it with data from your own external services. Commented examples are provided in `src/usePreLoadData.ts` showing two approaches:
-
-### Fetching data from an external API
-
-Use `PIM.api.external.call()` to call your own external service (ERP, pricing engine, compliance tool, etc.):
+This example uses simulated data for demonstration purposes. In a real-world scenario, you would replace the certification date with data from your own external services using `PIM.api.external.call()`:
 
 ```typescript
 const response = await globalThis.PIM.api.external.call({
     method: 'GET',
-    url: `${erpApiUrl}/products/${identifier}/stock`,
-    credentials_code: 'your_erp_api_token',
+    url: `${erpApiUrl}/products/${identifier}/certification`,
+    credentials_code: 'your_api_token',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -70,20 +68,7 @@ To use this, you need to:
 2. Reference its `code` in the `credentials_code` parameter
 3. Deploy the extension with credentials: `make create-with-credentials` or `make update-with-credentials`
 
-### Configuration via custom_variables
-
-Use `PIM.custom_variables` to read extension-level configuration set by the PIM administrator (API URLs, thresholds, feature flags, etc.):
-
-```typescript
-const erpApiUrl = globalThis.PIM.custom_variables.erp_api_url as string;
-const stockThreshold = globalThis.PIM.custom_variables.stock_threshold as number;
-```
-
-Custom variables are defined in the PIM administration interface and are available to the extension at runtime.
-
-### Combining both
-
-A typical pattern is to use `custom_variables` for configuration (API URL, attribute codes) and `api.external.call()` to fetch data — as shown in the commented examples in `src/usePreLoadData.ts`.
+A typical pattern is to use `custom_variables` for configuration (API URL, attribute codes) and `api.external.call()` to fetch data.
 
 ## Prerequisites
 
@@ -189,7 +174,7 @@ This is highly recommended for an efficient development workflow.
 
 The application is organized into the following files:
 - **`src/App.tsx`**: Main component that displays the certification notification or error/loading states
-- **`src/usePreLoadData.ts`**: Custom hook that fetches the product or product model label from the PIM API and reads the certification expiration date from `PIM.custom_variables`. Contains commented examples of how to call an external API using `PIM.api.external.call()`
+- **`src/usePreLoadData.ts`**: Custom hook that loads configuration from `PIM.custom_variables` (with fallback defaults), fetches the product or product model label from the PIM API, and returns the data for display
 
 ### Extension configuration
 

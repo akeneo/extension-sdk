@@ -5,6 +5,30 @@ interface PreLoadData {
     expirationDate: string;
 }
 
+/**
+ * Default configuration
+ * This serves as a fallback when custom_variables are not configured in the PIM
+ */
+const DEFAULT_CONFIG = {
+    certification_expiration_date: '2027-09-15',
+};
+
+/**
+ * Load configuration from custom_variables or use defaults
+ */
+function loadConfig() {
+    const customVars = globalThis.PIM?.custom_variables;
+
+    if (!customVars) {
+        console.warn('PIM custom_variables not found, using default configuration');
+        return DEFAULT_CONFIG;
+    }
+
+    return {
+        certification_expiration_date: (customVars.certification_expiration_date as string) || DEFAULT_CONFIG.certification_expiration_date,
+    };
+}
+
 const LABEL_ATTRIBUTE_CODES = ['name', 'label', 'nom'];
 
 const usePreLoadData = () => {
@@ -18,7 +42,7 @@ const usePreLoadData = () => {
                 const context = globalThis.PIM.context;
 
                 // ---------------------------------------------------------------
-                // EXAMPLE 1: Fetch data from an external API
+                // EXAMPLE: Fetch data from an external API
                 // ---------------------------------------------------------------
                 // Use PIM.api.external.call() to call your own external service
                 // (ERP, pricing engine, compliance tool, etc.).
@@ -39,18 +63,8 @@ const usePreLoadData = () => {
                 // const externalData = await externalResponse.json();
                 // ---------------------------------------------------------------
 
-                // ---------------------------------------------------------------
-                // EXAMPLE 2: Read configuration from custom_variables
-                // ---------------------------------------------------------------
-                // Use PIM.custom_variables to read extension-level configuration
-                // set by the PIM administrator. This is useful for storing API
-                // URLs, thresholds, feature flags, attribute codes, etc.
-                // You can then use these values to configure your external API
-                // calls or customize the extension behavior.
-                //
-                // const erpApiUrl = globalThis.PIM.custom_variables.erp_api_url as string;
-                // const stockThreshold = globalThis.PIM.custom_variables.stock_threshold as number;
-                // ---------------------------------------------------------------
+                // Load configuration from custom_variables (set in PIM UI)
+                const config = loadConfig();
 
                 const ctx = context as any;
                 const uuid = ctx.product?.uuid;
@@ -71,7 +85,7 @@ const usePreLoadData = () => {
                     return;
                 }
 
-                const expirationDate = (globalThis.PIM.custom_variables.certification_expiration_date as string) || '2027-09-15';
+                const expirationDate = config.certification_expiration_date;
 
                 setPreLoadData({label, expirationDate});
             } catch (err) {
