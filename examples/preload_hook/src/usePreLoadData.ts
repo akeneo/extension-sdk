@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 
 interface PreLoadData {
     label: string;
+    expirationDate: string;
 }
 
 const LABEL_ATTRIBUTE_CODES = ['name', 'label', 'nom'];
@@ -70,7 +71,9 @@ const usePreLoadData = () => {
                     return;
                 }
 
-                setPreLoadData({label});
+                const expirationDate = (globalThis.PIM.custom_variables.certification_expiration_date as string) || '2027-09-15';
+
+                setPreLoadData({label, expirationDate});
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An unknown error occurred');
             } finally {

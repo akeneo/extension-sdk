@@ -4,10 +4,10 @@
   "type": "sdk_script",
   "file": "dist/preload_hook.js",
   "configuration": {
-    "default_label": "Pre-load Hook",
+    "default_label": "Certification notification",
     "labels": {
-      "en_US": "Pre-load Hook",
-      "fr_FR": "Pre-load Hook"
+      "en_US": "Certification notification",
+      "fr_FR": "Notification de certification"
     }
   },
   "credentials": []

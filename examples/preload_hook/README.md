@@ -1,8 +1,8 @@
-# SDK script example: Pre-load Hook
+# SDK script example: Certification notification
 
 This is an example of a UI extension that demonstrates a "preload hook" pattern using a custom component (`sdk_script`) positioned on the **`pim.product.header`** placement.
 
-When a product or product model page loads, the extension automatically fetches the product label and displays simulated external data (certification, expiration) — no user interaction required.
+When a product or product model page loads, the extension automatically fetches the product label and displays a certification expiration notification — no user interaction required. The expiration date is configurable via `custom_variables`.
 
 ## How it works
 
@@ -10,9 +10,28 @@ When a product or product model page loads, the extension automatically fetches 
 2. On mount, it reads the product context and user's catalog locale from `PIM.context`
 3. For products (`context.product.uuid` exists), it calls `PIM.api.product_uuid_v1.get()` and extracts the label from product values
 4. For product models (`context.product.identifier` exists), the label is provided directly by the context
-5. It displays the product label and simulated external data: certification and expiration status
+5. It reads the certification expiration date from `PIM.custom_variables.certification_expiration_date` (falls back to `2027-09-15` if not set)
+6. It displays a message: "The {label} has a certificate that will expire on {date}."
 
 This illustrates how a custom component can act as a "preload hook" — executing logic automatically at page load without requiring user interaction.
+
+### Custom Variables
+
+The extension uses `custom_variables` to configure the certification expiration date.
+
+#### Example
+
+```json
+{
+  "certification_expiration_date": "2027-09-15"
+}
+```
+
+#### Configuration Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `certification_expiration_date` | string | No | The certification expiration date displayed in the notification. Defaults to `2027-09-15` if not set |
 
 ## Supported positions
 
@@ -169,8 +188,8 @@ This is highly recommended for an efficient development workflow.
 ### Application logic
 
 The application is organized into the following files:
-- **`src/App.tsx`**: Main component that displays the product information or error/loading states
-- **`src/usePreLoadData.ts`**: Custom hook that fetches the product or product model label from the PIM API. Contains commented examples of how to call an external API using `PIM.api.external.call()` and how to read configuration from `PIM.custom_variables`
+- **`src/App.tsx`**: Main component that displays the certification notification or error/loading states
+- **`src/usePreLoadData.ts`**: Custom hook that fetches the product or product model label from the PIM API and reads the certification expiration date from `PIM.custom_variables`. Contains commented examples of how to call an external API using `PIM.api.external.call()`
 
 ### Extension configuration
 
