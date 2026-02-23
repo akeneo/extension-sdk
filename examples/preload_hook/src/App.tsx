@@ -1,11 +1,15 @@
-import {Helper, Placeholder, UsersIllustration} from "akeneo-design-system";
+import {Helper, InfoRoundIcon, Placeholder, UsersIllustration} from "akeneo-design-system";
 import {usePreLoadData} from "./usePreLoadData.ts";
 import styled from "styled-components";
 
 const Container = styled.div`
     padding: 12px 16px;
-    font-size: 13px;
-    color: #67768a;
+    font-size: 15px;
+    color: #000000;
+    background-color: #fac365;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 `;
 
 function App() {
@@ -34,7 +38,8 @@ function App() {
 
     return (
         <Container>
-            The {preLoadData.label} has a certificate that will expire on {preLoadData.expirationDate}.
+            <InfoRoundIcon size={16} color="#000000" />
+            The {preLoadData.label} has a certificate that will expire on <b>{preLoadData.expirationDate}</b>.
         </Container>
     );
 }
