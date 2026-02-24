@@ -1,43 +1,23 @@
 # SDK script example: Certification notification
-
-This is an example of a UI extension that demonstrates a "preload hook" pattern using a custom component (`sdk_script`) positioned on the **`pim.product.header`** placement.
-
-When a product or product model page loads, the extension automatically fetches the product label and displays a certification expiration notification — no user interaction required. The expiration date is configurable via `custom_variables`.
+This is an example of a UI extension that demonstrates a "preload hook" pattern using a custom component (`sdk_script`) positioned on the **`pim.product.header`** placement. On page load, it automatically fetches the product label and displays a certification expiration notification — no user interaction required. The expiration date is configurable via `custom_variables`.
 
 ## How it works
 
-1. The extension mounts on the product page header (`pim.product.header`)
-2. On mount, it reads the product context and user's catalog locale from `PIM.context`
-3. For products (`context.product.uuid` exists), it calls `PIM.api.product_uuid_v1.get()` and extracts the label from product values
-4. For product models (`context.product.identifier` exists), the label is provided directly by the context
-5. It reads the certification expiration date from `PIM.custom_variables.certification_expiration_date` (falls back to `2027-09-15` if not set)
-6. It displays a message: "The {label} has a certificate that will expire on {date}."
+1. Mounts on the product page header (`pim.product.header`)
+2. Reads product context and catalog locale from `PIM.context`
+3. For products, calls `PIM.api.product_uuid_v1.get()` to extract the label; for product models, the label is provided directly by the context
+4. Reads the expiration date from `PIM.custom_variables.certification_expiration_date` (defaults to `2027-09-15`)
+5. Displays: "The {label} has a certificate that will expire on {date}."
 
-This illustrates how a custom component can act as a "preload hook" — executing logic automatically at page load without requiring user interaction.
-
-### Custom Variables
-
-The extension uses `custom_variables` to configure the certification expiration date. Configure the `custom_variables` in the extension settings after uploading to the PIM.
-
-#### Example
-
+### Custom variables
+Configure the expiration date in the extension settings after uploading to the PIM:
 ```json
 {
   "certification_expiration_date": "2027-09-15"
 }
 ```
 
-#### Configuration Parameters
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `certification_expiration_date` | string | No | The certification expiration date displayed in the notification. Defaults to `2027-09-15` if not set |
-
-If `custom_variables` are not configured, the extension falls back to default values defined in `src/usePreLoadData.ts`.
-
-## Supported positions
-
-This example uses `pim.product.header` by default. You can change the `position` in `extension_configuration.json` to target other header placements:
+### Supported positions
 
 | Position | Description |
 | --- | --- |
@@ -45,38 +25,11 @@ This example uses `pim.product.header` by default. You can change the `position`
 | `pim.product-model.header` | Product model edit page header |
 | `pim.sub-product-model.header` | Sub product model edit page header |
 
-The hook automatically detects whether it is running on a product or a product model based on the context and calls the appropriate API.
-
-## Connecting to your own tools
-
-This example uses simulated data for demonstration purposes. In a real-world scenario, you would replace the certification date with data from your own external services using `PIM.api.external.call()`:
-
-```typescript
-const response = await globalThis.PIM.api.external.call({
-    method: 'GET',
-    url: `${erpApiUrl}/products/${identifier}/certification`,
-    credentials_code: 'your_api_token',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
-const data = await response.json();
-```
-
-To use this, you need to:
-1. Define a credential in `extension_configuration.json` (see [Credentials object](#credentials-object) below)
-2. Reference its `code` in the `credentials_code` parameter
-3. Deploy the extension with credentials: `make create-with-credentials` or `make update-with-credentials`
-
-A typical pattern is to use `custom_variables` for configuration (API URL, attribute codes) and `api.external.call()` to fetch data.
-
 ## Prerequisites
-
 Before you begin, you need an active connection to an Akeneo PIM sandbox.
 To learn more about setting up your connection, please follow the instructions in the [official documentation](https://api.akeneo.com/getting-started/connect-the-pim-4x/step-1.html#you-said-connection).
 
 ## Get started
-
 To begin, run the setup command:
 ```bash
 make start
@@ -84,7 +37,6 @@ make start
 ...and follow the interactive instructions in your terminal. This will install dependencies, configure your environment, and create the extension in your PIM for the first time.
 
 ### Manual setup commands
-
 If you prefer to set up your environment manually or need more control over individual steps, you can use these commands:
 
 **Copy environment configuration:**
@@ -132,7 +84,6 @@ This creates the extension in production mode, including any credentials defined
 ## Development
 
 ### Uploading changes
-
 To upload your changes to Akeneo, use the following command. This will build the extension for development and push it to the PIM.
 ```bash
 make update-dev
@@ -145,7 +96,6 @@ make update-dev-with-credentials
 This builds the extension for development and updates it in the PIM, including any credentials defined in your `extension_configuration.json`.
 
 ### Development server
-
 To run the development server locally:
 ```bash
 make dev
@@ -153,7 +103,6 @@ make dev
 This starts a local development server (typically on port 3000) where you can test your extension.
 
 ### Development build
-
 To build the extension for development without uploading:
 ```bash
 make build-dev
@@ -161,7 +110,6 @@ make build-dev
 This creates a development build with source maps and debugging tools enabled.
 
 ### Automatic updates (hot-reload)
-
 To have your extension automatically update every time you save a code change, run the watch command:
 ```bash
 make watch
@@ -171,13 +119,11 @@ This is highly recommended for an efficient development workflow.
 ## Customization
 
 ### Application logic
-
 The application is organized into the following files:
 - **`src/App.tsx`**: Main component that displays the certification notification or error/loading states
-- **`src/usePreLoadData.ts`**: Custom hook that loads configuration from `PIM.custom_variables` (with fallback defaults), fetches the product or product model label from the PIM API, and returns the data for display
+- **`src/usePreLoadData.ts`**: Custom hook that loads configuration from `PIM.custom_variables`, fetches the product or product model label from the PIM API, and returns the data for display
 
 ### Extension configuration
-
 The `extension_configuration.json` file is crucial for defining how your UI extension behaves and appears within Akeneo PIM. Below is a detailed breakdown of its properties.
 
 | Key | Type | Description | Required |
@@ -192,7 +138,6 @@ The `extension_configuration.json` file is crucial for defining how your UI exte
 | `credentials` | `array` | An array of objects defining credentials that your extension may need to interact with external services. Each object represents a credential. | No |
 
 #### Credentials object
-
 Each object in the `credentials` array can have the following properties:
 
 | Key | Type | Description |
@@ -231,7 +176,6 @@ Each object in the `credentials` array can have the following properties:
 ```
 
 ## Build for production
-
 Once your project is finished, you can build it for production with the command:
 ```bash
 make build
@@ -248,17 +192,3 @@ make update
 make update-with-credentials
 ```
 This builds the extension for production and updates it in the PIM, including any credentials defined in your `extension_configuration.json`.
-
-## Understanding SES (Secure ECMAScript)
-
-**Important**: Akeneo PIM uses SES (Secure ECMAScript) to run UI extensions in a secure sandbox environment. SES provides isolation and security by restricting access to potentially dangerous JavaScript features. See [here](https://www.npmjs.com/package/ses/v/1.14.0) and [here](https://github.com/endojs/endo/tree/master/packages/ses#ses) for more information.
-
-### What this means for your extension:
-
-- **Security First**: Your extension script runs in a controlled environment that prevents access to sensitive browser APIs and global objects.
-- **Error Messages**: If you encounter errors mentioning "SES" in the browser console, these are typically related to:
-  - Module loading or import statements that SES cannot resolve
-  - Use of restricted JavaScript features or APIs
-  - Dynamic code evaluation or unsafe patterns
-
-If you encounter SES-related errors, review your build configuration and ensure your code doesn't rely on restricted features or dynamic code execution patterns.

@@ -6,7 +6,7 @@ const Container = styled.div`
     padding: 12px 16px;
     font-size: 15px;
     color: #000000;
-    background-color: #fac365;
+    background-color: #e8ebee;
     display: flex;
     align-items: center;
     gap: 6px;
