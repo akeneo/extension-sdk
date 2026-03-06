@@ -2,7 +2,7 @@
 
 Requires a valid PIM API token. The MCP server handles authentication; the agent runs the curl command with the compiled file.
 
-All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md §10.2` and `§10.3`.
+All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md §11.2` and `§11.3`.
 
 ---
 
@@ -85,7 +85,7 @@ Do not ask the user to do this manually — write it directly. Then confirm:
 
 ## Step 5 — Confirm it is live
 
-> "Navigate to [plain-language description of the position] in your PIM — the component should appear there. If you do not see it, refresh the page."
+> "Navigate to [plain-language description of the position] in your PIM. You may need to refresh the page for it to appear."
 
 ---
 

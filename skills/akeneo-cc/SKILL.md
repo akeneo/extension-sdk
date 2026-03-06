@@ -6,17 +6,6 @@ description: >
 user-invocable: false
 ---
 
-An Akeneo **Custom Component** (also called `sdk_script`) is a JavaScript/TypeScript application that you compile and upload directly into the Akeneo PIM. Once uploaded, it renders inside the PIM interface at a position you choose — a product page panel, a tab, a header, a grid action bar, and more. It has access to PIM data and APIs through a secure SDK injected at runtime.
+The user wants help building an Akeneo Custom Component. Start the guided setup immediately — do not ask them to run a command manually.
 
-**Resources:**
-- Official docs: https://api.akeneo.com/advanced-extensions/overview.html
-- Extension SDK repo (examples, starter templates): https://github.com/akeneo/extension-sdk
-- Akeneo MCP server: connect it to your AI tool to get guided assistance automatically
-
-To get started building your Custom Component, run:
-
-```
-/akeneo-cc-setup
-```
-
-That command will ask you three quick questions and walk you through the full process step by step.
+Read and follow `${CLAUDE_SKILL_DIR}/../akeneo-cc-setup/SKILL.md` now.

@@ -10,9 +10,30 @@ All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md`. Read from ther
 
 ## Before starting
 
-Confirm the full plan and ask for a single go-ahead:
+First, ask the user where the component should appear. Show this list in full — do not truncate it:
 
-> "I am going to scaffold a **[name]** component at **[plain-language position]**, build it, and upload it so you can see it live in your PIM. Once it is working, we will add the actual functionality. Ready?"
+> "Where should your component appear in the PIM?"
+>
+> | Position | Where it appears |
+> |---|---|
+> | Product Header | Product edit page — header |
+> | Product Panel | Product edit page — right sidebar |
+> | Product Tab | Product edit page — tab |
+> | Product Model Header | Product model edit page — header |
+> | Product Model Panel | Product model edit page — right sidebar |
+> | Product Model Tab | Product model edit page — tab |
+> | Sub-Product Model Header | Sub product model edit page — header |
+> | Sub-Product Model Panel | Sub product model edit page — right sidebar |
+> | Sub-Product Model Tab | Sub product model edit page — tab |
+> | Category Tab | Category edit page — tab |
+> | Reference Entity Record Tab | Reference entity record edit page — tab |
+> | Product Grid Action Bar | Product list page — bulk action bar |
+> | Activity Navigation Tab | Activity navigation — tab |
+> | Performance Analytics Tab | Performance analytics — tab |
+
+Wait for their answer, then confirm the full plan and ask for a go-ahead:
+
+> "I am going to scaffold a **[name]** component at **[chosen position]**, build it, and upload it so you can see it live in your PIM. Once it is working, we will add the actual functionality. Ready?"
 
 Wait for confirmation. Then proceed without checking in again until the component is live.
 
@@ -63,7 +84,6 @@ function App() {
 
   return (
     <div style={{ padding: '16px' }}>
-      <h2>[name]</h2>
       {user && <p>Hello, {user.first_name}!</p>}
     </div>
   );
@@ -76,7 +96,7 @@ export default App;
 
 ## Step 2 — Install and build
 
-Run:
+Run both commands directly inside the project folder:
 
 ```bash
 npm install

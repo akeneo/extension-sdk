@@ -192,25 +192,24 @@ const expirationDate = globalThis.PIM.custom_variables.certification_expiration_
 
 ## 7. Available Positions
 
-| Position identifier | Where it appears |
-|---|---|
-| `pim.product.header` | Product edit page — header |
-| `pim.product.panel` | Product edit page — right sidebar |
-| `pim.product.tab` | Product edit page — tab |
-| `pim.product.index` | Product list page — top-left menu |
-| `pim.product-model.header` | Product model edit page — header |
-| `pim.product-model.panel` | Product model edit page — right sidebar |
-| `pim.product-model.tab` | Product model edit page — tab |
-| `pim.sub-product-model.header` | Sub product model edit page — header |
-| `pim.sub-product-model.panel` | Sub product model edit page — right sidebar |
-| `pim.sub-product-model.tab` | Sub product model edit page — tab |
-| `pim.category.tab` | Category edit page — tab |
-| `pim.reference-entity-record.tab` | Reference entity record edit page — tab |
-| `pim.product-grid.action-bar` | Product list page — bulk action bar (max 500 selected items) |
-| `pim.activity.navigation.tab` | Activity navigation — tab |
-| `pim.performance.analytics.tab` | Performance analytics — tab |
+| Position identifier | Where it appears | UI label (PIM admin dropdown) |
+|---|---|---|
+| `pim.product.header` | Product edit page — header | Product Header |
+| `pim.product.panel` | Product edit page — right sidebar | Product Panel |
+| `pim.product.tab` | Product edit page — tab | Product Tab |
+| `pim.product-model.header` | Product model edit page — header | Product Model Header |
+| `pim.product-model.panel` | Product model edit page — right sidebar | Product Model Panel |
+| `pim.product-model.tab` | Product model edit page — tab | Product Model Tab |
+| `pim.sub-product-model.header` | Sub product model edit page — header | Sub-Product Model Header |
+| `pim.sub-product-model.panel` | Sub product model edit page — right sidebar | Sub-Product Model Panel |
+| `pim.sub-product-model.tab` | Sub product model edit page — tab | Sub-Product Model Tab |
+| `pim.category.tab` | Category edit page — tab | Category Tab |
+| `pim.reference-entity-record.tab` | Reference entity record edit page — tab | Reference Entity Record Tab |
+| `pim.product-grid.action-bar` | Product list page — bulk action bar (max 500 selected items) | Product Grid Action Bar |
+| `pim.activity.navigation.tab` | Activity navigation — tab | Activity Navigation Tab |
+| `pim.performance.analytics.tab` | Performance analytics — tab | Performance Analytics Tab |
 
-Header positions have a constrained height to preserve page readability. `pim.product-grid.action-bar` only fires when at most 500 products/models are selected.
+Header positions (`*.header`) have a constrained height to preserve page readability. `pim.product-grid.action-bar` only fires when at most 500 products/models are selected.
 
 ---
 
@@ -314,11 +313,17 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
+  define: {
+    // Replace at build time — process is not available in the SES sandbox at runtime
+    'process.env.NODE_ENV': JSON.stringify(mode === 'production' ? 'production' : 'development'),
+  },
   build: {
-    lib: {
-      entry: 'src/main.tsx',
-      formats: ['es'],
-      fileName: () => 'my-extension', // produces dist/my-extension.js; must match extension_configuration.json "file"
+    rollupOptions: {
+      input: 'src/main.tsx',
+      output: {
+        format: 'es',
+        entryFileNames: 'my-extension.js', // explicit .js; must match extension_configuration.json "file"
+      },
     },
     outDir: 'dist',
     target: 'es2020',
@@ -337,7 +342,7 @@ export default defineConfig(({ mode }) => ({
 }));
 ```
 
-Replace `my-extension` in `fileName` with the component's snake_case name to match the `file` field in `extension_configuration.json`.
+Replace `my-extension` in `entryFileNames` with the component's snake_case name to match the `file` field in `extension_configuration.json`.
 
 ### 8.4 TypeScript configuration
 
@@ -431,7 +436,37 @@ EXTENSION_UUID=          # filled in automatically after first upload
 
 ---
 
-## 9. Build Commands
+## 9. Known SES Runtime Errors
+
+These errors appear in the browser console when the extension loads in the PIM. They indicate the compiled bundle contains code incompatible with the SES sandbox.
+
+### `SES_UNCAUGHT_EXCEPTION: ReferenceError: process is not defined`
+
+**Cause:** The bundle contains a runtime reference to `process` (typically `process.env.NODE_ENV` from React or other libraries). `process` is a Node.js global; the SES sandbox does not provide it.
+
+**Fix:** Add a `define` entry in `vite.config.ts` to replace it at build time:
+
+```typescript
+define: {
+  'process.env.NODE_ENV': JSON.stringify('production'),
+},
+```
+
+This must be a top-level `defineConfig` option, not inside `build`.
+
+### `SES Removing unpermitted intrinsics` (warnings)
+
+**Cause:** The SES sandbox removes built-ins that are newer than its locked-down environment (e.g. `MapPrototype.getOrInsert`, `WeakMapPrototype.getOrInsert`, `DatePrototype.toTemporalInstant`). These are console warnings only — they do not affect functionality and can be ignored.
+
+### Output file has no `.js` extension
+
+**Cause:** Vite lib mode `fileName` does not always guarantee a `.js` extension depending on the version and format.
+
+**Fix:** Use `rollupOptions.output.entryFileNames` with an explicit `.js` suffix instead of `lib.fileName`.
+
+---
+
+## 10. Build Commands
 
 | Command | What it does |
 |---|---|
@@ -442,9 +477,9 @@ EXTENSION_UUID=          # filled in automatically after first upload
 
 ---
 
-## 10. Upload Methods
+## 11. Upload Methods
 
-### 10.1 Via the Akeneo UI
+### 11.1 Via the Akeneo UI
 
 1. Log into your PIM instance.
 2. Navigate to **System → Extensions**.
@@ -465,7 +500,7 @@ To update an existing extension: navigate to **System → Extensions**, select t
 
 ---
 
-### 10.2 Via curl
+### 11.2 Via curl
 
 **Create:**
 
@@ -516,7 +551,7 @@ Note: the update endpoint uses `POST` with a `_method=PATCH` form field, not an 
 
 ---
 
-### 10.3 Via the REST API (programmatic)
+### 11.3 Via the REST API (programmatic)
 
 **Endpoint — create:**
 ```
@@ -561,7 +596,7 @@ Content-Type: multipart/form-data
 
 ---
 
-## 11. Credential Types Reference
+## 12. Credential Types Reference
 
 | Type | Form field value | Auth header injected by PIM |
 |---|---|---|
@@ -573,7 +608,7 @@ Credentials are stored encrypted in the PIM database. Never hardcode credentials
 
 ---
 
-## 12. Type Definitions
+## 13. Type Definitions
 
 The full TypeScript type definitions for the PIM SDK are available at:
 
@@ -591,7 +626,7 @@ TypeScript will pick it up automatically since it is inside `src/`. No explicit 
 
 ---
 
-## 13. Official Documentation Links
+## 14. Official Documentation Links
 
 | Topic | URL |
 |---|---|
