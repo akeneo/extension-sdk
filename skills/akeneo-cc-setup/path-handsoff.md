@@ -1,73 +1,85 @@
 # Hands-off path
 
-The user wants the agent to handle everything. Build autonomously. Explain outcomes, not decisions. Confirm once before starting — not before every action.
+The user wants the agent to handle everything. Build autonomously. Explain outcomes, not decisions. Confirm once before each phase — not before every action.
 
 All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md`. Read from there when you need specifics.
 
 ---
 
+# Phase 1 — Hello World
+
 ## Before starting
 
-Show the user a one-line summary of what you are about to do and ask for a single confirmation:
+Confirm the full plan and ask for a single go-ahead:
 
-> "I am going to scaffold a Custom Component named **[name]**, configure it to appear at **[plain-language position]**, build it, and hand off to the upload step. Ready to start?"
+> "I am going to scaffold a **[name]** component at **[plain-language position]**, build it, and upload it so you can see it live in your PIM. Once it is working, we will add the actual functionality. Ready?"
 
-Wait for confirmation. Then proceed without checking in again until the build is done.
+Wait for confirmation. Then proceed without checking in again until the component is live.
 
 ---
 
-## Step 1 — Scaffold the project
+## Step 1 — Create the project
 
-Clone or copy the quickstart example from the `extension-sdk` repository:
+Create a new directory named after the component (snake_case). Inside it, create the following files exactly.
 
+**`extension_configuration.json`** — fill in the real values from the session:
+
+```json
+{
+  "name": "[name]",
+  "type": "sdk_script",
+  "position": "[position identifier]",
+  "file": "dist/[name].js",
+  "configuration": {
+    "default_label": "[name]"
+  }
+}
 ```
-https://github.com/akeneo/extension-sdk/tree/main/examples/quickstart
+
+**`package.json`** — from `reference.md §8.2`:
+
+Use the standalone package.json. Set `"name"` to the component name.
+
+**`tsconfig.json`**:
+
+```json
+{
+  "references": [{ "path": "./tsconfig.app.json" }],
+  "files": []
+}
 ```
 
-Rename the project folder to the component name (snake_case). Then configure `extension_configuration.json` using the values collected during profiling:
+**`tsconfig.app.json`** — from `reference.md §8.4`.
 
-- `name` — the technical identifier (snake_case, no spaces)
-- `position` — the position identifier from `reference.md §7`; map the user's plain-language choice to the correct identifier
-- `configuration.default_label` — the display label the user gave
-- `configuration.labels` — add locale-specific labels if the user provided them
+**`vite.config.ts`** — from `reference.md §8.3` (standalone version). Replace `my-extension` in `fileName` with the component name.
 
-Do not explain the file structure. Just do it and move on.
+**`src/main.tsx`** — from `reference.md §8.5`.
 
----
+**`src/App.tsx`** — a minimal hello world that reads the logged-in user:
 
-## Step 2 — Tell the user what their component will be able to do
+```tsx
+function App() {
+  const user = (globalThis as any).PIM?.user;
 
-Before building, give a plain-language summary of what this component can do once it is live. Tailor it to the position they chose. Examples:
+  return (
+    <div style={{ padding: '16px' }}>
+      <h2>[name]</h2>
+      {user && <p>Hello, {user.first_name}!</p>}
+    </div>
+  );
+}
 
-- **Product page positions:** "Your component will be able to read the product currently open — its identifier, the current locale and channel — and display anything you like alongside it. It can also read or update any PIM data your account has permission to access."
-- **Activity navigation tab:** "Your component will appear as a tab in the main navigation. It can read your user info and access any PIM data your account allows, but it will not have a specific product or category in context."
-- **Product grid action bar:** "Your component will appear when products are selected in the list. It can read the UUIDs of the selected products and act on them in bulk."
-
-Keep it to two or three sentences. No API names, no code.
-
----
-
-## Step 3 — Remind the user of the simple rules
-
-Before building, state the constraints plainly:
-
-- "The compiled file must be under 10 MB."
-- "The component can only call external services through the PIM — it cannot make direct internet requests on its own."
-- "What it can read and write depends on the permissions of the person who is logged in."
+export default App;
+```
 
 ---
 
-## Step 4 — Build
+## Step 2 — Install and build
 
-Run the build command:
+Run:
 
 ```bash
-make build
-```
-
-If the `Makefile` is not available (from-scratch project), run:
-
-```bash
+npm install
 npm run build
 ```
 
@@ -75,13 +87,55 @@ If the build succeeds, tell the user:
 
 > "Build complete. The compiled file is at `dist/[name].js`."
 
-If the build fails, show the error and diagnose it before continuing. Do not proceed to the upload step with a failed build.
+If the build fails, diagnose and fix the error before continuing. Do not proceed with a broken build.
 
 ---
 
-## Step 5 — Hand off to the upload sub-flow
+## Step 3 — Upload (first time)
 
 Read and follow the upload sub-flow the user chose during profiling:
 
 - UI upload → `${CLAUDE_SKILL_DIR}/upload-ui.md`
 - curl + API → `${CLAUDE_SKILL_DIR}/upload-api.md`
+
+---
+
+## Step 4 — Confirm it is live
+
+Ask the user to navigate to the position in their PIM and confirm the hello world appears. Do not move to Phase 2 until they confirm.
+
+---
+
+# Phase 2 — Enhance
+
+## Step 5 — Ask what to build
+
+Ask a single question:
+
+> "The hello world is live. What should this component actually do?"
+
+Wait for their answer before proceeding.
+
+---
+
+## Step 6 — Build it
+
+Implement the requested functionality. Read `reference.md §3` and `§4` for the SDK surface available at the chosen position. Build what the user asked for — no unnecessary explanation.
+
+After implementing, rebuild:
+
+```bash
+npm run build
+```
+
+If the build fails, fix it before continuing.
+
+---
+
+## Step 7 — Push the update
+
+Follow the "Updating the component later" section of the upload sub-flow the user chose — not the create step.
+
+---
+
+Hand back to `SKILL.md` for the session wrap-up.

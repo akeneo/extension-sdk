@@ -6,27 +6,54 @@ All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md §10.2` and `§1
 
 ---
 
-## Step 1 — Acquire an API token via MCP
+## Step 1 — Collect connection info and write `.env`
 
-Use the MCP PIM authentication tool to acquire a Bearer token for the user's PIM instance.
+Ask the user for their PIM connection details:
 
-Ask the user for what the MCP auth tool needs (typically PIM host, client ID, client secret, username, password — or an App token if they use a custom App). Explain why:
+> "To upload via the API I need a few details from your PIM. Which authentication method do you use — a Connection (client ID + secret + username + password) or a custom App token?"
 
-> "To upload via the API I need a token from your PIM. I will use the MCP server to get one — your credentials are handled by the MCP server and are not stored in the project."
+Collect the appropriate values, then write them to `.env` in the project root (create the file if it does not exist):
 
-Once the token is acquired, proceed. Do not print the token value in the conversation.
+```
+PIM_HOST=https://your-pim.cloud.akeneo.com
+# Connection credentials (if applicable)
+CLIENT_ID=
+CLIENT_SECRET=
+USERNAME=
+PASSWORD=
+# App token (if applicable)
+APP_TOKEN=
+# Filled in automatically:
+API_TOKEN=
+EXTENSION_UUID=
+```
 
-**Fallback — if MCP auth is unavailable or fails:**
+Do not print credential values in the conversation. Confirm once the file is written:
 
-> "I could not acquire a token automatically. You can get one manually by running:
-> ```bash
-> make get-token
-> ```
-> or by following the [Akeneo connection guide](https://api.akeneo.com/getting-started/connect-the-pim-4x/step-1.html). Once you have the token, paste it here and I will run the upload."
+> ".env created with your connection details."
 
 ---
 
-## Step 2 — Create the extension
+## Step 2 — Acquire an API token
+
+**If the MCP PIM authentication tool is available:** use it to get a Bearer token. Do not print the token value.
+
+**If MCP is unavailable or fails:** run the token endpoint directly. For Connection credentials:
+
+```bash
+curl -X POST "https://[PIM_HOST]/api/oauth/v1/token" \
+  -H "Content-Type: application/json" \
+  -u "[CLIENT_ID]:[CLIENT_SECRET]" \
+  -d '{"grant_type":"password","username":"[USERNAME]","password":"[PASSWORD]"}'
+```
+
+For a custom App token, it is already a Bearer token — use it directly.
+
+Extract `access_token` from the response, write it to `.env` as `API_TOKEN=`, and use it for all subsequent curl commands. Do not print the token value in the conversation.
+
+---
+
+## Step 3 — Create the extension
 
 Run the curl command with all values substituted from the session:
 
@@ -40,28 +67,23 @@ curl -X POST "https://[PIM_HOST]/api/rest/v1/ui-extensions" \
   -F "configuration[default_label]=[default_label]"
 ```
 
-Add locale labels if collected during profiling:
+---
+
+## Step 4 — Save the extension UUID to `.env`
+
+Extract the `uuid` field from the response and write it to `.env`:
 
 ```bash
-  -F "configuration[labels][en_US]=[label_en]" \
-  -F "configuration[labels][fr_FR]=[label_fr]"
+EXTENSION_UUID=[uuid from response]
 ```
 
----
+Do not ask the user to do this manually — write it directly. Then confirm:
 
-## Step 3 — Save the extension UUID
-
-The response contains a `uuid` field. Extract it and save it — the user will need it for every future update.
-
-Tell the user:
-
-> "Extension created. Your extension UUID is: `[uuid]`
->
-> Save this — you will need it to push updates. I recommend adding it to your `.env` file as `EXTENSION_UUID=[uuid]`."
+> "Done. Extension UUID saved to `.env`. You will not need to look it up again."
 
 ---
 
-## Step 4 — Confirm it is live
+## Step 5 — Confirm it is live
 
 > "Navigate to [plain-language description of the position] in your PIM — the component should appear there. If you do not see it, refresh the page."
 
@@ -69,7 +91,7 @@ Tell the user:
 
 ## Updating the extension later
 
-When the user rebuilds and wants to push a new version, run:
+Read `PIM_HOST`, `EXTENSION_UUID`, and `API_TOKEN` from `.env`. If the token has expired, re-run Step 2 to get a new one and update `API_TOKEN` in `.env`. Then run:
 
 ```bash
 curl -X POST "https://[PIM_HOST]/api/rest/v1/ui-extensions/[EXTENSION_UUID]" \

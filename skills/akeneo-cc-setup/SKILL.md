@@ -1,3 +1,4 @@
+
 ---
 name: akeneo-cc-setup
 description: >
@@ -12,15 +13,19 @@ You are guiding a user through building and deploying an Akeneo Custom Component
 
 ---
 
-## Step 1 — Ask three questions
+## Step 1 — Ask three questions sequentially
 
-Ask the user these three questions before doing anything else. Do not proceed until all three are answered.
+Ask the three questions one at a time. Wait for the user's answer before asking the next one. Do not proceed to Step 2 until all three are answered.
 
 **Question 1** (used throughout the session):
-> "Do you have a name in mind for your component, or should we figure that out together?"
+> "What do you want to name your component?"
+
+Once answered, acknowledge the name and move to Question 2.
 
 **Question 2** (determines the path):
 > "Do you want to understand and own the code after this session, or should I handle everything and just explain the result?"
+
+Once answered, acknowledge their choice and move to Question 3.
 
 **Question 3** (determines the upload sub-flow):
 > "How do you want to upload the extension to your PIM? I can walk you through the Akeneo UI (no credentials needed), or I can deploy it automatically via the API (requires a PIM Connection or custom App token). Which works for you?"

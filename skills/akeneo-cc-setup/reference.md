@@ -292,10 +292,16 @@ Optional fields: `configuration.labels`, `configuration.custom_variables`, `cred
     "preview": "vite preview"
   },
   "dependencies": {
-    "akeneo-design-system": "^4.0.0",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "styled-components": "^6.1.13"
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "terser": "^5.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0"
   }
 }
 ```
@@ -303,34 +309,66 @@ Optional fields: `configuration.labels`, `configuration.custom_variables`, `cred
 ### 8.3 `vite.config.ts`
 
 ```typescript
-import { createViteConfig } from '../common/vite.config.base';
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-export default createViteConfig({
-  projectName: 'my-extension',
-});
+export default defineConfig(({ mode }) => ({
+  plugins: [react()],
+  build: {
+    lib: {
+      entry: 'src/main.tsx',
+      formats: ['es'],
+      fileName: () => 'my-extension', // produces dist/my-extension.js; must match extension_configuration.json "file"
+    },
+    outDir: 'dist',
+    target: 'es2020',
+    minify: mode === 'production' ? 'terser' : false,
+    sourcemap: mode !== 'production',
+    terserOptions: {
+      compress: {
+        passes: 3,
+        drop_console: true,
+      },
+    },
+    commonjsOptions: {
+      strictRequires: 'auto', // reduces bundle size ~8x; must not be removed
+    },
+  },
+}));
 ```
 
-The base config (`examples/common/vite.config.base.js`) handles:
-- Output format: `es` (ESM)
-- Target: `ES2020`
-- Entry: `src/main.tsx`
-- Output file: derived from `extension_configuration.json → file`
-- Production: Terser minification with aggressive settings (3 compression passes), no source maps, `drop_console: true`
-- Development: no minification, inline source maps
-- **Critical setting:** `commonjsOptions.strictRequires: 'auto'` — reduces bundle size by ~8x, must not be removed
+Replace `my-extension` in `fileName` with the component's snake_case name to match the `file` field in `extension_configuration.json`.
 
-### 8.4 TypeScript configuration (`tsconfig.app.json`)
+### 8.4 TypeScript configuration
+
+**`tsconfig.json`** (project references entry point for `tsc -b`):
+
+```json
+{
+  "references": [{ "path": "./tsconfig.app.json" }],
+  "files": []
+}
+```
+
+**`tsconfig.app.json`**:
 
 ```json
 {
   "compilerOptions": {
     "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
+    "skipLibCheck": true,
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
     "jsx": "react-jsx",
     "strict": true
   },
-  "include": ["src/**/*", "../common/global.d.ts"]
+  "include": ["src"]
 }
 ```
 
@@ -376,7 +414,7 @@ export default App;
 
 ### 8.7 `.env` variables
 
-> **extension-sdk only.** This file and the variables below are part of the `extension-sdk` repository tooling. Developers building from scratch will not have this file and must manage authentication and deployment themselves.
+Optional — useful for storing PIM connection details when deploying via curl. Not loaded by the PIM runtime; only used by local tooling.
 
 ```
 PIM_HOST=https://your-pim-instance.com
@@ -387,34 +425,20 @@ PASSWORD=your_password
 # OR (alternative authentication)
 APP_TOKEN=your_app_token
 
-EXTENSION_UUID=          # set automatically after first creation
-API_TOKEN=               # set automatically
-REFRESH_TOKEN=           # set automatically
-TOKEN_CREATED_AT=        # set automatically
+API_TOKEN=               # filled in automatically after token fetch
+EXTENSION_UUID=          # filled in automatically after first upload
 ```
 
 ---
 
 ## 9. Build Commands
 
-> **extension-sdk only.** The `make` commands below are provided by the `Makefile` included in the `extension-sdk` repository (under `examples/common/`). They are not available in a from-scratch project. Developers building independently must run the equivalent `npm`/`node` commands directly or set up their own tooling.
-
 | Command | What it does |
 |---|---|
-| `make start` | First-time setup: installs deps, configures env, creates extension in PIM |
-| `make install` | Install npm dependencies |
-| `make copy-env` | Copy `.env.example` to `.env` |
-| `make get-token` | Fetch API token from PIM and write to `.env` |
-| `make dev` | Start local Vite dev server |
-| `make build-dev` | Build in development mode (no minification, inline source maps) |
-| `make build` | Build in production mode (minified, no source maps) |
-| `make create-dev` | Build dev + create extension in PIM |
-| `make create` | Build prod + create extension in PIM |
-| `make create-dev-with-credentials` | Build dev + create extension with credentials |
-| `make create-with-credentials` | Build prod + create extension with credentials |
-| `make update-dev` | Build dev + push update to PIM |
-| `make update` | Build prod + push update to PIM |
-| `make watch` | Watch `src/` for changes and auto-run `make update-dev` |
+| `npm install` | Install all dependencies |
+| `npm run dev` | Start local Vite dev server |
+| `npm run build` | Production build: TypeScript check + Vite bundle → `dist/[name].js` |
+| `npm run preview` | Preview the production build locally |
 
 ---
 
@@ -551,17 +575,19 @@ Credentials are stored encrypted in the PIM database. Never hardcode credentials
 
 ## 12. Type Definitions
 
-The full TypeScript type definitions for the PIM SDK are in:
+The full TypeScript type definitions for the PIM SDK are available at:
 
 ```
-examples/common/global.d.ts
+https://github.com/akeneo/extension-sdk/blob/main/examples/common/global.d.ts
 ```
 
-This file (3,185 lines) contains all types for `PIM_SDK`, `PIM_USER`, `PIM_CONTEXT`, and all API parameter/response types. It must be referenced in `tsconfig.app.json` via:
+This file contains all types for `PIM_SDK`, `PIM_USER`, `PIM_CONTEXT`, and all API parameter/response types. Download it into the project (e.g. `src/global.d.ts`) and add it to `tsconfig.app.json`:
 
 ```json
-"include": ["src/**/*", "../common/global.d.ts"]
+"include": ["src"]
 ```
+
+TypeScript will pick it up automatically since it is inside `src/`. No explicit reference needed.
 
 ---
 
