@@ -94,7 +94,6 @@ Read `PIM_HOST`, `EXTENSION_UUID`, and `API_TOKEN` from `.env`. If the token has
 ```bash
 curl -X POST "https://[PIM_HOST]/api/rest/v1/ui-extensions/[EXTENSION_UUID]" \
   -H "Authorization: Bearer [API_TOKEN]" \
-  -F "_method=PATCH" \
   -F "name=[name]" \
   -F "type=sdk_script" \
   -F "position=[position]" \
@@ -102,7 +101,7 @@ curl -X POST "https://[PIM_HOST]/api/rest/v1/ui-extensions/[EXTENSION_UUID]" \
   -F "configuration[default_label]=[default_label]"
 ```
 
-Note: the update endpoint uses `POST` with `_method=PATCH` — not an actual HTTP PATCH.
+Note: do not add `_method=PATCH` — the PIM rejects it with a 400 error. Use a plain `POST` to the UUID endpoint.
 
 ---
 

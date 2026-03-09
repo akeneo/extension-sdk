@@ -69,9 +69,7 @@ dist/
 .env
 ```
 
-Then explain:
-
-> "This ensures `node_modules/`, the compiled `dist/` output, and `.env` (which will hold your PIM credentials) are never accidentally committed. Created first so it's in place before we write any sensitive values."
+Mention that it was created — no further explanation needed.
 
 ---
 
@@ -92,7 +90,7 @@ Write the file using §8.2, with the component name set. Then explain and valida
 
 Write all three files using §8.4, using the extended `tsconfig.json` variant (the one that also references `tsconfig.node.json`). Then explain and validate:
 
-> "Three config files because `tsc -b` uses project references. `tsconfig.app.json` covers everything in `src/`. `tsconfig.node.json` covers `vite.config.ts` — since you'll likely adjust the build config, having TypeScript check it means typos and misconfigurations get caught at `tsc` time rather than silently failing at build time. The important setting in both is `noEmit: true` — TypeScript only type-checks, Vite handles the actual bundling. Feel free to tighten or relax the compiler options to match your team's conventions.
+> "Three config files because `tsc -b` uses project references. `tsconfig.app.json` covers everything in `src/`. `tsconfig.node.json` covers `vite.config.ts` — it type-checks the build configuration so misconfigurations are caught at `tsc` time rather than silently failing at build time. The important setting in both is `noEmit: true` — TypeScript only type-checks, Vite handles the actual bundling.
 >
 > Any changes, or shall we move on?"
 
@@ -148,7 +146,7 @@ function App() {
   const user = globalThis.PIM?.user;
 
   return (
-    <div style={{ padding: '16px' }}>
+    <div style={{ padding: '16px', fontSize: '16px' }}>
       {user && <p>Hello, {user.first_name}!</p>}
     </div>
   );
@@ -159,9 +157,7 @@ export default App;
 
 Then explain and validate:
 
-> "A minimal starting point. `globalThis.PIM` is the SDK object the PIM runtime injects — we use optional chaining (`?.`) so the component doesn't crash when running locally where PIM isn't present. Thanks to `global.d.ts`, `PIM` is fully typed — no `any` casts needed. We'll replace this with the real logic in Phase 2.
->
-> Good to go?"
+> "A minimal starting point — it reads your name from the PIM SDK (typed via the `global.d.ts` we just downloaded) and displays it. We'll replace this with the real implementation in Phase 2. What would you like the component to do?"
 
 ---
 
@@ -211,7 +207,7 @@ Before writing any logic, explain what the component can read and do at the chos
 Also cover the constraints from §2:
 - No direct `fetch()` — use `PIM.api.external.call()` for external HTTP.
 - No `process.env` — use `import.meta.env` for build-time config.
-- All API calls inherit the logged-in user's PIM permissions.
+- All PIM API calls respect the logged-in user's API permissions.
 
 ---
 

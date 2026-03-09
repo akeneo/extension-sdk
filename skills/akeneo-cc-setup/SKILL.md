@@ -1,12 +1,8 @@
 
 ---
 name: akeneo-cc-setup
-description: >
-  Use this when the user mentions Akeneo Custom Components, CC extensions,
-  sdk_script extensions, or asks how to build, extend, or customize the Akeneo
-  PIM UI. Also guides a user through building and deploying a Custom Component
-  from scratch when invoked manually via /akeneo-cc-setup.
-user-invocable: true
+description: Guides a user through building and deploying an Akeneo Custom Component from scratch. Invoked manually via /akeneo-cc-setup.
+user-invokable: true
 context: fork
 allowed-tools: Read, Write, Edit, Bash
 ---

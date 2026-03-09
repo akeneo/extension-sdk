@@ -96,12 +96,30 @@ Plus one position-specific payload (mutually exclusive):
 
 All API calls are asynchronous (Promise-based). Operations follow REST semantics: `get`, `list`, `create`/`post`, `patch`/`upsert`, `delete`.
 
+**`list()` search parameter:** pass a plain object — do not `JSON.stringify` it. The SDK serializes it internally; wrapping it in a string causes a 400 error.
+
+```typescript
+// Correct
+PIM.api.product_uuid_v1.list({ search: { uuid: [{ operator: 'IN', value: uuids }] } })
+
+// Wrong — double-encodes the search param
+PIM.api.product_uuid_v1.list({ search: JSON.stringify({ uuid: [...] }) })
+```
+
 ### 4.1 Product APIs
 
 | Object | API key | Operations |
 |---|---|---|
 | Product (by UUID) | `product_uuid_v1` | `get`, `list`, `create`, `patch`, `delete` |
 | Product model | `product_model_v1` | `get`, `list`, `post`, `patch`, `delete` |
+
+When filtering `product_uuid_v1.list()` by UUID, the search key is `uuid` (not `id`):
+
+```typescript
+PIM.api.product_uuid_v1.list({
+  search: { uuid: [{ operator: 'IN', value: ['uuid-1', 'uuid-2'] }] }
+})
+```
 | Product media file | `product_media_file_v1` | `get`, `post`, `download` |
 
 ### 4.2 Catalog Structure APIs
@@ -565,7 +583,6 @@ The response contains the extension `uuid`. Save it — you need it for updates.
 ```bash
 curl -X POST "https://{PIM_HOST}/api/rest/v1/ui-extensions/{EXTENSION_UUID}" \
   -H "Authorization: Bearer {API_TOKEN}" \
-  -F "_method=PATCH" \
   -F "name=my_extension" \
   -F "type=sdk_script" \
   -F "position=pim.product.panel" \
@@ -573,7 +590,7 @@ curl -X POST "https://{PIM_HOST}/api/rest/v1/ui-extensions/{EXTENSION_UUID}" \
   -F "configuration[default_label]=My Extension"
 ```
 
-Note: the update endpoint uses `POST` with a `_method=PATCH` form field, not an actual HTTP PATCH.
+Note: do not add a `_method=PATCH` form field — the PIM rejects it with a 400 error. Use a plain `POST` to the UUID endpoint.
 
 **With credentials:**
 
@@ -634,7 +651,8 @@ Content-Type: multipart/form-data
 | `credentials[n][value][password]` | No | string | Password (for Basic Auth) |
 | `credentials[n][value][header_key]` | No | string | Header name (for Custom Header) |
 | `credentials[n][value][header_value]` | No | string | Header value (for Custom Header) |
-| `_method` | Update only | string | Must be `PATCH` |
+
+**Do not include `_method=PATCH`** — the PIM rejects it with a 400 error. Both create and update use `POST`; they are distinguished by whether a UUID is present in the URL.
 
 ---
 
@@ -665,6 +683,8 @@ This file contains all types for `PIM_SDK`, `PIM_USER`, `PIM_CONTEXT`, and all A
 ```
 
 TypeScript will pick it up automatically since it is inside `src/`. No explicit reference needed.
+
+**Important:** `global.d.ts` uses `declare interface` and `declare type` at the top level with no `import` or `export` statements. This makes it an **ambient declaration file** — all types it defines are globally available throughout the project without any import. Do not inline types manually or add import statements for them. Use the type names directly (e.g. `PIM_USER`, `PIM_CONTEXT`) wherever needed.
 
 ---
 
