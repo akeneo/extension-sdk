@@ -10,26 +10,9 @@ All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md`. Read from ther
 
 ## Before starting
 
-First, ask the user where the component should appear. Show this list in full — do not truncate it:
+First, ask the user where the component should appear. Read the full position list from `reference.md §7` and display the UI label and location columns — do not truncate it:
 
 > "Where should your component appear in the PIM?"
->
-> | Position | Where it appears |
-> |---|---|
-> | Product Header | Product edit page — header |
-> | Product Panel | Product edit page — right sidebar |
-> | Product Tab | Product edit page — tab |
-> | Product Model Header | Product model edit page — header |
-> | Product Model Panel | Product model edit page — right sidebar |
-> | Product Model Tab | Product model edit page — tab |
-> | Sub-Product Model Header | Sub product model edit page — header |
-> | Sub-Product Model Panel | Sub product model edit page — right sidebar |
-> | Sub-Product Model Tab | Sub product model edit page — tab |
-> | Category Tab | Category edit page — tab |
-> | Reference Entity Record Tab | Reference entity record edit page — tab |
-> | Product Grid Action Bar | Product list page — bulk action bar |
-> | Activity Navigation Tab | Activity navigation — tab |
-> | Performance Analytics Tab | Performance analytics — tab |
 
 Wait for their answer, then confirm the full plan and ask for a go-ahead:
 
@@ -42,6 +25,14 @@ Wait for confirmation. Then proceed without checking in again until the componen
 ## Step 1 — Create the project
 
 Create a new directory named after the component (snake_case). Inside it, create the following files exactly.
+
+**`.gitignore`**:
+
+```
+node_modules/
+dist/
+.env
+```
 
 **`extension_configuration.json`** — fill in the real values from the session:
 
@@ -57,7 +48,9 @@ Create a new directory named after the component (snake_case). Inside it, create
 }
 ```
 
-**`package.json`** — from `reference.md §8.2`:
+Optional fields (`labels`, `custom_variables`, `credentials`) are documented in `reference.md §8.1` — add them when needed.
+
+**`package.json`** — from `reference.md §8.2`. Set `"name"` to the component name:
 
 Use the standalone package.json. Set `"name"` to the component name.
 
@@ -74,13 +67,21 @@ Use the standalone package.json. Set `"name"` to the component name.
 
 **`vite.config.ts`** — from `reference.md §8.3` (standalone version). Replace `my-extension` in `fileName` with the component name.
 
-**`src/main.tsx`** — from `reference.md §8.5`.
+**`src/index.css`** — from `reference.md §8.5`.
+
+**`src/main.tsx`** — from `reference.md §8.6`.
+
+**`src/global.d.ts`** — download the official SDK type definitions:
+
+```bash
+curl -o src/global.d.ts https://raw.githubusercontent.com/akeneo/extension-sdk/main/examples/common/global.d.ts
+```
 
 **`src/App.tsx`** — a minimal hello world that reads the logged-in user:
 
 ```tsx
 function App() {
-  const user = (globalThis as any).PIM?.user;
+  const user = globalThis.PIM?.user;
 
   return (
     <div style={{ padding: '16px' }}>
@@ -128,11 +129,18 @@ Ask the user to navigate to the position in their PIM and confirm the hello worl
 
 # Phase 2 — Enhance
 
-## Step 5 — Ask what to build
+## Step 5 — Surface SDK context, then ask what to build
 
-Ask a single question:
+Read `reference.md §3.2` and `§4` for the chosen position. Then briefly tell the user what data is available to them before asking what to build. Keep it non-technical — one short paragraph. For example:
 
-> "The hello world is live. What should this component actually do?"
+- **Product/product model positions:** "At this position your component knows which product is open (its UUID and identifier). From there it can fetch the full product data, read or update any attribute, fetch the product's family or categories, and so on."
+- **Product grid action bar:** "At this position your component receives the list of selected product UUIDs (up to 500). It's designed for bulk actions — triggering a workflow, exporting data, applying a tag to all selected products, etc."
+- **Category positions:** "At this position your component knows which category is being edited (its code). It can fetch the category's details or trigger actions scoped to that category."
+- **Other positions:** "At this position there is no specific entity in context — your component can still read the logged-in user's details and call any PIM API, but it has no pre-selected product or category to work from."
+
+Then ask:
+
+> "Given what's available — what should this component actually do?"
 
 Wait for their answer before proceeding.
 

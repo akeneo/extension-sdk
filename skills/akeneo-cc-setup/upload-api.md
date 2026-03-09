@@ -36,9 +36,7 @@ Do not print credential values in the conversation. Confirm once the file is wri
 
 ## Step 2 — Acquire an API token
 
-**If the MCP PIM authentication tool is available:** use it to get a Bearer token. Do not print the token value.
-
-**If MCP is unavailable or fails:** run the token endpoint directly. For Connection credentials:
+For Connection credentials, run:
 
 ```bash
 curl -X POST "https://[PIM_HOST]/api/oauth/v1/token" \

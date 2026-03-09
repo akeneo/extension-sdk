@@ -10,26 +10,9 @@ All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md`. Read from ther
 
 ## Before starting
 
-First, ask the user where the component should appear. Show this list in full — do not truncate it:
+First, ask the user where the component should appear. Read the full position list from `reference.md §7` and display the UI label and location columns — do not truncate it:
 
 > "Where should your component appear in the PIM?"
->
-> | Position | Where it appears |
-> |---|---|
-> | Product Header | Product edit page — header |
-> | Product Panel | Product edit page — right sidebar |
-> | Product Tab | Product edit page — tab |
-> | Product Model Header | Product model edit page — header |
-> | Product Model Panel | Product model edit page — right sidebar |
-> | Product Model Tab | Product model edit page — tab |
-> | Sub-Product Model Header | Sub product model edit page — header |
-> | Sub-Product Model Panel | Sub product model edit page — right sidebar |
-> | Sub-Product Model Tab | Sub product model edit page — tab |
-> | Category Tab | Category edit page — tab |
-> | Reference Entity Record Tab | Reference entity record edit page — tab |
-> | Product Grid Action Bar | Product list page — bulk action bar |
-> | Activity Navigation Tab | Activity navigation — tab |
-> | Performance Analytics Tab | Performance analytics — tab |
 
 Wait for their answer, then confirm the plan and ask for a go-ahead:
 
@@ -70,8 +53,25 @@ Then explain and validate:
 > - `type` is always `sdk_script`, which is the internal name for Custom Components.
 > - `file` points to the compiled output. Only that single file gets uploaded — nothing else from the project.
 > - `default_label` is what appears in the PIM UI; we're using the component name as a starting point, you can change it anytime.
+> - Optional fields (`labels` for per-locale names, `custom_variables` for runtime config, `credentials` for external API keys) are documented in `reference.md §8.1` — add them when needed.
 >
 > Does this look right, or would you like to adjust anything?"
+
+---
+
+**`.gitignore`**
+
+Write this file before anything else:
+
+```
+node_modules/
+dist/
+.env
+```
+
+Then explain:
+
+> "This ensures `node_modules/`, the compiled `dist/` output, and `.env` (which will hold your PIM credentials) are never accidentally committed. Created first so it's in place before we write any sensitive values."
 
 ---
 
@@ -88,11 +88,11 @@ Write the file from `reference.md §8.2`, with the component name set. Then expl
 
 ---
 
-**`tsconfig.json`** and **`tsconfig.app.json`**
+**`tsconfig.json`**, **`tsconfig.app.json`**, and **`tsconfig.node.json`**
 
-Write both files from `reference.md §8.4`. Then explain and validate:
+Write all three files from `reference.md §8.4`, using the extended `tsconfig.json` variant (the one that also references `tsconfig.node.json`). Then explain and validate:
 
-> "Two config files because `tsc -b` (the TypeScript build command) uses project references. The important setting in `tsconfig.app.json` is `noEmit: true` — TypeScript only type-checks the code, it doesn't produce output. Vite handles the actual bundling. Feel free to tighten or relax the compiler options to match your team's conventions.
+> "Three config files because `tsc -b` uses project references. `tsconfig.app.json` covers everything in `src/`. `tsconfig.node.json` covers `vite.config.ts` — since you'll likely adjust the build config, having TypeScript check it means typos and misconfigurations get caught at `tsc` time rather than silently failing at build time. The important setting in both is `noEmit: true` — TypeScript only type-checks, Vite handles the actual bundling. Feel free to tighten or relax the compiler options to match your team's conventions.
 >
 > Any changes, or shall we move on?"
 
@@ -105,7 +105,7 @@ Write the file from `reference.md §8.3`, replacing `my-extension` in `entryFile
 > "The build config. Here's what the key settings do:
 > - `rollupOptions` with `format: 'es'` and `entryFileNames` — produces a single named `.js` file in `dist/`. The filename must match what you declared in `extension_configuration.json`.
 > - `target: 'es2020'` — a reasonable baseline for modern browsers; you can raise it if you know your users are on recent browsers, or lower it for broader compatibility.
-> - `define: { 'process.env.NODE_ENV' }` — replaces that reference at build time so it doesn't cause an error in the PIM's sandboxed runtime.
+> - `define: { 'process.env.NODE_ENV' }` — React uses this internally; the PIM's SES sandbox doesn't have `process`, so it must be replaced with a hardcoded string at build time or the component crashes on load.
 > - `commonjsOptions.strictRequires: 'auto'` — significantly reduces bundle size by tree-shaking CommonJS modules more aggressively. We'd recommend keeping this unless you hit a specific compatibility issue.
 > - Terser with 3 compression passes — good compression with reasonable build times. You can reduce the passes if builds feel slow.
 >
@@ -115,11 +115,27 @@ Write the file from `reference.md §8.3`, replacing `my-extension` in `entryFile
 
 **`src/main.tsx`**
 
-Write the file from `reference.md §8.5`. Then explain and validate:
+Write `src/index.css` from `reference.md §8.5`, then write `src/main.tsx` from `reference.md §8.6`. Then explain and validate:
 
 > "The entry point. The PIM injects a `<div id=\"root\">` into the page and your component mounts into it. The `if (!document.getElementById('root'))` guard just creates that div when running locally via `npm run dev`, where the PIM isn't there to inject it.
 >
 > This file rarely needs changing. Ready to move on?"
+
+---
+
+**`src/global.d.ts`**
+
+Download the official SDK type definitions:
+
+```bash
+curl -o src/global.d.ts https://raw.githubusercontent.com/akeneo/extension-sdk/main/examples/common/global.d.ts
+```
+
+Then explain:
+
+> "This file contains TypeScript types for the entire PIM SDK — `globalThis.PIM`, all context shapes, and all API parameters and responses. It lives in `src/` so TypeScript picks it up automatically. This means you get autocompletion and type errors when working with the SDK instead of having to cast everything to `any`.
+>
+> You should re-download it if the SDK adds new APIs."
 
 ---
 
@@ -129,7 +145,7 @@ Write the hello world:
 
 ```tsx
 function App() {
-  const user = (globalThis as any).PIM?.user;
+  const user = globalThis.PIM?.user;
 
   return (
     <div style={{ padding: '16px' }}>
@@ -143,7 +159,7 @@ export default App;
 
 Then explain and validate:
 
-> "A minimal starting point. `globalThis.PIM` is the SDK object the PIM runtime injects — we use optional chaining (`?.`) so the component doesn't crash when running locally where PIM isn't present. We'll replace this with the real logic in Phase 2.
+> "A minimal starting point. `globalThis.PIM` is the SDK object the PIM runtime injects — we use optional chaining (`?.`) so the component doesn't crash when running locally where PIM isn't present. Thanks to `global.d.ts`, `PIM` is fully typed — no `any` casts needed. We'll replace this with the real logic in Phase 2.
 >
 > Good to go?"
 

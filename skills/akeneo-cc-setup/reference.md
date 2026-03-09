@@ -315,7 +315,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [react()],
   define: {
     // Replace at build time — process is not available in the SES sandbox at runtime
-    'process.env.NODE_ENV': JSON.stringify(mode === 'production' ? 'production' : 'development'),
+    'process.env.NODE_ENV': JSON.stringify('production'),
   },
   build: {
     rollupOptions: {
@@ -346,12 +346,44 @@ Replace `my-extension` in `entryFileNames` with the component's snake_case name 
 
 ### 8.4 TypeScript configuration
 
-**`tsconfig.json`** (project references entry point for `tsc -b`):
+**`tsconfig.json`** (minimal — only references `tsconfig.app.json`):
 
 ```json
 {
   "references": [{ "path": "./tsconfig.app.json" }],
   "files": []
+}
+```
+
+**`tsconfig.json`** (extended — also type-checks `vite.config.ts` via `tsconfig.node.json`):
+
+```json
+{
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "files": []
+}
+```
+
+**`tsconfig.node.json`** (only needed alongside the extended `tsconfig.json`):
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true
+  },
+  "include": ["vite.config.ts"]
 }
 ```
 
@@ -377,15 +409,25 @@ Replace `my-extension` in `entryFileNames` with the component's snake_case name 
 }
 ```
 
-### 8.5 `src/main.tsx` pattern
+### 8.5 `src/index.css`
+
+Create this file alongside `main.tsx`. A minimal reset is sufficient:
+
+```css
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+```
+
+### 8.6 `src/main.tsx` pattern
 
 ```typescript
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import App from './App.tsx'
 import './index.css'
-import { pimTheme } from 'akeneo-design-system'
-import { ThemeProvider } from 'styled-components'
 
 if (!document.getElementById('root')) {
   document.body.innerHTML = '<div id="root"></div>'
@@ -393,15 +435,13 @@ if (!document.getElementById('root')) {
 
 ReactDOM.render(
   <StrictMode>
-    <ThemeProvider theme={pimTheme}>
       <App />
-    </ThemeProvider>
   </StrictMode>,
   document.getElementById('root')
 )
 ```
 
-### 8.6 `src/App.tsx` pattern
+### 8.7 `src/App.tsx` pattern
 
 ```typescript
 function App() {
@@ -417,7 +457,7 @@ function App() {
 export default App;
 ```
 
-### 8.7 `.env` variables
+### 8.8 `.env` variables
 
 Optional — useful for storing PIM connection details when deploying via curl. Not loaded by the PIM runtime; only used by local tooling.
 
@@ -474,6 +514,8 @@ This must be a top-level `defineConfig` option, not inside `build`.
 | `npm run dev` | Start local Vite dev server |
 | `npm run build` | Production build: TypeScript check + Vite bundle → `dist/[name].js` |
 | `npm run preview` | Preview the production build locally |
+
+> **Note:** `npm run dev` has limited value for Custom Components. The PIM SDK (`globalThis.PIM`) is only injected when the component runs inside the PIM runtime. Most features — context data, API calls, navigation — are unavailable locally. The recommended workflow is: build → upload → verify in the PIM. `index.html` is not scaffolded by default; if local dev is needed, create one at the project root with a `<div id="root"></div>` body and `<script type="module" src="/src/main.tsx"></script>`.
 
 ---
 
