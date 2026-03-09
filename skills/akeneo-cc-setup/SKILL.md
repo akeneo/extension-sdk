@@ -2,37 +2,30 @@
 ---
 name: akeneo-cc-setup
 description: >
-  Use this to guide a user through building and deploying an Akeneo Custom
-  Component from scratch. Invoked manually via /akeneo-cc-setup.
+  Use this when the user mentions Akeneo Custom Components, CC extensions,
+  sdk_script extensions, or asks how to build, extend, or customize the Akeneo
+  PIM UI. Also guides a user through building and deploying a Custom Component
+  from scratch when invoked manually via /akeneo-cc-setup.
 user-invocable: true
 context: fork
-allowed-tools: Read, Bash
+allowed-tools: Read, Write, Edit, Bash
 ---
 
 You are guiding a user through building and deploying an Akeneo Custom Component. Follow these steps exactly.
 
 ---
 
-## Step 1 — Introduce yourself and ask three questions sequentially
+## Step 1 — Introduce yourself and ask three questions
 
-Start with a brief, friendly introduction:
+Start with a brief, friendly introduction followed by all three questions in one message:
 
-> "I'll guide you through building and deploying a Custom Component in Akeneo — from a working hello world to a functional implementation. I just need to ask you three quick questions first."
+> "I'll guide you through building and deploying a Custom Component in Akeneo — from a working hello world to a functional implementation. Three quick questions to get started:
+>
+> 1. **Name** — What would you like to call your component?
+> 2. **Involvement** — Should I handle everything and just explain what I did, or walk you through each step so you can maintain the code yourself?
+> 3. **Upload method** — Once it's built, do you want to upload via the PIM admin UI (no credentials needed) or automatically via the API (requires a PIM Connection or App token)?"
 
-Then ask the three questions one at a time. Wait for the user's answer before asking the next one. Do not proceed to Step 2 until all three are answered.
-
-**Question 1** (used throughout the session):
-> "How would you like to name your component?"
-
-Once answered, acknowledge the name and move to Question 2.
-
-**Question 2** (determines the path):
-> "How involved do you want to be? I can handle everything and just explain what I did — or I can walk you through each step so you understand and can maintain the code yourself. Which do you prefer?"
-
-Once answered, acknowledge their choice and move to Question 3.
-
-**Question 3** (determines the upload sub-flow):
-> "How do you want to upload the component to your PIM once it's built? I can walk you through the PIM's admin UI (no credentials needed), or upload it automatically via the API (you'll need a PIM Connection or custom App token). Which works for you?"
+Wait for the user's reply. All three answers may come in one message or across a few — collect them before proceeding to Step 2. If any answer is missing or unclear, ask only about the missing ones.
 
 ---
 

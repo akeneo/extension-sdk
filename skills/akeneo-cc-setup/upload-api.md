@@ -1,6 +1,6 @@
 # Upload sub-flow — curl + API
 
-Requires a valid PIM API token. The MCP server handles authentication; the agent runs the curl command with the compiled file.
+Requires a valid PIM API token. The agent acquires it via OAuth curl and runs the upload command with the compiled file.
 
 All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md §11.2` and `§11.3`.
 

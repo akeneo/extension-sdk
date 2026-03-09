@@ -2,7 +2,7 @@
 
 The user wants to understand and own the code. Explain every significant decision before acting. Use technical language where it adds clarity. The user should come out of this session able to iterate on the project independently.
 
-All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md`. Read from there when you need specifics.
+Read `${CLAUDE_SKILL_DIR}/reference.md` now. You will use it throughout this session — do not read it again.
 
 ---
 
@@ -10,7 +10,7 @@ All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md`. Read from ther
 
 ## Before starting
 
-First, ask the user where the component should appear. Read the full position list from `reference.md §7` and display the UI label and location columns — do not truncate it:
+First, ask the user where the component should appear. Use §7 from reference.md and display the UI label and location columns — do not truncate it:
 
 > "Where should your component appear in the PIM?"
 
@@ -77,7 +77,7 @@ Then explain:
 
 **`package.json`**
 
-Write the file from `reference.md §8.2`, with the component name set. Then explain and validate:
+Write the file using §8.2, with the component name set. Then explain and validate:
 
 > "Standard Node project config. A couple of things to note:
 > - `\"type\": \"module\"` makes all `.js` files use ESM syntax by default — this is a natural fit since we're producing an ESM bundle.
@@ -90,7 +90,7 @@ Write the file from `reference.md §8.2`, with the component name set. Then expl
 
 **`tsconfig.json`**, **`tsconfig.app.json`**, and **`tsconfig.node.json`**
 
-Write all three files from `reference.md §8.4`, using the extended `tsconfig.json` variant (the one that also references `tsconfig.node.json`). Then explain and validate:
+Write all three files using §8.4, using the extended `tsconfig.json` variant (the one that also references `tsconfig.node.json`). Then explain and validate:
 
 > "Three config files because `tsc -b` uses project references. `tsconfig.app.json` covers everything in `src/`. `tsconfig.node.json` covers `vite.config.ts` — since you'll likely adjust the build config, having TypeScript check it means typos and misconfigurations get caught at `tsc` time rather than silently failing at build time. The important setting in both is `noEmit: true` — TypeScript only type-checks, Vite handles the actual bundling. Feel free to tighten or relax the compiler options to match your team's conventions.
 >
@@ -100,7 +100,7 @@ Write all three files from `reference.md §8.4`, using the extended `tsconfig.js
 
 **`vite.config.ts`**
 
-Write the file from `reference.md §8.3`, replacing `my-extension` in `entryFileNames` with the component name. Then explain and validate:
+Write the file using §8.3, replacing `my-extension` in `entryFileNames` with the component name. Then explain and validate:
 
 > "The build config. Here's what the key settings do:
 > - `rollupOptions` with `format: 'es'` and `entryFileNames` — produces a single named `.js` file in `dist/`. The filename must match what you declared in `extension_configuration.json`.
@@ -115,7 +115,7 @@ Write the file from `reference.md §8.3`, replacing `my-extension` in `entryFile
 
 **`src/main.tsx`**
 
-Write `src/index.css` from `reference.md §8.5`, then write `src/main.tsx` from `reference.md §8.6`. Then explain and validate:
+Write `src/index.css` using §8.5, then write `src/main.tsx` using §8.6. Then explain and validate:
 
 > "The entry point. The PIM injects a `<div id=\"root\">` into the page and your component mounts into it. The `if (!document.getElementById('root'))` guard just creates that div when running locally via `npm run dev`, where the PIM isn't there to inject it.
 >
@@ -201,14 +201,14 @@ Ask the user to navigate to the position in their PIM and confirm the hello worl
 
 ## Step 5 — Explain the SDK for their position
 
-Before writing any logic, explain what the component can read and do at the chosen position. Read the exact context payload from `reference.md §3.2` and the API surface from `reference.md §4`. For example:
+Before writing any logic, explain what the component can read and do at the chosen position. Use §3.2 and §4 from reference.md. For example:
 
 - **Product/product model page:** `PIM.context.product.uuid` and `.identifier` — the product currently open. `PIM.api.product_uuid_v1.get(uuid)` to fetch full product data.
 - **Product grid action bar:** `PIM.context.productGrid.productUuids` — UUIDs of selected products. Useful for bulk actions.
 - **Category page:** `PIM.context.category.code` — the category being edited.
 - **All positions:** `PIM.context.user.catalog_locale` and `.catalog_scope` — the user's active locale and channel.
 
-Also cover the constraints from `reference.md §2`:
+Also cover the constraints from §2:
 - No direct `fetch()` — use `PIM.api.external.call()` for external HTTP.
 - No `process.env` — use `import.meta.env` for build-time config.
 - All API calls inherit the logged-in user's PIM permissions.

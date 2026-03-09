@@ -2,7 +2,7 @@
 
 The user wants the agent to handle everything. Build autonomously. Explain outcomes, not decisions. Confirm once before each phase — not before every action.
 
-All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md`. Read from there when you need specifics.
+Read `${CLAUDE_SKILL_DIR}/reference.md` now. You will use it throughout this session — do not read it again.
 
 ---
 
@@ -10,7 +10,7 @@ All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md`. Read from ther
 
 ## Before starting
 
-First, ask the user where the component should appear. Read the full position list from `reference.md §7` and display the UI label and location columns — do not truncate it:
+First, ask the user where the component should appear. Use §7 from reference.md and display the UI label and location columns — do not truncate it:
 
 > "Where should your component appear in the PIM?"
 
@@ -50,26 +50,15 @@ dist/
 
 Optional fields (`labels`, `custom_variables`, `credentials`) are documented in `reference.md §8.1` — add them when needed.
 
-**`package.json`** — from `reference.md §8.2`. Set `"name"` to the component name:
+**`package.json`** — use §8.2. Set `"name"` to the component name.
 
-Use the standalone package.json. Set `"name"` to the component name.
+**`tsconfig.json`**, **`tsconfig.app.json`**, **`tsconfig.node.json`** — use §8.4. Use the extended `tsconfig.json` variant (references both `tsconfig.app.json` and `tsconfig.node.json`).
 
-**`tsconfig.json`**:
+**`vite.config.ts`** — use §8.3. Replace `my-extension` in `entryFileNames` with the component name.
 
-```json
-{
-  "references": [{ "path": "./tsconfig.app.json" }],
-  "files": []
-}
-```
+**`src/index.css`** — use §8.5.
 
-**`tsconfig.app.json`** — from `reference.md §8.4`.
-
-**`vite.config.ts`** — from `reference.md §8.3` (standalone version). Replace `my-extension` in `fileName` with the component name.
-
-**`src/index.css`** — from `reference.md §8.5`.
-
-**`src/main.tsx`** — from `reference.md §8.6`.
+**`src/main.tsx`** — use §8.6.
 
 **`src/global.d.ts`** — download the official SDK type definitions:
 
@@ -131,7 +120,7 @@ Ask the user to navigate to the position in their PIM and confirm the hello worl
 
 ## Step 5 — Surface SDK context, then ask what to build
 
-Read `reference.md §3.2` and `§4` for the chosen position. Then briefly tell the user what data is available to them before asking what to build. Keep it non-technical — one short paragraph. For example:
+Use §3.2 and §4 from reference.md for the chosen position. Then briefly tell the user what data is available to them before asking what to build. Keep it non-technical — one short paragraph. For example:
 
 - **Product/product model positions:** "At this position your component knows which product is open (its UUID and identifier). From there it can fetch the full product data, read or update any attribute, fetch the product's family or categories, and so on."
 - **Product grid action bar:** "At this position your component receives the list of selected product UUIDs (up to 500). It's designed for bulk actions — triggering a workflow, exporting data, applying a tag to all selected products, etc."
@@ -148,7 +137,7 @@ Wait for their answer before proceeding.
 
 ## Step 6 — Build it
 
-Implement the requested functionality. Read `reference.md §3` and `§4` for the SDK surface available at the chosen position. Build what the user asked for — no unnecessary explanation.
+Implement the requested functionality. Use §3 and §4 from reference.md for the SDK surface available at the chosen position. Build what the user asked for — no unnecessary explanation.
 
 After implementing, rebuild:
 
