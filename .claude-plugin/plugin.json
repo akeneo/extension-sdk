@@ -1,5 +1,5 @@
 {
-  "name": "akeneo-cc",
+  "name": "akeneo-custom-component",
   "version": "1.0.0",
   "description": "Guides Claude Code users through building and deploying Akeneo Custom Components. Includes an awareness skill that triggers automatically when Custom Components are mentioned, and a setup skill (/akeneo-cc-setup) that scaffolds, builds, and deploys a component step by step.",
   "author": {
