@@ -37,21 +37,6 @@ try {
 }
 ```
 
-### Claude Code Plugin _(Beta)_
-
-This repository includes a **Claude Code plugin** (`akeneo-custom-component`) that helps you build and deploy Akeneo Custom Components directly from your Claude Code session. It provides an awareness skill that triggers automatically when Custom Components are mentioned, and a guided setup skill (`/akeneo-cc-setup`) that scaffolds, builds, and deploys a component step by step.
-
-> **Note:** This plugin is currently in beta. Expect rough edges and breaking changes.
-
-#### Installation
-
-1. Open the **Plugins** panel in Claude Code (`/plugins`)
-2. Go to **Marketplaces** and add the following marketplace URL:
-   ```
-   https://raw.githubusercontent.com/akeneo/extension-sdk/beta/marketplace.json
-   ```
-3. Go to **Discover**, find `akeneo-custom-component` and install it
-
 ## Further Documentation
 
 For more detailed information about the Akeneo PIM API, please refer to the official [Akeneo API documentation](https://api.akeneo.com/).
