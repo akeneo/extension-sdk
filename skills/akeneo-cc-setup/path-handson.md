@@ -211,7 +211,15 @@ Also cover the constraints from §2:
 
 ---
 
-## Step 6 — Ask what to build
+## Step 6 — Ask what to build (or use captured intent)
+
+**If `[USER_INTENT]` is set**, do not ask — open with:
+
+> "Now that the SDK is clear, let's implement what you described: [USER_INTENT]. Here's my approach: [brief explanation of the relevant API calls and logic]. Does that match what you had in mind, or would you like to adjust anything?"
+
+Wait for confirmation, then build it together.
+
+**If `[USER_INTENT]` is not set**, ask:
 
 > "Now that you can see how the SDK works — what should this component actually do?"
 

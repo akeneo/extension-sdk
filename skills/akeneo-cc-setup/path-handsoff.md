@@ -118,16 +118,18 @@ Ask the user to navigate to the position in their PIM and confirm the hello worl
 
 # Phase 2 — Enhance
 
-## Step 5 — Surface SDK context, then ask what to build
+## Step 5 — Surface SDK context, then move to implementation
 
-Use §3.2 and §4 from reference.md for the chosen position. Then briefly tell the user what data is available to them before asking what to build. Keep it non-technical — one short paragraph. For example:
+Use §3.2 and §4 from reference.md for the chosen position. Briefly tell the user what data is available at that position — one short non-technical paragraph. For example:
 
 - **Product/product model positions:** "At this position your component knows which product is open (its UUID and identifier). From there it can fetch the full product data, read or update any attribute, fetch the product's family or categories, and so on."
 - **Product grid action bar:** "At this position your component receives the list of selected product UUIDs (up to 500). It's designed for bulk actions — triggering a workflow, exporting data, applying a tag to all selected products, etc."
 - **Category positions:** "At this position your component knows which category is being edited (its code). It can fetch the category's details or trigger actions scoped to that category."
 - **Other positions:** "At this position there is no specific entity in context — your component can still read the logged-in user's details and call any PIM API, but it has no pre-selected product or category to work from."
 
-Then ask:
+**If `[USER_INTENT]` is set**, do not ask what to build — go directly to Step 6 and implement it.
+
+**If `[USER_INTENT]` is not set**, ask:
 
 > "Given what's available — what should this component actually do?"
 
