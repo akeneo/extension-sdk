@@ -43,8 +43,8 @@ PIM_HOST=https://your-pim-instance.cloud.akeneo.com
 # Connection credentials (if using a PIM Connection):
 CLIENT_ID=
 CLIENT_SECRET=
-USERNAME=
-PASSWORD=
+PIM_USERNAME=
+PIM_PASSWORD=
 # App token (if using a custom App — use instead of the four fields above):
 APP_TOKEN=
 # Filled in automatically after first upload:
@@ -75,7 +75,7 @@ upload:
 	  response=$$(curl -s -X POST "$$PIM_HOST/api/oauth/v1/token" \
 	    -H "Content-Type: application/json" \
 	    -u "$$CLIENT_ID:$$CLIENT_SECRET" \
-	    -d "{\"grant_type\":\"password\",\"username\":\"$$USERNAME\",\"password\":\"$$PASSWORD\"}"); \
+	    -d "{\"grant_type\":\"password\",\"username\":\"$$PIM_USERNAME\",\"password\":\"$$PIM_PASSWORD\"}"); \
 	  API_TOKEN=$$(echo "$$response" | grep -o '"access_token":"[^"]*"' | cut -d'"' -f4); \
 	  if [ -z "$$API_TOKEN" ]; then echo "ERROR: Failed to fetch API token. Check your .env credentials."; exit 1; fi; \
 	  sed -i.bak "s|^API_TOKEN=.*|API_TOKEN=$$API_TOKEN|" .env && rm -f .env.bak; \

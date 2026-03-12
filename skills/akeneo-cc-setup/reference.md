@@ -483,8 +483,8 @@ Optional — useful for storing PIM connection details when deploying via curl. 
 PIM_HOST=https://your-pim-instance.com
 CLIENT_ID=your_client_id
 CLIENT_SECRET=your_client_secret
-USERNAME=your_username
-PASSWORD=your_password
+PIM_USERNAME=your_username
+PIM_PASSWORD=your_password
 # OR (alternative authentication)
 APP_TOKEN=your_app_token
 
