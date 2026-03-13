@@ -10,6 +10,12 @@ Read `${CLAUDE_SKILL_DIR}/reference.md` now. You will use it throughout this ses
 
 Read existing project files to gather information. Do not ask the user for values you can find by reading. Only ask for what is genuinely missing.
 
+## IMPORTANT — credential value rule
+
+When reading `extension_configuration.json`, use only the structural fields (`name`, `position`, `file`, `configuration.*`, and credential `code` fields). If credential `value` fields are present in the file (actual tokens, passwords, API keys), do not read, display, or reference them — treat them as opaque. If the user asks about a credential value, respond with:
+
+> "I won't read credential values from `extension_configuration.json` — they would be exposed in this conversation. If you need to update a credential value, edit the file directly."
+
 ---
 
 ## Step 1 — Locate the project
