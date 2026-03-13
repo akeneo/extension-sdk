@@ -11,21 +11,35 @@ You are guiding a user through building and deploying an Akeneo Custom Component
 
 ---
 
-## Step 1 — Introduce yourself and ask three questions
+## Step 1 — Introduce yourself and ask the starting question
 
-Start with a brief, friendly introduction followed by all three questions in one message:
+**If `[USER_INTENT]` is set**, open with:
 
-> "I'll guide you through building and deploying a Custom Component in Akeneo — from a working hello world to a functional implementation. Three quick questions to get started:
+> "I'll help you build that. We'll start by bootstrapping a working Custom Component — once it's live in your PIM, I'll implement [USER_INTENT] directly. First — are you starting from scratch, or do you already have an existing project?"
+
+**If `[USER_INTENT]` is not set**, open with:
+
+> "I'll guide you through building and deploying a Custom Component in Akeneo. First — are you starting from scratch, or do you already have an existing project you want to upload or iterate on?"
+
+---
+
+## Step 2 — Route to the right path
+
+### Existing project
+
+If the user already has a project, read and follow `${CLAUDE_SKILL_DIR}/path-existing.md` in full. That path handles discovery, validation, and upload — no further questions needed here.
+
+### New project
+
+If the user is starting from scratch, ask three questions in one message:
+
+> "Three quick questions to get started:
 >
 > 1. **Name** — What would you like to call your component?
 > 2. **Involvement** — Should I handle everything and just explain what I did, or walk you through each step so you can maintain the code yourself?
 > 3. **Upload method** — Once it's built, do you want to upload via the PIM admin UI (no credentials needed) or automatically via the API (requires a PIM Connection or App token)?"
 
-Wait for the user's reply. All three answers may come in one message or across a few — collect them before proceeding to Step 2. If any answer is missing or unclear, ask only about the missing ones.
-
----
-
-## Step 2 — Route to the right path
+Wait for the user's reply. All three answers may come in one message or across a few — collect them before proceeding. If any answer is missing or unclear, ask only about the missing ones.
 
 Based on the answer to Question 2, read the appropriate path file and follow it in full:
 

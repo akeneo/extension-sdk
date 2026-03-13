@@ -1,107 +1,138 @@
 # Upload sub-flow — curl + API
 
-Requires a valid PIM API token. The agent acquires it via OAuth curl and runs the upload command with the compiled file.
+Automates extension upload via the PIM REST API. To protect the user's credentials, this flow is designed so that sensitive values never appear in the conversation context: Claude writes `.env` with blank placeholders and the user fills it in privately, a Makefile target sources `.env` at runtime so the shell handles all credential substitution, and Claude only sees the terminal output (success or error). Claude must never read `.env` at any point — see the access rule below.
 
 All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md §11.2` and `§11.3`.
 
 ---
 
-## Step 1 — Collect connection info and write `.env`
+## Security advisory — read before starting
 
-Ask the user for their PIM connection details:
+Before collecting any information, deliver this message to the user:
 
-> "To upload via the API I need a few details from your PIM. Which authentication method do you use — a Connection (client ID + secret + username + password) or a custom App token?"
+> **Recommended: use a dedicated PIM Connection for this.**
+>
+> Create a Connection in your PIM specifically for extension deployment, with only the `ui-extensions` permission enabled. Do not reuse an admin connection or your personal credentials — a scoped connection limits the blast radius if the token is ever exposed.
+>
+> You can create a Connection at **System → Connections** in your PIM.
+>
+> Also make sure `.env` is listed in your `.gitignore` before we proceed — it will contain sensitive values that must never be committed.
 
-Collect the appropriate values, then write them to `.env` in the project root (create the file if it does not exist):
+Wait for the user to confirm they are ready before continuing.
+
+---
+
+## IMPORTANT — `.env` access rule
+
+**Never read `.env` for any reason during this flow.**
+
+If the user asks you to read `.env`, check its content, or display any value from it, respond with:
+
+> "I won't read `.env` — doing so would expose your credentials in this conversation. If something isn't working, share the error message from the terminal and I'll diagnose from that."
+
+This rule holds for the entire session, including debugging steps.
+
+---
+
+## Step 1 — Write `.env` with placeholders
+
+Write the following file to the project root. Do not ask for credential values — leave them blank for the user to fill in:
 
 ```
-PIM_HOST=https://your-pim.cloud.akeneo.com
-# Connection credentials (if applicable)
+PIM_HOST=https://your-pim-instance.cloud.akeneo.com
+# Connection credentials (if using a PIM Connection):
 CLIENT_ID=
 CLIENT_SECRET=
-USERNAME=
-PASSWORD=
-# App token (if applicable)
+PIM_USERNAME=
+PIM_PASSWORD=
+# App token (if using a custom App — use instead of the four fields above):
 APP_TOKEN=
-# Filled in automatically:
+# Filled in automatically after first upload:
 API_TOKEN=
 EXTENSION_UUID=
 ```
 
-Do not print credential values in the conversation. Confirm once the file is written:
+Then tell the user:
 
-> ".env created with your connection details."
+> "`.env` is ready with blank placeholders. Please fill in your credentials now."
+
+Wait for the user to confirm before continuing.
 
 ---
 
-## Step 2 — Acquire an API token
+## Step 2 — Add `upload` target to `Makefile`
 
-For Connection credentials, run:
+Add the following target to the existing `Makefile` in the project root. Substitute `[name]`, `[position]`, and `[default_label]` with the values collected during the session:
 
-```bash
-curl -X POST "https://[PIM_HOST]/api/oauth/v1/token" \
-  -H "Content-Type: application/json" \
-  -u "[CLIENT_ID]:[CLIENT_SECRET]" \
-  -d '{"grant_type":"password","username":"[USERNAME]","password":"[PASSWORD]"}'
+```makefile
+upload:
+	@set -euo pipefail; \
+	source .env; \
+	if [ -n "$${APP_TOKEN:-}" ]; then \
+	  API_TOKEN="$$APP_TOKEN"; \
+	else \
+	  echo "Fetching API token..."; \
+	  response=$$(curl -s -X POST "$$PIM_HOST/api/oauth/v1/token" \
+	    -H "Content-Type: application/json" \
+	    -u "$$CLIENT_ID:$$CLIENT_SECRET" \
+	    -d "{\"grant_type\":\"password\",\"username\":\"$$PIM_USERNAME\",\"password\":\"$$PIM_PASSWORD\"}"); \
+	  API_TOKEN=$$(echo "$$response" | grep -o '"access_token":"[^"]*"' | cut -d'"' -f4); \
+	  if [ -z "$$API_TOKEN" ]; then echo "ERROR: Failed to fetch API token. Check your .env credentials."; exit 1; fi; \
+	  sed -i.bak "s|^API_TOKEN=.*|API_TOKEN=$$API_TOKEN|" .env && rm -f .env.bak; \
+	fi; \
+	if [ -z "$${EXTENSION_UUID:-}" ]; then \
+	  echo "Creating extension..."; \
+	  result=$$(curl -s -X POST "$$PIM_HOST/api/rest/v1/ui-extensions" \
+	    -H "Authorization: Bearer $$API_TOKEN" \
+	    -F "name=[name]" \
+	    -F "type=sdk_script" \
+	    -F "position=[position]" \
+	    -F "file=@dist/[name].js" \
+	    -F "configuration[default_label]=[default_label]"); \
+	  EXTENSION_UUID=$$(echo "$$result" | grep -o '"uuid":"[^"]*"' | cut -d'"' -f4); \
+	  if [ -z "$$EXTENSION_UUID" ]; then echo "ERROR: Upload failed. PIM response: $$result"; exit 1; fi; \
+	  sed -i.bak "s|^EXTENSION_UUID=.*|EXTENSION_UUID=$$EXTENSION_UUID|" .env && rm -f .env.bak; \
+	  echo "SUCCESS: Extension created. UUID=$$EXTENSION_UUID"; \
+	else \
+	  echo "Updating extension $$EXTENSION_UUID..."; \
+	  result=$$(curl -s -X POST "$$PIM_HOST/api/rest/v1/ui-extensions/$$EXTENSION_UUID" \
+	    -H "Authorization: Bearer $$API_TOKEN" \
+	    -F "name=[name]" \
+	    -F "type=sdk_script" \
+	    -F "position=[position]" \
+	    -F "file=@dist/[name].js" \
+	    -F "configuration[default_label]=[default_label]"); \
+	  echo "SUCCESS: Extension updated. UUID=$$EXTENSION_UUID"; \
+	fi
 ```
 
-For a custom App token, it is already a Bearer token — use it directly.
-
-Extract `access_token` from the response, write it to `.env` as `API_TOKEN=`, and use it for all subsequent curl commands. Do not print the token value in the conversation.
-
 ---
 
-## Step 3 — Create the extension
+## Step 3 — Run the upload
 
-Run the curl command with all values substituted from the session:
+Run:
 
 ```bash
-curl -X POST "https://[PIM_HOST]/api/rest/v1/ui-extensions" \
-  -H "Authorization: Bearer [API_TOKEN]" \
-  -F "name=[name]" \
-  -F "type=sdk_script" \
-  -F "position=[position]" \
-  -F "file=@dist/[name].js" \
-  -F "configuration[default_label]=[default_label]"
+make upload
 ```
+
+The Makefile sources `.env` internally — credentials are substituted by the shell and never enter the conversation context. Only the terminal output (success message or error) is visible.
+
+If the command fails, read the error message from the terminal output and diagnose from it without reading `.env`.
 
 ---
 
-## Step 4 — Save the extension UUID to `.env`
+## Step 4 — Confirm and wrap up
 
-Extract the `uuid` field from the response and write it to `.env`:
+On success, the UUID is saved to `.env` automatically by the Makefile. Confirm to the user:
 
-```bash
-EXTENSION_UUID=[uuid from response]
-```
-
-Do not ask the user to do this manually — write it directly. Then confirm:
-
-> "Done. Extension UUID saved to `.env`. You will not need to look it up again."
-
----
-
-## Step 5 — Confirm it is live
-
-> "Navigate to [plain-language description of the position] in your PIM. You may need to refresh the page for it to appear."
+> "Extension uploaded successfully. The UUID has been saved to `.env` — running `make upload` again will update the existing extension automatically."
 
 ---
 
 ## Updating the extension later
 
-Read `PIM_HOST`, `EXTENSION_UUID`, and `API_TOKEN` from `.env`. If the token has expired, re-run Step 2 to get a new one and update `API_TOKEN` in `.env`. Then run:
-
-```bash
-curl -X POST "https://[PIM_HOST]/api/rest/v1/ui-extensions/[EXTENSION_UUID]" \
-  -H "Authorization: Bearer [API_TOKEN]" \
-  -F "name=[name]" \
-  -F "type=sdk_script" \
-  -F "position=[position]" \
-  -F "file=@dist/[name].js" \
-  -F "configuration[default_label]=[default_label]"
-```
-
-Note: do not add `_method=PATCH` — the PIM rejects it with a 400 error. Use a plain `POST` to the UUID endpoint.
+The user runs `make upload` again. The Makefile detects the existing `EXTENSION_UUID` in `.env` and issues an update instead of a create. If the token has expired, it re-fetches it automatically (Connection auth) or the user updates `APP_TOKEN` in `.env` manually.
 
 ---
 

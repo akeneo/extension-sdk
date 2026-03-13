@@ -173,17 +173,64 @@ PIM.api.product_uuid_v1.list({
 
 ### 4.7 External API calls
 
-To call an external HTTP API from within an extension:
+Two methods are available:
+
+| Method | Use case |
+|---|---|
+| `PIM.api.external.call(params)` | Standard requests |
+| `PIM.api.external.longCall(params)` | Long-running requests that may exceed normal timeout — only one `longCall` can run at a time |
+
+Both accept the same parameters:
 
 ```typescript
 const response = await PIM.api.external.call({
-  method: 'GET',
-  url: 'https://api.example.com/data',
-  credentials_code: 'my_credential_code', // optional
+  method: 'GET',                                    // required
+  url: 'https://api.example.com/data',              // required
+  credentials_code: 'my_credential_code',           // optional
+  headers: { 'Content-Type': 'application/json' },  // optional
+  body: JSON.stringify({ key: 'value' }),            // optional — for POST/PATCH
 });
 ```
 
-`credentials_code` references a credential stored in the extension configuration. The PIM injects the appropriate headers server-side. Hardcoding credentials in the JS file is prohibited — they are visible in browser developer tools.
+`credentials_code` is optional — omit it for public APIs. When provided, it references a credential stored in the extension configuration; the PIM injects the appropriate auth header server-side. Hardcoding credentials in the JS file is prohibited — they are visible in browser developer tools.
+
+### Response handling
+
+The raw return value is a SES-proxied Response-like object. Call `.json()` on it to get the actual envelope — the real API payload is at `wrapper.body`:
+
+```typescript
+const response = await PIM.api.external.call({ method: 'GET', url });
+const wrapper = await response.json();
+const data = wrapper.body; // actual API response data
+```
+
+The envelope shape after `.json()`:
+
+```typescript
+{
+  status: 'success' | 'error', // string, not HTTP number
+  statusCode: 200,             // HTTP status code
+  body: { ... },               // actual API response payload
+  contentType: 'application/json',
+  error: null | string
+}
+```
+
+**Do not** access `response.body` directly — it is an opaque `ReadableStream` before `.json()` is called. `response.status` is the HTTP status number (e.g. `200`); `response.statusCode` is `undefined` on the raw object — both move to the expected shape only after `.json()`.
+
+### SES debugging note
+
+`JSON.stringify()` and `Object.keys()` on the raw response object return `{}` / `[]` even when properties exist — the object is SES-hardened. Use direct property access instead:
+
+```typescript
+// Wrong — always prints {}
+console.log(JSON.stringify(response));
+
+// Correct
+console.log(response.status, response.statusCode);
+```
+
+The same applies after `.json()` if the wrapper is also proxied — always access properties directly.
 
 ---
 
@@ -296,6 +343,8 @@ Full schema:
 
 Required fields: `name`, `type` (must be `sdk_script`), `position`, `file`, `configuration.default_label`.
 Optional fields: `configuration.labels`, `configuration.custom_variables`, `credentials`.
+
+**Label length limit:** `default_label` and all per-locale `labels` values must not exceed **30 characters**.
 
 ### 8.2 `package.json`
 
@@ -483,8 +532,8 @@ Optional — useful for storing PIM connection details when deploying via curl. 
 PIM_HOST=https://your-pim-instance.com
 CLIENT_ID=your_client_id
 CLIENT_SECRET=your_client_secret
-USERNAME=your_username
-PASSWORD=your_password
+PIM_USERNAME=your_username
+PIM_PASSWORD=your_password
 # OR (alternative authentication)
 APP_TOKEN=your_app_token
 

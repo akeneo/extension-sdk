@@ -6,6 +6,16 @@ Read `${CLAUDE_SKILL_DIR}/reference.md` now. You will use it throughout this ses
 
 ---
 
+## IMPORTANT — credential value rule
+
+When writing or reading `extension_configuration.json`, always leave credential `value` fields as placeholders — never write actual token or password values into the file. Tell the user to fill them in directly:
+
+> "I've left the credential values as placeholders in `extension_configuration.json`. Please fill them in directly — I won't write or read actual credential values to keep them out of this conversation."
+
+If the user asks you to write a credential value into the file, decline and redirect them to edit it manually.
+
+---
+
 # Phase 1 — Hello World
 
 ## Before starting
@@ -211,7 +221,15 @@ Also cover the constraints from §2:
 
 ---
 
-## Step 6 — Ask what to build
+## Step 6 — Ask what to build (or use captured intent)
+
+**If `[USER_INTENT]` is set**, do not ask — open with:
+
+> "Now that the SDK is clear, let's implement what you described: [USER_INTENT]. Here's my approach: [brief explanation of the relevant API calls and logic]. Does that match what you had in mind, or would you like to adjust anything?"
+
+Wait for confirmation, then build it together.
+
+**If `[USER_INTENT]` is not set**, ask:
 
 > "Now that you can see how the SDK works — what should this component actually do?"
 
