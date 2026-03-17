@@ -6,6 +6,28 @@ This file is the single source of truth for all factual technical content about 
 
 ---
 
+## 0. Prerequisites
+
+The following must be present on the user's machine before the skill can run successfully.
+
+| Requirement | Minimum version | Used for |
+|---|---|---|
+| Claude Code | any | Running the skill |
+| `akeneo-cc` plugin | any | Skill availability (`/akeneo-cc-setup` command) |
+| Node.js | 18 | `npm install`, `npm run build` |
+| npm | bundled with Node.js | Dependency installation and build scripts |
+| curl | any | `make upload` (API upload path); downloading `global.d.ts` during scaffold |
+
+The plugin is installed from the `extension-sdk` public repository. Node.js and npm must be available in the shell where Claude Code runs — the skill executes `npm install` and `npm run build` directly via Bash.
+
+curl is required for two distinct purposes:
+- **Scaffold step:** `curl -o src/global.d.ts https://raw.githubusercontent.com/akeneo/extension-sdk/main/examples/common/global.d.ts`
+- **API upload path:** the `make upload` Makefile target uses curl to POST the compiled file to the PIM REST API
+
+curl is not required for the UI upload path.
+
+---
+
 ## 1. What Is a Custom Component
 
 A Custom Component is a UI Extension of type `sdk_script`. "Custom Component" is the current product name; "sdk_script" was its name during the development phase and is still used as the `type` value in all API payloads and configuration files. It is a compiled JavaScript/TypeScript application uploaded directly into the PIM. Once uploaded, it renders inside the Akeneo PIM interface at a specific position on the page.
@@ -540,6 +562,90 @@ APP_TOKEN=your_app_token
 API_TOKEN=               # filled in automatically after token fetch
 EXTENSION_UUID=          # filled in automatically after first upload
 ```
+
+### 8.9 Design Systems (optional)
+
+The scaffold does not include a design system by default. Any design system can be added after the hello world is working.
+
+#### Available options (used in official extension-sdk examples)
+
+| Design system | Packages | CSS approach | SES-safe |
+|---|---|---|---|
+| Akeneo Design System | `akeneo-design-system@^4.0.0`, `styled-components@^6.1.0` | CSS-in-JS (no external file) | Yes — with `process.env.NODE_ENV` define |
+| Shopify Polaris | `@shopify/polaris` | External CSS file | Requires CSS injection plugin |
+| shadcn/UI | Radix UI primitives + Tailwind CSS | External CSS file | Requires CSS injection plugin |
+
+Reference: `examples/generic_dashboard` demonstrates all three in a single project.
+
+#### SES constraint: CSS injection
+
+Extensions run in an SES sandbox and cannot load separate CSS files — only the single compiled JS bundle is deployed. Any design system that ships an external stylesheet must have its CSS inlined into the bundle at build time.
+
+**Fix:** add `vite-plugin-css-injected-by-js` to `devDependencies` and register it in `vite.config.ts`:
+
+```bash
+npm install --save-dev vite-plugin-css-injected-by-js
+```
+
+```typescript
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
+
+export default defineConfig({
+  plugins: [react(), cssInjectedByJsPlugin()],
+  // ...
+});
+```
+
+This plugin inlines all CSS into the JS bundle during the Vite build. Without it, Polaris or Tailwind styles are silently absent when the extension loads in the PIM.
+
+The Akeneo Design System does **not** need this plugin — `styled-components` injects styles at runtime via a `<style>` tag, which works inside the SES sandbox.
+
+#### Akeneo Design System pattern
+
+**`src/main.tsx`** — wrap the root with `ThemeProvider`:
+
+```typescript
+import { pimTheme } from 'akeneo-design-system';
+import { ThemeProvider } from 'styled-components';
+
+ReactDOM.render(
+  <StrictMode>
+    <ThemeProvider theme={pimTheme}>
+      <App />
+    </ThemeProvider>
+  </StrictMode>,
+  document.getElementById('root')
+);
+```
+
+`ThemeProvider` can also wrap individual components instead of the root — useful when mixing multiple design systems.
+
+**`src/styled.d.ts`** — TypeScript theme augmentation (required for typed styled-components usage):
+
+```typescript
+import 'styled-components';
+import { Theme } from 'akeneo-design-system';
+
+declare module 'styled-components' {
+  export interface DefaultTheme extends Theme {}
+}
+```
+
+**`process.env.NODE_ENV` define** — already present in the `vite.config.ts` scaffold (`define: { 'process.env.NODE_ENV': JSON.stringify('production') }`). This is required: styled-components references `process.env.NODE_ENV` internally; without the define, it throws at runtime in the SES sandbox.
+
+**`createGlobalStyle` — do not use.** It injects styles into the document root, which conflicts with PIM's own styles and leaks outside the extension's container. Scope all styles to the component level.
+
+#### Bundle size impact
+
+Each design system adds significant weight to the bundle. Representative additions (minified + gzipped):
+
+| Addition | Approximate bundle increase |
+|---|---|
+| `akeneo-design-system` + `styled-components` | ~300–500 KB |
+| `@shopify/polaris` | ~400–600 KB |
+| Tailwind CSS (purged) + Radix UI | ~50–150 KB |
+
+The PIM enforces a 10 MB hard limit on the compiled file. Check the output size after adding any design system: `ls -lh dist/*.js`.
 
 ---
 
