@@ -60,51 +60,76 @@ Wait for the user to confirm before continuing.
 
 ---
 
-## Step 2 — Add `upload` target to `Makefile`
+## Step 2 — Write `upload.sh` and add a trivial `upload` target to `Makefile`
 
-Add the following target to the existing `Makefile` in the project root. Substitute `[name]`, `[position]`, and `[default_label]` with the values collected during the session:
+Never embed a multi-step bash script as a Make recipe. Once you need `source`, pipes, and JSON parsing in the same block, quote escaping in inline Make recipes becomes unmaintainable. The Makefile delegates to a proper shell script instead.
+
+**`upload.sh`** — write this file to the project root. Substitute `[name]`, `[position]`, and `[default_label]` with the values collected during the session:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+source .env
+
+# Strip trailing slash defensively
+PIM_HOST="${PIM_HOST%/}"
+
+# Determine API token
+if [ -n "${APP_TOKEN:-}" ]; then
+  API_TOKEN="$APP_TOKEN"
+else
+  echo "Fetching API token..."
+  response=$(curl -s -X POST "$PIM_HOST/api/oauth/v1/token" \
+    -H "Content-Type: application/json" \
+    -u "$CLIENT_ID:$CLIENT_SECRET" \
+    -d "{\"grant_type\":\"password\",\"username\":\"$PIM_USERNAME\",\"password\":\"$PIM_PASSWORD\"}")
+  API_TOKEN=$(echo "$response" | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p' || true)
+  if [ -z "$API_TOKEN" ]; then
+    echo "ERROR: Failed to fetch API token. PIM response: $response"
+    exit 1
+  fi
+  sed -i.bak "s|^API_TOKEN=.*|API_TOKEN=$API_TOKEN|" .env && rm -f .env.bak
+fi
+
+# Upload or update
+if [ -z "${EXTENSION_UUID:-}" ]; then
+  echo "Creating extension..."
+  result=$(curl -s -X POST "$PIM_HOST/api/rest/v1/ui-extensions" \
+    -H "Authorization: Bearer $API_TOKEN" \
+    -F "name=[name]" \
+    -F "type=sdk_script" \
+    -F "position=[position]" \
+    -F "file=@dist/[name].js" \
+    -F "configuration[default_label]=[default_label]")
+  EXTENSION_UUID=$(echo "$result" | sed -n 's/.*"uuid":"\([^"]*\)".*/\1/p' || true)
+  if [ -z "$EXTENSION_UUID" ]; then
+    echo "ERROR: Upload failed. PIM response: $result"
+    exit 1
+  fi
+  sed -i.bak "s|^EXTENSION_UUID=.*|EXTENSION_UUID=$EXTENSION_UUID|" .env && rm -f .env.bak
+  echo "SUCCESS: Extension created. UUID=$EXTENSION_UUID"
+else
+  echo "Updating extension $EXTENSION_UUID..."
+  result=$(curl -s -X POST "$PIM_HOST/api/rest/v1/ui-extensions/$EXTENSION_UUID" \
+    -H "Authorization: Bearer $API_TOKEN" \
+    -F "name=[name]" \
+    -F "type=sdk_script" \
+    -F "position=[position]" \
+    -F "file=@dist/[name].js" \
+    -F "configuration[default_label]=[default_label]")
+  echo "SUCCESS: Extension updated. UUID=$EXTENSION_UUID"
+fi
+```
+
+**`Makefile`** — add this target (the recipe is a single line):
 
 ```makefile
 upload:
-	@set -euo pipefail; \
-	source .env; \
-	if [ -n "$${APP_TOKEN:-}" ]; then \
-	  API_TOKEN="$$APP_TOKEN"; \
-	else \
-	  echo "Fetching API token..."; \
-	  response=$$(curl -s -X POST "$$PIM_HOST/api/oauth/v1/token" \
-	    -H "Content-Type: application/json" \
-	    -u "$$CLIENT_ID:$$CLIENT_SECRET" \
-	    -d "{\"grant_type\":\"password\",\"username\":\"$$PIM_USERNAME\",\"password\":\"$$PIM_PASSWORD\"}"); \
-	  API_TOKEN=$$(echo "$$response" | grep -o '"access_token":"[^"]*"' | cut -d'"' -f4); \
-	  if [ -z "$$API_TOKEN" ]; then echo "ERROR: Failed to fetch API token. Check your .env credentials."; exit 1; fi; \
-	  sed -i.bak "s|^API_TOKEN=.*|API_TOKEN=$$API_TOKEN|" .env && rm -f .env.bak; \
-	fi; \
-	if [ -z "$${EXTENSION_UUID:-}" ]; then \
-	  echo "Creating extension..."; \
-	  result=$$(curl -s -X POST "$$PIM_HOST/api/rest/v1/ui-extensions" \
-	    -H "Authorization: Bearer $$API_TOKEN" \
-	    -F "name=[name]" \
-	    -F "type=sdk_script" \
-	    -F "position=[position]" \
-	    -F "file=@dist/[name].js" \
-	    -F "configuration[default_label]=[default_label]"); \
-	  EXTENSION_UUID=$$(echo "$$result" | grep -o '"uuid":"[^"]*"' | cut -d'"' -f4); \
-	  if [ -z "$$EXTENSION_UUID" ]; then echo "ERROR: Upload failed. PIM response: $$result"; exit 1; fi; \
-	  sed -i.bak "s|^EXTENSION_UUID=.*|EXTENSION_UUID=$$EXTENSION_UUID|" .env && rm -f .env.bak; \
-	  echo "SUCCESS: Extension created. UUID=$$EXTENSION_UUID"; \
-	else \
-	  echo "Updating extension $$EXTENSION_UUID..."; \
-	  result=$$(curl -s -X POST "$$PIM_HOST/api/rest/v1/ui-extensions/$$EXTENSION_UUID" \
-	    -H "Authorization: Bearer $$API_TOKEN" \
-	    -F "name=[name]" \
-	    -F "type=sdk_script" \
-	    -F "position=[position]" \
-	    -F "file=@dist/[name].js" \
-	    -F "configuration[default_label]=[default_label]"); \
-	  echo "SUCCESS: Extension updated. UUID=$$EXTENSION_UUID"; \
-	fi
+	@bash upload.sh
 ```
+
+Also add `upload.sh` to `.gitignore` if the project uses App token auth — it will source `.env` which is already excluded, but the script itself is safe to commit.
 
 ---
 
@@ -116,15 +141,15 @@ Run:
 make upload
 ```
 
-The Makefile sources `.env` internally — credentials are substituted by the shell and never enter the conversation context. Only the terminal output (success message or error) is visible.
+`upload.sh` sources `.env` directly — credentials are substituted by the shell and never enter the conversation context. Only the terminal output (success message or error) is visible.
 
-If the command fails, read the error message from the terminal output and diagnose from it without reading `.env`.
+If the command fails, the script prints the raw PIM response. Diagnose from that output without reading `.env`.
 
 ---
 
 ## Step 4 — Confirm and wrap up
 
-On success, the UUID is saved to `.env` automatically by the Makefile. Confirm to the user:
+On success, the UUID is saved to `.env` automatically by `upload.sh`. Confirm to the user:
 
 > "Extension uploaded successfully. The UUID has been saved to `.env` — running `make upload` again will update the existing extension automatically."
 
@@ -132,7 +157,7 @@ On success, the UUID is saved to `.env` automatically by the Makefile. Confirm t
 
 ## Updating the extension later
 
-The user runs `make upload` again. The Makefile detects the existing `EXTENSION_UUID` in `.env` and issues an update instead of a create. If the token has expired, it re-fetches it automatically (Connection auth) or the user updates `APP_TOKEN` in `.env` manually.
+The user runs `make upload` again. `upload.sh` detects the existing `EXTENSION_UUID` in `.env` and issues an update instead of a create. If the token has expired, it re-fetches it automatically (Connection auth) or the user updates `APP_TOKEN` in `.env` manually.
 
 ---
 
