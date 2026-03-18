@@ -577,6 +577,14 @@ The scaffold does not include a design system by default. Any design system can 
 
 Reference: `examples/generic_dashboard` demonstrates all three in a single project.
 
+**Exact install command for the Akeneo Design System:**
+
+```bash
+npm install akeneo-design-system styled-components
+```
+
+The package name is `akeneo-design-system` — unscoped, no `@akeneo-pim-community/` prefix. That scoped variant does not exist on the public npm registry. styled-components must be v6 (`^6.1.0`) — v5 has different SES behaviour and a different `styled.d.ts` augmentation pattern.
+
 #### SES constraint: CSS injection
 
 Extensions run in an SES sandbox and cannot load separate CSS files — only the single compiled JS bundle is deployed. Any design system that ships an external stylesheet must have its CSS inlined into the bundle at build time.
@@ -692,125 +700,6 @@ This must be a top-level `defineConfig` option, not inside `build`.
 
 ---
 
-## 11. Upload Methods
-
-### 11.1 Via the Akeneo UI
-
-1. Log into your PIM instance.
-2. Navigate to **System → Extensions**.
-3. Click **Create**.
-4. Fill in the fields:
-   - **Name**: unique identifier (e.g. `my_custom_panel`)
-   - **Labels**: display labels per locale
-   - **Type**: select `SDK Script`
-   - **Position**: one of the identifiers from §7
-5. Upload the compiled JavaScript file (e.g. `dist/my-extension.js`).
-6. (Optional) Add credentials: Bearer Token, Basic Auth, or Custom Header.
-7. (Optional) Add custom variables as JSON.
-8. Click **Save**. The extension is immediately active.
-
-No API token is required for UI upload.
-
-To update an existing extension: navigate to **System → Extensions**, select the extension, upload the new JS file, and save.
-
----
-
-### 11.2 Via curl
-
-**Create:**
-
-```bash
-curl -X POST "https://{PIM_HOST}/api/rest/v1/ui-extensions" \
-  -H "Authorization: Bearer {API_TOKEN}" \
-  -F "name=my_extension" \
-  -F "type=sdk_script" \
-  -F "position=pim.product.panel" \
-  -F "file=@dist/my-extension.js" \
-  -F "configuration[default_label]=My Extension" \
-  -F "configuration[labels][en_US]=My Extension" \
-  -F "configuration[labels][fr_FR]=Mon extension"
-```
-
-The response contains the extension `uuid`. Save it — you need it for updates.
-
-**Update:**
-
-```bash
-curl -X POST "https://{PIM_HOST}/api/rest/v1/ui-extensions/{EXTENSION_UUID}" \
-  -H "Authorization: Bearer {API_TOKEN}" \
-  -F "name=my_extension" \
-  -F "type=sdk_script" \
-  -F "position=pim.product.panel" \
-  -F "file=@dist/my-extension.js" \
-  -F "configuration[default_label]=My Extension"
-```
-
-Note: do not add a `_method=PATCH` form field — the PIM rejects it with a 400 error. Use a plain `POST` to the UUID endpoint.
-
-**With credentials:**
-
-```bash
-  -F "credentials[0][code]=my_api_token" \
-  -F "credentials[0][type]=Bearer Token" \
-  -F "credentials[0][value]=secret-token-value" \
-  -F "credentials[1][code]=my_basic_auth" \
-  -F "credentials[1][type]=Basic Auth" \
-  -F "credentials[1][value][username]=user" \
-  -F "credentials[1][value][password]=pass" \
-  -F "credentials[2][code]=my_custom_header" \
-  -F "credentials[2][type]=Custom Header" \
-  -F "credentials[2][value][header_key]=X-My-Header" \
-  -F "credentials[2][value][header_value]=my-value"
-```
-
----
-
-### 11.3 Via the REST API (programmatic)
-
-**Endpoint — create:**
-```
-POST {PIM_HOST}/api/rest/v1/ui-extensions
-```
-
-**Endpoint — update:**
-```
-POST {PIM_HOST}/api/rest/v1/ui-extensions/{EXTENSION_UUID}
-```
-
-**Endpoint — list:**
-```
-GET {PIM_HOST}/api/rest/v1/ui-extensions
-```
-
-**Headers:**
-```
-Authorization: Bearer {API_TOKEN}
-Content-Type: multipart/form-data
-```
-
-**FormData fields:**
-
-| Field | Required | Type | Description |
-|---|---|---|---|
-| `name` | Yes | string | Unique extension identifier |
-| `type` | Yes | string | Must be `sdk_script` |
-| `position` | Yes | string | Position identifier (§7) |
-| `file` | Yes | file | Compiled JS file |
-| `configuration[default_label]` | Yes | string | Default display label |
-| `configuration[labels][{locale}]` | No | string | Per-locale display label |
-| `configuration[custom_variables]` | No | JSON string | Custom variables |
-| `credentials[n][code]` | No | string | Credential identifier |
-| `credentials[n][type]` | No | string | `Bearer Token`, `Basic Auth`, or `Custom Header` |
-| `credentials[n][value]` | No | string | Token value (for Bearer Token) |
-| `credentials[n][value][username]` | No | string | Username (for Basic Auth) |
-| `credentials[n][value][password]` | No | string | Password (for Basic Auth) |
-| `credentials[n][value][header_key]` | No | string | Header name (for Custom Header) |
-| `credentials[n][value][header_value]` | No | string | Header value (for Custom Header) |
-
-**Do not include `_method=PATCH`** — the PIM rejects it with a 400 error. Both create and update use `POST`; they are distinguished by whether a UUID is present in the URL.
-
----
-
 ## 12. Credential Types Reference
 
 | Type | Form field value | Auth header injected by PIM |
@@ -839,20 +728,31 @@ This file contains all types for `PIM_SDK`, `PIM_USER`, `PIM_CONTEXT`, and all A
 
 TypeScript will pick it up automatically since it is inside `src/`. No explicit reference needed.
 
-**Important:** `global.d.ts` uses `declare interface` and `declare type` at the top level with no `import` or `export` statements. This makes it an **ambient declaration file** — all types it defines are globally available throughout the project without any import. Do not inline types manually or add import statements for them. Use the type names directly (e.g. `PIM_USER`, `PIM_CONTEXT`) wherever needed.
+**File structure — module, not ambient.** `global.d.ts` contains `export declare type` statements and a bare `export { }`, making it a TypeScript **module** file. Two consequences:
 
----
+1. **`globalThis.PIM` is correctly typed** via the `declare global { namespace globalThis { var PIM: PIM_SDK; } }` block at the end of the file. This is module augmentation — it works correctly and requires no import. `globalThis.PIM`, `globalThis.PIM.context`, `globalThis.PIM.api.*` are all fully typed as long as the file is included in the compilation.
 
-## 14. Official Documentation Links
+2. **Exported types (`PIM_CONTEXT`, `PIM_USER`, `PIM_SDK`, `EXTENSION_VARIABLES`) are NOT globally ambient.** They cannot be used as type names in annotations without an explicit import:
 
-| Topic | URL |
-|---|---|
-| Advanced Extensions overview | https://api.akeneo.com/advanced-extensions/overview.html |
-| SDK in depth | https://api.akeneo.com/advanced-extensions/sdk-in-depth.html |
-| Development workflow | https://api.akeneo.com/advanced-extensions/development-workflow.html |
-| API deployment | https://api.akeneo.com/advanced-extensions/api-deployment.html |
-| UI deployment | https://api.akeneo.com/advanced-extensions/ui-deployment.html |
-| Credentials | https://api.akeneo.com/advanced-extensions/sdk-credentials.html |
-| Available positions | https://api.akeneo.com/extensions/positions.html |
-| FAQ & Troubleshooting | https://api.akeneo.com/advanced-extensions/faq.html |
-| Build with AI | https://api.akeneo.com/advanced-extensions/build-sdk-with-ai.html |
+```typescript
+import type { PIM_CONTEXT, PIM_USER } from './global';
+```
+
+**`PIM_CONTEXT` is a discriminated union — `'in'` narrowing required.** Even with correct typing, accessing position-specific context fields directly raises `TS2339: Property 'product' does not exist on type 'PIM_CONTEXT'`. The type is a union of three mutually exclusive branches; TypeScript requires narrowing before accessing branch-specific properties:
+
+```typescript
+const context = globalThis.PIM.context;
+
+if ('product' in context) {
+  const uuid = context.product.uuid; // fully typed after narrowing
+}
+if ('category' in context) {
+  const code = context.category.code;
+}
+if ('productGrid' in context) {
+  const uuids = context.productGrid.productUuids;
+}
+```
+
+`BaseContext` fields (`context.position`, `context.user.catalog_locale`, `context.user.catalog_scope`) are always present and do not require narrowing.
+
