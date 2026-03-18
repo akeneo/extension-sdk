@@ -1,0 +1,18 @@
+{
+  "name": "akeneo-custom-components",
+  "owner": {
+    "name": "Akeneo"
+  },
+  "plugins": [
+    {
+      "name": "akeneo-custom-component",
+      "source": {
+        "source": "github",
+        "repo": "akeneo/extension-sdk",
+        "ref": "beta"
+      },
+      "description": "[BETA] Guides you through building and deploying Akeneo Custom Components — from scaffolding to live deployment.",
+      "version": "1.0.0-beta"
+    }
+  ]
+}
