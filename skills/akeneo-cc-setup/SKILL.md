@@ -41,21 +41,27 @@ If the user is starting from scratch, ask three questions in one message:
 
 Wait for the user's reply. All three answers may come in one message or across a few — collect them before proceeding. If any answer is missing or unclear, ask only about the missing ones.
 
-Based on the answer to Question 2, read the appropriate path file and follow it in full:
+Once all three answers are collected, read the following files **simultaneously in a single parallel batch** — do not read them sequentially:
+
+- The path file for Question 2:
 
 | Answer | File |
 |---|---|
 | Hands-off — agent handles everything | `${CLAUDE_SKILL_DIR}/path-handsoff.md` |
 | Hands-on — user wants to own the code | `${CLAUDE_SKILL_DIR}/path-handson.md` |
 
-If the answer is ambiguous, default to hands-off and mention you can switch if they want more detail.
-
-Each path file ends by reading the upload sub-flow chosen in Question 3:
+- The upload sub-flow for Question 3:
 
 | Answer | File |
 |---|---|
 | UI upload | `${CLAUDE_SKILL_DIR}/upload-ui.md` |
 | curl + API | `${CLAUDE_SKILL_DIR}/upload-api.md` |
+
+- `${CLAUDE_SKILL_DIR}/reference.md`
+
+If the answer to Question 2 is ambiguous, default to hands-off and mention you can switch if they want more detail.
+
+With all three files loaded, follow the path file in full. `reference.md` is already in context — the path file will not ask you to read it again.
 
 Carry the component name from Question 1 throughout the entire session. If the user did not have a name, help them pick one before starting the path (snake_case, no spaces, unique in their PIM).
 

@@ -2,7 +2,7 @@
 
 The user wants the agent to handle everything. Build autonomously. Explain outcomes, not decisions. Confirm once before each phase — not before every action.
 
-Read `${CLAUDE_SKILL_DIR}/reference.md` now. You will use it throughout this session — do not read it again.
+`reference.md` is already loaded — SKILL.md pre-loaded it alongside this file.
 
 ---
 

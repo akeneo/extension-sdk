@@ -2,7 +2,7 @@
 
 The user already has a Custom Component project. This path does not scaffold anything — it reads what exists, surfaces any gaps or deviations from the expected structure, and routes to the appropriate upload sub-flow.
 
-Read `${CLAUDE_SKILL_DIR}/reference.md` now. You will use it throughout this session — do not read it again.
+`reference.md` is already loaded — SKILL.md pre-loaded it alongside this file.
 
 ---
 

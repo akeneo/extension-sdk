@@ -2,7 +2,7 @@
 
 The user wants to understand and own the code. Explain every significant decision before acting. Use technical language where it adds clarity. The user should come out of this session able to iterate on the project independently.
 
-Read `${CLAUDE_SKILL_DIR}/reference.md` now. You will use it throughout this session — do not read it again.
+`reference.md` is already loaded — SKILL.md pre-loaded it alongside this file.
 
 ---
 

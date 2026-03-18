@@ -48,7 +48,7 @@ This repository includes a **Claude Code plugin** (`akeneo-custom-component`) th
 1. Open the **Plugins** panel in Claude Code (`/plugins`)
 2. Go to **Marketplaces** and add the following marketplace URL:
    ```
-   https://raw.githubusercontent.com/akeneo/extension-sdk/beta/marketplace.json
+   https://raw.githubusercontent.com/akeneo/extension-sdk/marketplace.json
    ```
 3. Go to **Discover**, find `akeneo-custom-component` and install it
 

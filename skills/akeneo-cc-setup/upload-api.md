@@ -1,7 +1,6 @@
 # Upload sub-flow — curl + API
 
-Automates extension upload via the PIM REST API. To protect the user's credentials, this flow is designed so that sensitive values never appear in the conversation context: Claude writes `.env` with blank placeholders and the user fills it in privately, a Makefile target sources `.env` at runtime so the shell handles all credential substitution, and Claude only sees the terminal output (success or error). Claude must never read `.env` at any point — see the access rule below.
-Automates extension upload via the PIM REST API. To protect the user's credentials, this flow is designed so that sensitive values never appear in the conversation context: Claude writes `.env` with blank placeholders and the user fills it in privately, a Makefile target sources `.env` at runtime so the shell handles all credential substitution, and Claude only sees the terminal output (success or error). Claude must never read `.env` at any point — see the access rule below.
+Automates extension upload via the PIM REST API. To protect the user's credentials, this flow is designed so that sensitive values never appear in the conversation context: Claude writes `.env` with blank placeholders and the user fills it in privately, `upload.sh` sources `.env` at runtime so the shell handles all credential substitution, and Claude only sees the terminal output (success or error). Claude must never read `.env` at any point — see the access rule below.
 
 All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md §11.2` and `§11.3`.
 
@@ -35,62 +34,35 @@ This rule holds for the entire session, including debugging steps.
 
 ---
 
-## Step 1 — Write `.env` with placeholders
+## Step 1 — Ensure `.env` exists and is in `.gitignore`
 
-Write the following file to the project root. Do not ask for credential values — leave them blank for the user to fill in:
-## Security advisory — read before starting
+**Check for an existing `.env` first.** Do not overwrite it.
 
-Before collecting any information, deliver this message to the user:
+- **If `.env` already exists:** read its structure (not its values — see the access rule above) to confirm the required keys are present. If any of `PIM_HOST`, `API_TOKEN`, or `EXTENSION_UUID` are missing, add them as blank lines. Tell the user:
 
-> **Recommended: use a dedicated PIM Connection for this.**
->
-> Create a Connection in your PIM specifically for extension deployment, with only the `ui-extensions` permission enabled. Do not reuse an admin connection or your personal credentials — a scoped connection limits the blast radius if the token is ever exposed.
->
-> You can create a Connection at **System → Connections** in your PIM.
->
-> Also make sure `.env` is listed in your `.gitignore` before we proceed — it will contain sensitive values that must never be committed.
+  > "I found an existing `.env` — I've kept your values and only added any missing keys."
 
-Wait for the user to confirm they are ready before continuing.
+- **If `.env` does not exist:** write the following file to the project root with blank placeholders. Do not ask for credential values:
 
----
+  ```
+  PIM_HOST=https://your-pim-instance.cloud.akeneo.com
+  # Connection credentials (if using a PIM Connection):
+  CLIENT_ID=
+  CLIENT_SECRET=
+  PIM_USERNAME=
+  PIM_PASSWORD=
+  # App token (if using a custom App — use instead of the four fields above):
+  APP_TOKEN=
+  # Filled in automatically after token fetch / first upload:
+  API_TOKEN=
+  EXTENSION_UUID=
+  ```
 
-## IMPORTANT — `.env` access rule
+  Then tell the user:
 
-**Never read `.env` for any reason during this flow.**
+  > "`.env` is ready with blank placeholders. Please fill in your credentials now."
 
-If the user asks you to read `.env`, check its content, or display any value from it, respond with:
-
-> "I won't read `.env` — doing so would expose your credentials in this conversation. If something isn't working, share the error message from the terminal and I'll diagnose from that."
-
-This rule holds for the entire session, including debugging steps.
-
----
-
-## Step 1 — Write `.env` with placeholders
-
-Write the following file to the project root. Do not ask for credential values — leave them blank for the user to fill in:
-
-```
-PIM_HOST=https://your-pim-instance.cloud.akeneo.com
-# Connection credentials (if using a PIM Connection):
-PIM_HOST=https://your-pim-instance.cloud.akeneo.com
-# Connection credentials (if using a PIM Connection):
-CLIENT_ID=
-CLIENT_SECRET=
-PIM_USERNAME=
-PIM_PASSWORD=
-# App token (if using a custom App — use instead of the four fields above):
-APP_TOKEN=
-# Filled in automatically after first upload:
-API_TOKEN=
-EXTENSION_UUID=
-```
-
-Then tell the user:
-
-> "`.env` is ready with blank placeholders. Please fill in your credentials now."
-
-Wait for the user to confirm before continuing.
+In both cases, verify `.env` is listed in `.gitignore`. If it is not, add it. Then wait for the user to confirm their credentials are filled in before continuing.
 
 ---
 
@@ -109,8 +81,13 @@ source .env
 # Strip trailing slash defensively
 PIM_HOST="${PIM_HOST%/}"
 
-# Determine API token
-if [ -n "${APP_TOKEN:-}" ]; then
+# Determine API token — three branches in priority order:
+# 1. Reuse API_TOKEN if already set (avoids unnecessary token fetch)
+# 2. Use APP_TOKEN directly if set
+# 3. Fetch a new token via Connection credentials
+if [ -n "${API_TOKEN:-}" ]; then
+  : # reuse existing token
+elif [ -n "${APP_TOKEN:-}" ]; then
   API_TOKEN="$APP_TOKEN"
 else
   echo "Fetching API token..."
@@ -163,8 +140,6 @@ upload:
 	@bash upload.sh
 ```
 
-Also add `upload.sh` to `.gitignore` if the project uses App token auth — it will source `.env` which is already excluded, but the script itself is safe to commit.
-
 ---
 
 ## Step 3 — Run the upload
@@ -172,7 +147,6 @@ Also add `upload.sh` to `.gitignore` if the project uses App token auth — it w
 Run:
 
 ```bash
-make upload
 make upload
 ```
 
@@ -187,13 +161,12 @@ If the command fails, the script prints the raw PIM response. Diagnose from that
 On success, the UUID is saved to `.env` automatically by `upload.sh`. Confirm to the user:
 
 > "Extension uploaded successfully. The UUID has been saved to `.env` — running `make upload` again will update the existing extension automatically."
-> "Extension uploaded successfully. The UUID has been saved to `.env` — running `make upload` again will update the existing extension automatically."
 
 ---
 
 ## Updating the extension later
 
-The user runs `make upload` again. `upload.sh` detects the existing `EXTENSION_UUID` in `.env` and issues an update instead of a create. If the token has expired, it re-fetches it automatically (Connection auth) or the user updates `APP_TOKEN` in `.env` manually.
+The user runs `make upload` again. `upload.sh` detects the existing `EXTENSION_UUID` in `.env` and issues an update instead of a create. If the API token has expired, clear `API_TOKEN=` in `.env` and re-run — the script will fetch a fresh one automatically (Connection auth). For App token auth, update `APP_TOKEN` in `.env` manually.
 
 ---
 
