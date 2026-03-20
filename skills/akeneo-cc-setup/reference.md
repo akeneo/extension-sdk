@@ -118,6 +118,22 @@ Plus one position-specific payload (mutually exclusive):
 
 All API calls are asynchronous (Promise-based). Operations follow REST semantics: `get`, `list`, `create`/`post`, `patch`/`upsert`, `delete`.
 
+**`get()` takes an object, not a plain string.** Every `.get()` call requires a params object — passing a raw string causes `TS2345: Argument of type 'string' is not assignable to parameter of type '...'`:
+
+```typescript
+// Wrong — TS2345
+PIM.api.product_uuid_v1.get(uuid)
+PIM.api.family_v1.get(familyCode)
+
+// Correct
+PIM.api.product_uuid_v1.get({ uuid })
+PIM.api.family_v1.get({ code: familyCode })
+PIM.api.category_v1.get({ code: categoryCode })
+PIM.api.attribute_v1.get({ code: attributeCode })
+```
+
+The param key matches the identifier type: `uuid` for products, `code` for everything else.
+
 **`list()` search parameter:** pass a plain object — do not `JSON.stringify` it. The SDK serializes it internally; wrapping it in a string causes a 400 error.
 
 ```typescript
@@ -746,21 +762,47 @@ TypeScript will pick it up automatically since it is inside `src/`. No explicit 
 import type { PIM_CONTEXT, PIM_USER } from './global';
 ```
 
-**`PIM_CONTEXT` is a discriminated union — `'in'` narrowing required.** Even with correct typing, accessing position-specific context fields directly raises `TS2339: Property 'product' does not exist on type 'PIM_CONTEXT'`. The type is a union of three mutually exclusive branches; TypeScript requires narrowing before accessing branch-specific properties:
+**`PIM_CONTEXT` is a discriminated union — `'in'` narrowing required.** Even with correct typing, accessing position-specific context fields directly raises `TS2339: Property 'product' does not exist on type 'PIM_CONTEXT'`. The type is a union of three mutually exclusive branches; TypeScript requires narrowing before accessing branch-specific properties.
+
+**Important:** `'in'` narrowing alone is not sufficient. The position-specific fields (`product`, `category`, `productGrid`) are typed as optional (`?`) within their branch, so TypeScript strict mode still raises `TS18048: 'context.product' is possibly 'undefined'` unless you also add a truthiness check on the field itself:
 
 ```typescript
 const context = globalThis.PIM.context;
 
+// Wrong — TS18048 even after 'in' check
 if ('product' in context) {
-  const uuid = context.product.uuid; // fully typed after narrowing
+  const uuid = context.product.uuid; // error: possibly undefined
 }
-if ('category' in context) {
+
+// Correct — 'in' check + field truthiness check
+if ('product' in context && context.product) {
+  const uuid = context.product.uuid; // fully typed
+}
+if ('category' in context && context.category) {
   const code = context.category.code;
 }
-if ('productGrid' in context) {
+if ('productGrid' in context && context.productGrid) {
   const uuids = context.productGrid.productUuids;
 }
 ```
 
+Always use both checks together. Apply this pattern proactively — skipping the field truthiness check will cause a build failure under `strict: true`.
+
 `BaseContext` fields (`context.position`, `context.user.catalog_locale`, `context.user.catalog_scope`) are always present and do not require narrowing.
+
+### Casting SES-proxied response data
+
+When accessing data from `PIM.api.*` responses or `PIM.api.external.call()`, TypeScript may raise errors if you attempt to cast an `unknown` value directly to a specific type (e.g. `TS2352: Conversion of type 'unknown' may be a mistake`). The SES sandbox wraps objects in proxies, so TypeScript sees them as `unknown`. Use a double cast through `Record<string, unknown>` as an intermediate step:
+
+```typescript
+// Wrong — TypeScript error TS2352
+const data = response as MyType;
+
+// Correct — cast through Record<string, unknown> first
+const data = response as unknown as MyType;
+// or equivalently
+const data = (response as Record<string, unknown>) as MyType;
+```
+
+Apply this pattern proactively whenever casting API response payloads — it avoids a rebuild cycle.
 

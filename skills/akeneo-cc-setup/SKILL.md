@@ -9,6 +9,8 @@ allowed-tools: Read, Write, Edit, Bash
 
 You are guiding a user through building and deploying an Akeneo Custom Component. Follow these steps exactly.
 
+**Note on `${CLAUDE_SKILL_DIR}`:** all file paths in this skill and its sub-files (path-handsoff.md, path-handson.md, path-existing.md, upload-ui.md, upload-api.md, reference.md) resolve relative to the `akeneo-cc-setup/` directory — the directory containing this file. Not the directory of any skill that delegated to this one.
+
 ---
 
 ## Step 1 — Introduce yourself and ask the starting question
@@ -27,24 +29,36 @@ You are guiding a user through building and deploying an Akeneo Custom Component
 
 ### Existing project
 
-If the user already has a project, read the following files **simultaneously in a single parallel batch**:
+If the user already has a project, ask one question:
+
+> "How would you like to upload — via the PIM admin UI (no credentials needed) or automatically via the API (requires a PIM Connection or App token)?"
+
+Wait for the answer, then read the following files **simultaneously in a single parallel batch**:
 
 - `${CLAUDE_SKILL_DIR}/path-existing.md`
 - `${CLAUDE_SKILL_DIR}/reference.md`
+- The upload sub-flow for their answer:
 
-Then follow `path-existing.md` in full. That path handles discovery, validation, and upload — no further questions needed here.
+| Answer | File |
+|---|---|
+| UI upload | `${CLAUDE_SKILL_DIR}/upload-ui.md` |
+| curl + API | `${CLAUDE_SKILL_DIR}/upload-api.md` |
+
+Then follow `path-existing.md` in full. The upload sub-flow is already in context — `path-existing.md` will not ask you to read it again.
 
 ### New project
 
-If the user is starting from scratch, ask three questions in one message:
+If the user is starting from scratch, check which of the following are already known from `[COMPONENT_NAME]`, `[INVOLVEMENT]`, and `[UPLOAD_METHOD]` set by the awareness skill. Ask only the missing ones in a single message:
 
-> "Three quick questions to get started:
+> "A few quick questions to get started:
 >
-> 1. **Name** — What would you like to call your component?
-> 2. **Involvement** — Should I handle everything and just explain what I did, or walk you through each step so you can maintain the code yourself?
-> 3. **Upload method** — Once it's built, do you want to upload via the PIM admin UI (no credentials needed) or automatically via the API (requires a PIM Connection or App token)?"
+> 1. **Name** — What would you like to call your component? _(skip if `[COMPONENT_NAME]` is set)_
+> 2. **Involvement** — Should I handle everything and just explain what I did, or walk you through each step so you can maintain the code yourself? _(skip if `[INVOLVEMENT]` is set)_
+> 3. **Upload method** — Once it's built, do you want to upload via the PIM admin UI (no credentials needed) or automatically via the API (requires a PIM Connection or App token)? _(skip if `[UPLOAD_METHOD]` is set)_"
 
-Wait for the user's reply. All three answers may come in one message or across a few — collect them before proceeding. If any answer is missing or unclear, ask only about the missing ones.
+If all three are already known, skip the question entirely and proceed directly to loading files.
+
+Wait for the user's reply if needed. Answers may come in one message or across a few — collect all before proceeding. If any answer is missing or unclear, ask only about the missing ones.
 
 Once all three answers are collected, read the following files **simultaneously in a single parallel batch** — do not read them sequentially:
 

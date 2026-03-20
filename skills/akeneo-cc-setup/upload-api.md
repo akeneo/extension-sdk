@@ -142,7 +142,7 @@ upload:
 
 ## Step 3 — Run the upload
 
-Run:
+**Always run this command yourself — do not ask the user to run it:**
 
 ```bash
 make upload

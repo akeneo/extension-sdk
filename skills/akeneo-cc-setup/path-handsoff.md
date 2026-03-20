@@ -28,7 +28,11 @@ Wait for their answer, then confirm the full plan and ask for a go-ahead:
 
 > "I am going to scaffold a **[name]** component at **[chosen position]**, build it, and upload it so you can see it live in your PIM. Once it is working, we will add the actual functionality. Ready?"
 
-Wait for confirmation. Then proceed without checking in again until the component is live.
+If the user chose the API upload method, include this in the confirmation message:
+
+> "One thing before we start: I recommend using a dedicated PIM Connection scoped to `ui-extensions` only — not an admin connection or personal credentials. You can create one at **System → Connections**. Also make sure `.env` is in your `.gitignore` — it will contain credentials that must never be committed."
+
+Wait for confirmation. Then proceed without checking in again until the component is live — do not pause for the security advisory again when the upload sub-flow mentions it.
 
 ---
 
@@ -119,6 +123,8 @@ Wait for their answer before proceeding.
 ## Step 6 — Build it
 
 Implement the requested functionality. Use §3 and §4 from reference.md for the SDK surface available at the chosen position. Build what the user asked for — no unnecessary explanation.
+
+**File structure:** if the implementation is non-trivial, split it across files rather than putting everything in `App.tsx`. For example: `src/api.ts` for PIM API calls, `src/components/` for sub-components, `src/App.tsx` as the thin root. Smaller files generate faster and can be written in parallel.
 
 After implementing, rebuild:
 

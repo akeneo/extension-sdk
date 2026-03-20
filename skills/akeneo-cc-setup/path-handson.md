@@ -200,7 +200,7 @@ Wait for confirmation, then build it together.
 
 > "Now that you can see how the SDK works — what should this component actually do?"
 
-Discuss the approach with the user before implementing. Explain the relevant API calls you will use. Then build it together.
+Discuss the approach with the user before implementing. Explain the relevant API calls you will use. If the feature is non-trivial, propose splitting the implementation across files (e.g. `src/api.ts` for PIM API calls, `src/components/` for sub-components, `src/App.tsx` as the thin root) — this keeps each file focused and lets the user navigate the code independently. Then build it together.
 
 ---
 
