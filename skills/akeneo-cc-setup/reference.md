@@ -546,6 +546,14 @@ function App() {
 export default App;
 ```
 
+**Typing `context` or `user` explicitly:** `globalThis.PIM` is globally typed (no import needed), but the exported types from `global.d.ts` — `PIM_CONTEXT`, `PIM_USER`, etc. — are not globally ambient. If you annotate a variable or prop with one of these types, add an explicit import:
+
+```typescript
+import type { PIM_CONTEXT, PIM_USER } from './global';
+```
+
+Without this import, TypeScript will raise `TS2304: Cannot find name 'PIM_CONTEXT'`. See §13 for full details on `global.d.ts` module behaviour and `PIM_CONTEXT` union narrowing.
+
 ### 8.8 `.env` variables
 
 Optional — useful for storing PIM connection details when deploying via curl. Not loaded by the PIM runtime; only used by local tooling.

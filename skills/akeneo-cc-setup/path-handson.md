@@ -190,10 +190,7 @@ If either command fails, show the error output and diagnose it together before c
 
 ## Step 3 — Upload (first time)
 
-Read and follow the upload sub-flow the user chose during profiling:
-
-- UI upload → `${CLAUDE_SKILL_DIR}/upload-ui.md`
-- curl + API → `${CLAUDE_SKILL_DIR}/upload-api.md`
+The upload sub-flow is already in context — follow it now.
 
 ---
 

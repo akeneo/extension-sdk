@@ -2,8 +2,6 @@
 
 No API credentials required. Any PIM user with System access can complete this flow.
 
-All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md §11.1`.
-
 ---
 
 ## Steps

@@ -2,8 +2,6 @@
 
 Automates extension upload via the PIM REST API. To protect the user's credentials, this flow is designed so that sensitive values never appear in the conversation context: Claude writes `.env` with blank placeholders and the user fills it in privately, `upload.sh` sources `.env` at runtime so the shell handles all credential substitution, and Claude only sees the terminal output (success or error). Claude must never read `.env` at any point — see the access rule below.
 
-All technical facts come from `${CLAUDE_SKILL_DIR}/reference.md §11.2` and `§11.3`.
-
 ---
 
 ## Security advisory — read before starting

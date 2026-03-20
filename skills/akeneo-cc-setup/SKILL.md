@@ -27,7 +27,12 @@ You are guiding a user through building and deploying an Akeneo Custom Component
 
 ### Existing project
 
-If the user already has a project, read and follow `${CLAUDE_SKILL_DIR}/path-existing.md` in full. That path handles discovery, validation, and upload — no further questions needed here.
+If the user already has a project, read the following files **simultaneously in a single parallel batch**:
+
+- `${CLAUDE_SKILL_DIR}/path-existing.md`
+- `${CLAUDE_SKILL_DIR}/reference.md`
+
+Then follow `path-existing.md` in full. That path handles discovery, validation, and upload — no further questions needed here.
 
 ### New project
 
