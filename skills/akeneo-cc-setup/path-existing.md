@@ -24,7 +24,7 @@ Ask the user for the path to their project root if not already known:
 
 > "What is the path to your project? (e.g. `~/projects/my-component`)"
 
-Then read the following files if they exist. Do not error if they are missing — note what is absent and handle it in Step 2.
+Then read **only** the following files — do not explore the broader project structure. Do not error if they are missing — note what is absent and handle it in Step 2.
 
 - `extension_configuration.json`
 - `package.json`
@@ -109,16 +109,9 @@ Run the build command.
 
 ---
 
-## Step 5 — Ask the upload method
+## Step 5 — Upload
 
-> "The component is built and ready. How would you like to upload it — via the PIM admin UI (no credentials needed) or automatically via the API (requires a PIM Connection or App token)?"
-
-Then read and follow the appropriate sub-flow:
-
-| Answer | Action |
-|---|---|
-| UI upload | Read `${CLAUDE_SKILL_DIR}/upload-ui.md` and follow it. Use the `name`, `position`, `default_label`, and output path discovered in Step 2. |
-| curl + API | Read `${CLAUDE_SKILL_DIR}/upload-api.md` and follow it. Use the discovered values when writing the Makefile target. If no Makefile exists, create one with only the `upload` target. |
+The upload sub-flow is already in context — follow it now. Use the `name`, `position`, `default_label`, and output path discovered in Step 2. If using the API path and no Makefile exists, create one with only the `upload` target.
 
 ---
 

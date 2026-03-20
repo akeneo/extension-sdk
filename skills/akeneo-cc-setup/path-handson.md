@@ -42,21 +42,7 @@ For each file: write it, then present the explanation and ask if the user wants 
 
 **`extension_configuration.json`**
 
-Write the file (values from the session):
-
-```json
-{
-  "name": "[name]",
-  "type": "sdk_script",
-  "position": "[position identifier]",
-  "file": "dist/[name].js",
-  "configuration": {
-    "default_label": "[name]"
-  }
-}
-```
-
-Then explain and validate:
+Write the file using the schema in `reference.md §8.1`, substituting session values. Then explain and validate:
 
 > "This is the extension manifest the PIM reads when loading your component. A few things worth knowing:
 > - `name` is the technical identifier used by the PIM API — snake_case, must be unique in your instance.
@@ -149,23 +135,7 @@ Then explain:
 
 **`src/App.tsx`**
 
-Write the hello world:
-
-```tsx
-function App() {
-  const user = globalThis.PIM?.user;
-
-  return (
-    <div style={{ padding: '16px', fontSize: '16px' }}>
-      {user && <p>Hello, {user.first_name}!</p>}
-    </div>
-  );
-}
-
-export default App;
-```
-
-Then explain and validate:
+Write the hello world using `reference.md §8.7`. Then explain and validate:
 
 > "A minimal starting point — it reads your name from the PIM SDK (typed via the `global.d.ts` we just downloaded) and displays it. We'll replace this with the real implementation in Phase 2. What would you like the component to do?"
 
@@ -190,10 +160,7 @@ If either command fails, show the error output and diagnose it together before c
 
 ## Step 3 — Upload (first time)
 
-Read and follow the upload sub-flow the user chose during profiling:
-
-- UI upload → `${CLAUDE_SKILL_DIR}/upload-ui.md`
-- curl + API → `${CLAUDE_SKILL_DIR}/upload-api.md`
+The upload sub-flow is already in context — follow it now.
 
 ---
 
@@ -233,7 +200,7 @@ Wait for confirmation, then build it together.
 
 > "Now that you can see how the SDK works — what should this component actually do?"
 
-Discuss the approach with the user before implementing. Explain the relevant API calls you will use. Then build it together.
+Discuss the approach with the user before implementing. Explain the relevant API calls you will use. If the feature is non-trivial, propose splitting the implementation across files (e.g. `src/api.ts` for PIM API calls, `src/components/` for sub-components, `src/App.tsx` as the thin root) — this keeps each file focused and lets the user navigate the code independently. Then build it together.
 
 ---
 
