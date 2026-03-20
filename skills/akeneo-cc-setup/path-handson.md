@@ -42,21 +42,7 @@ For each file: write it, then present the explanation and ask if the user wants 
 
 **`extension_configuration.json`**
 
-Write the file (values from the session):
-
-```json
-{
-  "name": "[name]",
-  "type": "sdk_script",
-  "position": "[position identifier]",
-  "file": "dist/[name].js",
-  "configuration": {
-    "default_label": "[name]"
-  }
-}
-```
-
-Then explain and validate:
+Write the file using the schema in `reference.md §8.1`, substituting session values. Then explain and validate:
 
 > "This is the extension manifest the PIM reads when loading your component. A few things worth knowing:
 > - `name` is the technical identifier used by the PIM API — snake_case, must be unique in your instance.
@@ -149,23 +135,7 @@ Then explain:
 
 **`src/App.tsx`**
 
-Write the hello world:
-
-```tsx
-function App() {
-  const user = globalThis.PIM?.user;
-
-  return (
-    <div style={{ padding: '16px', fontSize: '16px' }}>
-      {user && <p>Hello, {user.first_name}!</p>}
-    </div>
-  );
-}
-
-export default App;
-```
-
-Then explain and validate:
+Write the hello world using `reference.md §8.7`. Then explain and validate:
 
 > "A minimal starting point — it reads your name from the PIM SDK (typed via the `global.d.ts` we just downloaded) and displays it. We'll replace this with the real implementation in Phase 2. What would you like the component to do?"
 

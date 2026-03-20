@@ -44,21 +44,7 @@ dist/
 .env
 ```
 
-**`extension_configuration.json`** — fill in the real values from the session:
-
-```json
-{
-  "name": "[name]",
-  "type": "sdk_script",
-  "position": "[position identifier]",
-  "file": "dist/[name].js",
-  "configuration": {
-    "default_label": "[name]"
-  }
-}
-```
-
-Optional fields (`labels`, `custom_variables`, `credentials`) are documented in `reference.md §8.1` — add them when needed.
+**`extension_configuration.json`** — write using the schema in `reference.md §8.1`, substituting `[name]`, `[position identifier]`, and `[default_label]` with session values. Include only required fields for now; add optional fields (`labels`, `custom_variables`, `credentials`) when needed.
 
 **`package.json`** — use §8.2. Set `"name"` to the component name.
 
@@ -76,21 +62,7 @@ Optional fields (`labels`, `custom_variables`, `credentials`) are documented in 
 curl -o src/global.d.ts https://raw.githubusercontent.com/akeneo/extension-sdk/main/examples/common/global.d.ts
 ```
 
-**`src/App.tsx`** — a minimal hello world that reads the logged-in user:
-
-```tsx
-function App() {
-  const user = globalThis.PIM?.user;
-
-  return (
-    <div style={{ padding: '16px' }}>
-      {user && <p>Hello, {user.first_name}!</p>}
-    </div>
-  );
-}
-
-export default App;
-```
+**`src/App.tsx`** — write the hello world using `reference.md §8.7`.
 
 ---
 
