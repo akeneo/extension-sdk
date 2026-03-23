@@ -37,11 +37,9 @@ try {
 }
 ```
 
-### Claude Code Plugin _(Beta)_
+### Claude Code Plugin
 
 This repository includes a **Claude Code plugin** (`akeneo-custom-component`) that helps you build and deploy Akeneo Custom Components directly from your Claude Code session. It provides an awareness skill that triggers automatically when Custom Components are mentioned, and a guided setup skill (`/akeneo-cc-setup`) that scaffolds, builds, and deploys a component step by step.
-
-> **Note:** This plugin is currently in beta. Expect rough edges and breaking changes.
 
 #### Installation
 
