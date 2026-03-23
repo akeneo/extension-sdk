@@ -190,6 +190,10 @@ Also cover the constraints from §2:
 
 ## Step 6 — Ask what to build (or use captured intent)
 
+**Do NOT use subagents (Agent tool, Plan agent, or any other agent) during this step.** All project context — files just created, SDK types, build config — is already in this conversation. Delegating to a subagent loses that context and forces a full re-read of the project. Plan and implement everything inline in this conversation.
+
+**Do NOT read `src/global.d.ts` as a whole.** All commonly needed types are in `reference.md §14`. If you need a type not covered there, search for it with a targeted Grep — e.g., `grep -A 20 "interface Attribute "` — rather than reading the file broadly.
+
 **If `[USER_INTENT]` is set**, do not ask — open with:
 
 > "Now that the SDK is clear, let's implement what you described: [USER_INTENT]. Here's my approach: [brief explanation of the relevant API calls and logic]. Does that match what you had in mind, or would you like to adjust anything?"

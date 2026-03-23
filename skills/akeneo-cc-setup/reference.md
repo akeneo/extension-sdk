@@ -583,7 +583,6 @@ PIM_PASSWORD=your_password
 # OR (alternative authentication)
 APP_TOKEN=your_app_token
 
-API_TOKEN=               # filled in automatically after token fetch
 EXTENSION_UUID=          # filled in automatically after first upload
 ```
 
@@ -742,6 +741,85 @@ The full TypeScript type definitions for the PIM SDK are available at:
 
 ```
 https://github.com/akeneo/extension-sdk/blob/main/examples/common/global.d.ts
+```
+
+**Do not read `src/global.d.ts` as a whole.** Commonly needed types are in §14 below. For anything not covered there, use a targeted Grep — e.g., `grep -A 20 "interface Attribute "` on `src/global.d.ts` — rather than reading the file broadly.
+
+---
+
+## 14. Key Response Type Shapes
+
+These are the most commonly used TypeScript interfaces from `global.d.ts`, reproduced here to avoid reading that file during implementation.
+
+### Product (`product_uuid_v1.get`)
+
+```typescript
+// Parameters
+interface ProductGetParams {
+  uuid: string;
+  withCompletenesses?: boolean;
+  withAssetShareLinks?: boolean;
+}
+
+// Response
+interface Product {
+  uuid: string;
+  identifier?: string;
+  enabled?: boolean;
+  family?: string | null;
+  categories?: string[];
+  groups?: string[];
+  parent?: string | null;
+  values?: ProductValues;
+  associations?: ProductAssociations;
+  quantifiedAssociations?: ProductQuantifiedAssociations;
+  completenesses?: Completeness[];
+  created?: string;
+  updated?: string;
+  metadata?: { workflow_status?: string };
+}
+
+// Attribute values — keyed by attribute code
+interface ProductValues {
+  [attributeCode: string]: Array<{
+    locale?: string;
+    scope?: string;
+    data: any;
+    linked_data?: any;
+  }>;
+}
+```
+
+### Family (`family_v1.get`)
+
+```typescript
+// Parameters
+interface FamilyGetParams {
+  code: string;
+}
+
+// Response
+interface Family {
+  code: string;
+  labels?: { [locale: string]: string };
+  attributes?: string[];           // array of attribute codes
+  attributeAsLabel?: string;
+  attributeAsImage?: string;
+  attributeRequirements?: { [channelCode: string]: string[] };
+}
+```
+
+> **Note:** `Family.attributes` is a flat `string[]` of attribute codes — there is no separate `FamilyAttribute` type. To get the full attribute definition (type, labels, etc.), call `PIM.api.attribute_v1.get({ code })` separately.
+
+### Casting response payloads
+
+API responses are SES-proxied. Cast through `unknown` to avoid `TS2352`:
+
+```typescript
+const product = (await PIM.api.product_uuid_v1.get({ uuid })) as unknown as Product;
+const family = (await PIM.api.family_v1.get({ code: product.family! })) as unknown as Family;
+const attributeCodes: string[] = family.attributes ?? [];
+const values: ProductValues = product.values ?? {};
 ```
 
 This file contains all types for `PIM_SDK`, `PIM_USER`, `PIM_CONTEXT`, and all API parameter/response types. Download it into the project (e.g. `src/global.d.ts`) and add it to `tsconfig.app.json`:
