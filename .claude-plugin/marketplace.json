@@ -10,8 +10,8 @@
         "source": "github",
         "repo": "akeneo/extension-sdk"
       },
-      "description": "[BETA] Guides you through building and deploying Akeneo Custom Components — from scaffolding to live deployment.",
-      "version": "1.0.0-beta"
+      "description": "Guides you through building and deploying Akeneo Custom Components — from scaffolding to live deployment.",
+      "version": "1.0.0"
     }
   ]
 }

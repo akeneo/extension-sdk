@@ -44,15 +44,11 @@ This rule holds for the entire session, including debugging steps.
 
   ```
   PIM_HOST=https://your-pim-instance.cloud.akeneo.com
-  # Connection credentials (if using a PIM Connection):
   CLIENT_ID=
   CLIENT_SECRET=
   PIM_USERNAME=
   PIM_PASSWORD=
-  # App token (if using a custom App — use instead of the four fields above):
-  APP_TOKEN=
-  # Filled in automatically after token fetch / first upload:
-  API_TOKEN=
+  # Filled in automatically after first upload:
   EXTENSION_UUID=
   ```
 
@@ -79,29 +75,19 @@ source .env
 # Strip trailing slash defensively
 PIM_HOST="${PIM_HOST%/}"
 
-# Determine API token — three branches in priority order:
-# 1. Reuse API_TOKEN if already set (avoids unnecessary token fetch)
-# 2. Use APP_TOKEN directly if set
-# 3. Fetch a new token via Connection credentials
-if [ -n "${API_TOKEN:-}" ]; then
-  : # reuse existing token
-elif [ -n "${APP_TOKEN:-}" ]; then
-  API_TOKEN="$APP_TOKEN"
-else
-  echo "Fetching API token..."
-  response=$(curl -s -X POST "$PIM_HOST/api/oauth/v1/token" \
-    -H "Content-Type: application/json" \
-    -u "$CLIENT_ID:$CLIENT_SECRET" \
-    -d "{\"grant_type\":\"password\",\"username\":\"$PIM_USERNAME\",\"password\":\"$PIM_PASSWORD\"}")
-  API_TOKEN=$(echo "$response" | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p' || true)
-  if [ -z "$API_TOKEN" ]; then
-    echo "ERROR: Failed to fetch API token. PIM response: $response"
-    exit 1
-  fi
-  sed -i.bak "s|^API_TOKEN=.*|API_TOKEN=$API_TOKEN|" .env && rm -f .env.bak
+# Step 1 — Fetch a fresh API token
+echo "Fetching API token..."
+token_response=$(curl -s -X POST "$PIM_HOST/api/oauth/v1/token" \
+  -H "Content-Type: application/json" \
+  -u "$CLIENT_ID:$CLIENT_SECRET" \
+  -d "{\"grant_type\":\"password\",\"username\":\"$PIM_USERNAME\",\"password\":\"$PIM_PASSWORD\"}")
+API_TOKEN=$(echo "$token_response" | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p' || true)
+if [ -z "$API_TOKEN" ]; then
+  echo "ERROR: Failed to fetch API token. PIM response: $token_response"
+  exit 1
 fi
 
-# Upload or update
+# Step 2 — Upload or update
 if [ -z "${EXTENSION_UUID:-}" ]; then
   echo "Creating extension..."
   result=$(curl -s -X POST "$PIM_HOST/api/rest/v1/ui-extensions" \
@@ -127,6 +113,10 @@ else
     -F "position=[position]" \
     -F "file=@dist/[name].js" \
     -F "configuration[default_label]=[default_label]")
+  if echo "$result" | grep -q '"code":[45]'; then
+    echo "ERROR: Update failed. PIM response: $result"
+    exit 1
+  fi
   echo "SUCCESS: Extension updated. UUID=$EXTENSION_UUID"
 fi
 ```
@@ -164,7 +154,7 @@ On success, the UUID is saved to `.env` automatically by `upload.sh`. Confirm to
 
 ## Updating the extension later
 
-The user runs `make upload` again. `upload.sh` detects the existing `EXTENSION_UUID` in `.env` and issues an update instead of a create. If the API token has expired, clear `API_TOKEN=` in `.env` and re-run — the script will fetch a fresh one automatically (Connection auth). For App token auth, update `APP_TOKEN` in `.env` manually.
+The user runs `make upload` again. `upload.sh` fetches a fresh token on every run, then detects the existing `EXTENSION_UUID` in `.env` and issues an update instead of a create.
 
 ---
 

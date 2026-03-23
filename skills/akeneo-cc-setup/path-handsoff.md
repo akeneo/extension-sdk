@@ -122,6 +122,10 @@ Wait for their answer before proceeding.
 
 ## Step 6 — Build it
 
+**Do NOT use subagents (Agent tool, Plan agent, or any other agent) during this step.** All project context — files just created, SDK types, build config — is already in this conversation. Delegating to a subagent loses that context and forces a full re-read of the project. Plan and implement everything inline in this conversation.
+
+**Do NOT read `src/global.d.ts` as a whole.** All commonly needed types are in `reference.md §14`. If you need a type not covered there, search for it with a targeted Grep — e.g., `grep -A 20 "interface Attribute "` — rather than reading the file broadly.
+
 Implement the requested functionality. Use §3 and §4 from reference.md for the SDK surface available at the chosen position. Build what the user asked for — no unnecessary explanation.
 
 **File structure:** if the implementation is non-trivial, split it across files rather than putting everything in `App.tsx`. For example: `src/api.ts` for PIM API calls, `src/components/` for sub-components, `src/App.tsx` as the thin root. Smaller files generate faster and can be written in parallel.
