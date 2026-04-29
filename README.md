@@ -48,6 +48,8 @@ This repository includes a **Claude Code plugin** (`akeneo-custom-component`) th
 /plugin install akeneo-custom-component@akeneo-custom-component
 ```
 
+> ⚠️ **Warning:** Before installing the plugin, make sure you have a GitHub SSH key configured on your machine. Without it, the plugin installation may fail. You can follow the [GitHub documentation on generating and adding an SSH key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh) if you haven't done so already.
+
 ## Further Documentation
 
 For more detailed information about the Akeneo PIM API, please refer to the official [Akeneo API documentation](https://api.akeneo.com/).
