@@ -1,0 +1,13 @@
+{
+  "position": "pim.activity.navigation.tab",
+  "name": "sdk_script_extension_endpoint_tester",
+  "type": "sdk_script",
+  "file": "dist/endpoint_tester.js",
+  "configuration": {
+    "default_label": "Endpoint Tester",
+    "labels": {
+      "en_US": "Endpoint Tester"
+    }
+  },
+  "credentials": []
+}

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -o \".\\\\{0,50\\\\}font-family.\\\\{0,50\\\\}\" /home/julien-verbrugge/Projects/extension-sdk/examples/quickstart/dist/quickstart.js)",
+      "Bash(grep *)"
+    ]
+  }
+}
