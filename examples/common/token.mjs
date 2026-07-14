@@ -12,7 +12,6 @@
  * 6. The new token, refresh token, and creation timestamp are saved to the .env file for subsequent uses.
  */
 
-import { execSync } from 'child_process';
 import dotenv from 'dotenv';
 import { updateEnvVar } from './utils.mjs';
 
@@ -21,7 +20,7 @@ import { updateEnvVar } from './utils.mjs';
 
   const clientId = process.env.CLIENT_ID;
   const clientSecret = process.env.CLIENT_SECRET;
-  const username = process.env.USERNAME;
+  const username = process.env.PIM_USERNAME;
   const password = process.env.PASSWORD;
   const pimHost = process.env.PIM_HOST;
   const apiToken = process.env.API_TOKEN;
@@ -37,7 +36,7 @@ import { updateEnvVar } from './utils.mjs';
   }
 
   if (!clientId || !clientSecret || !username || !password || !pimHost) {
-    console.error('Error: Please define CLIENT_ID, CLIENT_SECRET, USERNAME, PASSWORD and PIM_HOST in the .env file');
+    console.error('Error: Please define CLIENT_ID, CLIENT_SECRET, PIM_USERNAME, PASSWORD and PIM_HOST in the .env file');
     process.exit(1);
   }
 
@@ -50,43 +49,33 @@ import { updateEnvVar } from './utils.mjs';
     return Math.floor(Date.now() / 1000) - parseInt(tokenCreatedAt, 10) < 3600;
   };
 
-  const getNewToken = () => {
+  const postToken = async (body) => {
+    const response = await fetch(`${pimHost}/api/oauth/v1/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${base64Auth}`,
+      },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+    }
+    return response.json();
+  };
+
+  const getNewToken = async () => {
     try {
-      const response = execSync(
-        `curl -s -X POST "${pimHost}/api/oauth/v1/token" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Basic ${base64Auth}" \
-        -d '{
-            "grant_type": "password",
-            "username": "${username}",
-            "password": "${password}"
-        }'`,
-        { encoding: 'utf8' }
-      );
-      const jsonStart = response.indexOf('{');
-      const jsonResponse = response.substring(jsonStart);
-      return JSON.parse(jsonResponse);
+      return await postToken({ grant_type: 'password', username, password });
     } catch (error) {
       console.error('Error retrieving a new token:', error);
       process.exit(1);
     }
   };
 
-  const refreshExistingToken = (refreshTokenValue) => {
+  const refreshExistingToken = async (refreshTokenValue) => {
     try {
-      const response = execSync(
-        `curl -s -X POST "${pimHost}/api/oauth/v1/token" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Basic ${base64Auth}" \
-        -d '{
-            "refresh_token": "${refreshTokenValue}",
-            "grant_type": "refresh_token"
-        }'`,
-        { encoding: 'utf8' }
-      );
-      const jsonStart = response.indexOf('{');
-      const jsonResponse = response.substring(jsonStart);
-      return JSON.parse(jsonResponse);
+      return await postToken({ grant_type: 'refresh_token', refresh_token: refreshTokenValue });
     } catch (error) {
       console.error('Error refreshing token:', error);
       console.error('Refresh token failed, getting a new token...');
@@ -103,10 +92,10 @@ import { updateEnvVar } from './utils.mjs';
   let token;
   if (refreshToken) {
     console.log('Refreshing token...');
-    token = refreshExistingToken(refreshToken);
+    token = await refreshExistingToken(refreshToken);
   } else {
     console.log('Getting new token...');
-    token = getNewToken();
+    token = await getNewToken();
   }
   const currentTime = Math.floor(Date.now() / 1000);
   updateEnvVar('API_TOKEN', token.access_token);

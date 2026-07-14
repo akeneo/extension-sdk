@@ -30,8 +30,8 @@ start:
 		node ../common/set-env.mjs CLIENT_ID $$client_id; \
 		read -p "Enter your CLIENT_SECRET: " client_secret && \
 		node ../common/set-env.mjs CLIENT_SECRET $$client_secret; \
-		read -p "Enter your USERNAME: " username && \
-		node ../common/set-env.mjs USERNAME $$username; \
+		read -p "Enter your PIM USERNAME: " username && \
+		node ../common/set-env.mjs PIM_USERNAME $$username; \
 		read -p "Enter your PASSWORD: " password && \
 		node ../common/set-env.mjs PASSWORD $$password; \
 		echo "\nGenerating API token..."; \

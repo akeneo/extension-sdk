@@ -37,6 +37,19 @@ try {
 }
 ```
 
+### Claude Code Plugin
+
+This repository includes a **Claude Code plugin** (`akeneo-custom-component`) that helps you build and deploy Akeneo Custom Components directly from your Claude Code session. It provides an awareness skill that triggers automatically when Custom Components are mentioned, and a guided setup skill (`/akeneo-cc-setup`) that scaffolds, builds, and deploys a component step by step.
+
+#### Installation
+
+```
+/plugin marketplace add akeneo/extension-sdk
+/plugin install akeneo-custom-component@akeneo-custom-component
+```
+
+> ⚠️ **Warning:** Before installing the plugin, make sure you have a GitHub SSH key configured on your machine. Without it, the plugin installation may fail. You can follow the [GitHub documentation on generating and adding an SSH key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh) if you haven't done so already.
+
 ## Further Documentation
 
 For more detailed information about the Akeneo PIM API, please refer to the official [Akeneo API documentation](https://api.akeneo.com/).
