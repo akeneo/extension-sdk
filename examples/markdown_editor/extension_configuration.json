@@ -1,0 +1,17 @@
+{
+  "name": "markdown_editor",
+  "type": "sdk_script",
+  "position": "pim.product.panel",
+  "file": "dist/markdown_editor.js",
+  "configuration": {
+    "default_label": "Markdown Editor",
+    "labels": {
+      "en_US": "Markdown Editor"
+    },
+    "custom_variables": {
+      "markdown_attribute_code": "description",
+      "hide_mode_switch": "false",
+      "toolbar_items": "heading,bold|ul,ol"
+    }
+  }
+}

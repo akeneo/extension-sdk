@@ -1,0 +1,26 @@
+{
+  "name": "markdown-editor",
+  "description": "WYSIWYG markdown editor panel for a textarea attribute, powered by ToastUI Editor",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@toast-ui/react-editor": "^3.2.3",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.2",
+    "@vitejs/plugin-react": "^4.3.1",
+    "terser": "^5.44.1",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.0",
+    "vite-plugin-css-injected-by-js": "^3.5.0"
+  }
+}
