@@ -27,13 +27,17 @@ const Value = styled.dd`
     color: ${getColor('grey', 140)};
 `;
 
+const Row = styled.div`
+    display: contents;
+`;
+
 const DetailList = ({details}: {details: Detail[]}) => (
     <List>
         {details.map(({label, value}) => (
-            <div key={label} style={{display: 'contents'}}>
+            <Row key={label}>
                 <Label>{label}</Label>
                 <Value>{value}</Value>
-            </div>
+            </Row>
         ))}
     </List>
 );

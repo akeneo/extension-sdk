@@ -2,6 +2,8 @@ import {Table} from 'akeneo-design-system';
 import type {Subscription} from '../types';
 import SubscriptionRow from './SubscriptionRow';
 
+const COLUMNS = ['', 'Type', 'Source', 'Events', 'Status', 'Recent errors', 'Updated'];
+
 type SubscriptionTableProps = {
     subscriptions: Subscription[];
     recentErrorCounts: Record<string, number>;
@@ -15,13 +17,9 @@ const SubscriptionTable = ({subscriptions, recentErrorCounts}: SubscriptionTable
     return (
         <Table>
             <Table.Header>
-                <Table.HeaderCell>{''}</Table.HeaderCell>
-                <Table.HeaderCell>Type</Table.HeaderCell>
-                <Table.HeaderCell>Source</Table.HeaderCell>
-                <Table.HeaderCell>Events</Table.HeaderCell>
-                <Table.HeaderCell>Status</Table.HeaderCell>
-                <Table.HeaderCell>Recent errors</Table.HeaderCell>
-                <Table.HeaderCell>Updated</Table.HeaderCell>
+                {COLUMNS.map(column => (
+                    <Table.HeaderCell key={column}>{column}</Table.HeaderCell>
+                ))}
             </Table.Header>
             <Table.Body>
                 {subscriptions.map(subscription => (
@@ -29,6 +27,7 @@ const SubscriptionTable = ({subscriptions, recentErrorCounts}: SubscriptionTable
                         key={subscription.id}
                         subscription={subscription}
                         recentErrorCount={recentErrorCounts[subscription.id] ?? 0}
+                        columnCount={COLUMNS.length}
                     />
                 ))}
             </Table.Body>

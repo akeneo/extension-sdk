@@ -25,9 +25,7 @@ export type Subscription = {
     updated_at: string;
     filter?: string;
     send_product_identifier: boolean;
-    options?: {
-        send_product_identifier_in_changes: boolean;
-    };
+    options?: Record<string, unknown>;
 };
 
 export type SelfServiceLog = {

@@ -7,7 +7,7 @@ Read-only. Renders under **Activity > Event Platform**.
 
 ## Before anything else
 
-This example authenticates with an **OAuth2** credential. Open System > Extensions > Create and
+This example authenticates with an **OAuth2** credential. Open System > Extensions > Create a custom component and
 check that the Type of Authentication dropdown offers OAuth2. If it does not, the credential type
 is not enabled on your PIM and the authentication path used here cannot be configured; contact
 Akeneo support.
@@ -28,7 +28,7 @@ Output: `dist/event_platform_dashboard.js`, a single self-contained ES module.
 
 ## Install
 
-System > Extensions > Create.
+System > Extensions > Create a custom component.
 
 | Field | Value |
 | --- | --- |
@@ -63,12 +63,7 @@ without the `Bearer` prefix, which is what Event Platform expects.
     {
       "label": "ERP",
       "client_id": "<client id of the ERP connection>",
-      "credentials_code": "erp_connection"
-    },
-    {
-      "label": "Translation app",
-      "client_id": "<client id of the translation connection>",
-      "credentials_code": "translation_connection"
+      "credentials_code": "event_platform_connection"
     }
   ]
 }
@@ -96,7 +91,9 @@ The older flat form is still accepted for a single connection:
 Event Platform calls the PIM back on `/api/rest/v1/token-info` to verify that the token really
 belongs to that client id on that PIM.
 
-`extension_configuration.json` holds the same values as a template for an API-based deployment.
+`extension_configuration.json` is a template. `make create-with-credentials` deploys the file, the
+labels and the credentials; the custom variables are not sent by the API script, so you fill them in
+the PIM UI.
 
 ## How the call works
 
@@ -115,6 +112,10 @@ connection" is the native behaviour of the endpoint. The component does no filte
 - The connection selector is a credential picker, not a security boundary. Anyone who can see the
   extension can select any connection declared in it. To restrict per connection, create one
   extension per connection and scope it with `userGroup` or `userEmails`.
+- Every error table asks the Event Platform for the 50 most recent errors, set by
+  `ERROR_LOG_LIMIT` in `src/eventPlatformClient.ts`. Nothing older is shown. Raise it if you need a
+  longer history: the API accepts a larger `limit`, but a bigger page means a slower answer, and the
+  external call times out at 5 seconds.
 - No token cache in the PIM: every call re-runs the OAuth2 round trip.
 - 60 external calls per minute per extension. This component makes `1 + number of subscribers`
   calls per load, plus one per subscription expanded.

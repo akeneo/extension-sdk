@@ -24,27 +24,33 @@ const labelFor = (
     return 'Not created';
 };
 
+const columnsFor = (showSubscription: boolean): string[] => [
+    '',
+    'When',
+    ...(showSubscription ? ['Subscription'] : []),
+    'Type',
+    'Reason',
+    'Code',
+    'Message',
+];
+
 const ErrorLogTable = ({logs, subscriptionLabels, subscriberNames = {}}: ErrorLogTableProps) => {
     const showSubscription = subscriptionLabels !== undefined;
-    const columnCount = showSubscription ? 7 : 6;
+    const columns = columnsFor(showSubscription);
 
     return (
         <Table>
             <Table.Header>
-                <Table.HeaderCell>{''}</Table.HeaderCell>
-                <Table.HeaderCell>When</Table.HeaderCell>
-                {showSubscription && <Table.HeaderCell>Subscription</Table.HeaderCell>}
-                <Table.HeaderCell>Type</Table.HeaderCell>
-                <Table.HeaderCell>Reason</Table.HeaderCell>
-                <Table.HeaderCell>Code</Table.HeaderCell>
-                <Table.HeaderCell>Message</Table.HeaderCell>
+                {columns.map(column => (
+                    <Table.HeaderCell key={column}>{column}</Table.HeaderCell>
+                ))}
             </Table.Header>
             <Table.Body>
                 {logs.map(log => (
                     <ErrorLogRow
                         key={log.log_id}
                         log={log}
-                        columnCount={columnCount}
+                        columnCount={columns.length}
                         subscriptionLabel={
                             subscriptionLabels === undefined ? undefined : labelFor(log, subscriptionLabels, subscriberNames)
                         }

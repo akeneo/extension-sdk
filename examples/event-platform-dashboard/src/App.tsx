@@ -1,4 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
+import styled from 'styled-components';
+import {getColor} from 'akeneo-design-system';
 import {readConfiguration, targetFor, type Connection} from './configuration';
 import {ApiTargetProvider} from './ConfigurationContext';
 import {fetchErrorLogs, fetchSubscribers, fetchSubscriptions} from './eventPlatformClient';
@@ -13,6 +15,19 @@ type SubscriberState =
     | {status: 'loading'}
     | {status: 'loaded'; subscribers: SubscriberWithSubscriptions[]}
     | {status: 'failed'; reason: string};
+
+const Page = styled.div`
+    padding: 20px;
+`;
+
+const ProblemList = styled.ul`
+    margin-top: 8px;
+    padding-left: 20px;
+`;
+
+const LoadingMessage = styled.p`
+    color: ${getColor('grey', 120)};
+`;
 
 const reasonOf = (error: unknown): string => (error instanceof Error ? error.message : 'Unknown error.');
 
@@ -125,10 +140,10 @@ const App = () => {
 
     if (configuration === null || target === null || selectedConnection === null) {
         return (
-            <div style={{padding: '20px'}}>
+            <Page>
                 <Message level="error" title="This extension is not configured yet.">
                     <p>Fix the following custom variables, then reload the page:</p>
-                    <ul style={{marginTop: '8px', paddingLeft: '20px'}}>
+                    <ProblemList>
                         {(configurationResult.status === 'incomplete' ? configurationResult.problems : []).map(
                             problem => (
                                 <li key={problem}>
@@ -136,15 +151,15 @@ const App = () => {
                                 </li>
                             ),
                         )}
-                    </ul>
+                    </ProblemList>
                 </Message>
-            </div>
+            </Page>
         );
     }
 
     return (
         <ApiTargetProvider value={target}>
-            <div style={{padding: '20px'}}>
+            <Page>
                 <ConnectionSelector
                     connections={configuration.connections}
                     selected={selectedConnection}
@@ -167,7 +182,7 @@ const App = () => {
                 </Panel>
 
                 {subscriberState.status === 'loading' && (
-                    <p style={{color: '#67768a'}}>Loading your Event Platform subscriptions...</p>
+                    <LoadingMessage>Loading your Event Platform subscriptions...</LoadingMessage>
                 )}
 
                 {subscriberState.status === 'failed' && (
@@ -191,7 +206,7 @@ const App = () => {
                             recentErrorCounts={recentErrorCounts}
                         />
                     ))}
-            </div>
+            </Page>
         </ApiTargetProvider>
     );
 };

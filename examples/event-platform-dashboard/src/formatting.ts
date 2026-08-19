@@ -13,3 +13,12 @@ export const formatDateTime = (value: string): string => {
 };
 
 export const formatBoolean = (value: boolean): string => (value ? 'Yes' : 'No');
+
+export const formatFieldName = (name: string): string => {
+    const words = name.replace(/_/g, ' ');
+
+    return words.charAt(0).toUpperCase() + words.slice(1);
+};
+
+export const formatUnknown = (value: unknown): string =>
+    typeof value === 'boolean' ? formatBoolean(value) : String(value);

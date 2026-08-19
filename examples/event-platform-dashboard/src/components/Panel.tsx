@@ -1,5 +1,10 @@
 import type {ReactNode} from 'react';
+import styled from 'styled-components';
 import {SectionTitle} from 'akeneo-design-system';
+
+const Section = styled.section`
+    margin-bottom: 30px;
+`;
 
 type PanelProps = {
     title: string;
@@ -8,7 +13,7 @@ type PanelProps = {
 };
 
 const Panel = ({title, aside, children}: PanelProps) => (
-    <section style={{marginBottom: '30px'}}>
+    <Section>
         <SectionTitle>
             <SectionTitle.Title>{title}</SectionTitle.Title>
             {aside !== undefined && (
@@ -19,7 +24,7 @@ const Panel = ({title, aside, children}: PanelProps) => (
             )}
         </SectionTitle>
         {children}
-    </section>
+    </Section>
 );
 
 export default Panel;

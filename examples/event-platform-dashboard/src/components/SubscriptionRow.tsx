@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Table} from 'akeneo-design-system';
 import type {Subscription} from '../types';
-import {formatBoolean, formatDateTime} from '../formatting';
+import {formatBoolean, formatDateTime, formatFieldName, formatUnknown} from '../formatting';
 import {useSubscriptionErrors} from '../useSubscriptionErrors';
 import DetailList, {type Detail} from './DetailList';
 import ErrorCountBadge from './ErrorCountBadge';
@@ -10,11 +10,10 @@ import ExpandedCell from './ExpandedCell';
 import StatusBadge from './StatusBadge';
 import SubscriptionErrors from './SubscriptionErrors';
 
-const COLUMN_COUNT = 7;
-
 type SubscriptionRowProps = {
     subscription: Subscription;
     recentErrorCount: number;
+    columnCount: number;
 };
 
 const destinationOf = (subscription: Subscription): string => {
@@ -36,12 +35,9 @@ const detailsOf = (subscription: Subscription): Detail[] => {
         {label: 'Product identifier', value: formatBoolean(subscription.send_product_identifier)},
     ];
 
-    if (subscription.options !== undefined) {
-        details.push({
-            label: 'Identifier in changes',
-            value: formatBoolean(subscription.options.send_product_identifier_in_changes),
-        });
-    }
+    Object.entries(subscription.options ?? {}).forEach(([option, value]) => {
+        details.push({label: formatFieldName(option), value: formatUnknown(value)});
+    });
 
     details.push(
         {label: 'Created', value: formatDateTime(subscription.created_at)},
@@ -51,7 +47,7 @@ const detailsOf = (subscription: Subscription): Detail[] => {
     return details;
 };
 
-const SubscriptionRow = ({subscription, recentErrorCount}: SubscriptionRowProps) => {
+const SubscriptionRow = ({subscription, recentErrorCount, columnCount}: SubscriptionRowProps) => {
     const [expanded, setExpanded] = useState(false);
     const [firstEvent, ...otherEvents] = subscription.events;
     const errorsState = useSubscriptionErrors(subscription.id, expanded);
@@ -80,7 +76,7 @@ const SubscriptionRow = ({subscription, recentErrorCount}: SubscriptionRowProps)
             </Table.Row>
             {expanded && (
                 <Table.Row>
-                    <ExpandedCell columnCount={COLUMN_COUNT}>
+                    <ExpandedCell columnCount={columnCount}>
                         <DetailList details={detailsOf(subscription)} />
                         <SubscriptionErrors state={errorsState} />
                     </ExpandedCell>

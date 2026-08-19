@@ -39,6 +39,8 @@ export const useSubscriptionErrors = (subscriptionId: string, enabled: boolean):
                 }
             })
             .catch(error => {
+                requestedKey.current = null;
+
                 if (mounted.current) {
                     setState({
                         status: 'failed',
