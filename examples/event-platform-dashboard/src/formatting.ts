@@ -1,0 +1,24 @@
+const pad = (value: number): string => String(value).padStart(2, '0');
+
+export const formatDateTime = (value: string): string => {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    const day = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+    return `${day} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
+export const formatBoolean = (value: boolean): string => (value ? 'Yes' : 'No');
+
+export const formatFieldName = (name: string): string => {
+    const words = name.replace(/_/g, ' ');
+
+    return words.charAt(0).toUpperCase() + words.slice(1);
+};
+
+export const formatUnknown = (value: unknown): string =>
+    typeof value === 'boolean' ? formatBoolean(value) : String(value);

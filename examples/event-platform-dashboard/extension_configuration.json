@@ -1,0 +1,39 @@
+{
+  "name": "event_platform_dashboard",
+  "type": "sdk_script",
+  "position": "pim.activity.navigation.tab",
+  "file": "dist/event_platform_dashboard.js",
+  "configuration": {
+    "default_label": "Event Platform",
+    "labels": {
+      "en_US": "Event Platform",
+      "fr_FR": "Event Platform"
+    },
+    "custom_variables": {
+      "event_platform_url": "https://event.prd.sdk.akeneo.cloud",
+      "pim_url": "https://REPLACE_WITH_YOUR_PIM.cloud.akeneo.com",
+      "connections": [
+        {
+          "label": "REPLACE_WITH_A_READABLE_NAME",
+          "client_id": "REPLACE_WITH_THE_CONNECTION_CLIENT_ID",
+          "credentials_code": "event_platform_connection"
+        }
+      ]
+    }
+  },
+  "credentials": [
+    {
+      "code": "event_platform_connection",
+      "type": "OAuth2",
+      "value": {
+        "grant_type": "password_grant",
+        "token_url": "https://REPLACE_WITH_YOUR_PIM.cloud.akeneo.com/api/oauth/v1/token",
+        "client_id": "REPLACE_WITH_THE_CONNECTION_CLIENT_ID",
+        "client_secret": "REPLACE_WITH_THE_CONNECTION_SECRET",
+        "username": "REPLACE_WITH_THE_CONNECTION_USERNAME",
+        "password": "REPLACE_WITH_THE_CONNECTION_PASSWORD",
+        "header_name": "X-PIM-TOKEN"
+      }
+    }
+  ]
+}
